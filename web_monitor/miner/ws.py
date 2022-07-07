@@ -4,7 +4,7 @@ import datetime
 import websockets.exceptions
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 
-from miner_interface.miners.miner_factory import MinerFactory
+from pyasic.miners.miner_factory import MinerFactory
 from web_monitor._settings.func import (  # noqa - Ignore access to _module
     get_current_settings,
 )
