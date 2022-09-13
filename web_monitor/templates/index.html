@@ -1,7 +1,7 @@
 {% extends 'navbar.html'%}
 {% block content %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/luxon@2.3.1/build/global/luxon.min.js"></script>
+<script src="{{ url_for('static', path='/chart.js')}}"></script>
+<script src="{{ url_for('static', path='/luxon.min.js')}}"></script>
 <canvas id="line-chart" class="grad-border mt-3 mb-4" width="600" height="360"></canvas>
 {% if cur_miners|length == 0 %}<a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info">Click here to add miners.</a>{% endif %}
 
@@ -10,7 +10,7 @@
 
 <script>
 if (!window.WebSocket) alert("WebSocket not supported by this browser");
-var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.port %}{{request.url.port}}{% else %}80{% endif %}/dashboard/ws");
+var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/dashboard/ws");
 let all_data = []
 let all_labels = []
 ws.onmessage = function(event) {

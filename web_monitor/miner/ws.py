@@ -39,16 +39,21 @@ async def miner_websocket(websocket: WebSocket, miner_ip):
                     "temp": data.temperature_avg,
                     "datetime": datetime.datetime.now().isoformat(),
                     "model": data.model,
+                    "efficiency": data.efficiency,
+                    "wattage": data.wattage,
+                    "errors": [
+                        err.error_message for err in data.errors
+                    ]
                 }
                 await websocket.send_json(data)
                 await asyncio.sleep(settings["graph_data_sleep_time"])
             except asyncio.exceptions.TimeoutError:
-                data = {"error": "The miner is not responding."}
+                data = {"errors": ["The miner is not responding."]}
                 await websocket.send_json(data)
                 await asyncio.sleep(0.5)
             except KeyError as e:
                 print(e)
-                data = {"error": "The miner returned unusable/unsupported data."}
+                data = {"errors": ["The miner returned unusable/unsupported data."]}
                 await websocket.send_json(data)
                 await asyncio.sleep(0.5)
     except WebSocketDisconnect:

@@ -7,7 +7,7 @@ from .ws import router as ws_router
 
 import os
 
-dir_path = "\\".join(os.path.dirname(os.path.realpath(__file__)).split("\\")[:-1])
+dir_path = "\\".join(os.path.dirname(os.path.realpath(__file__)).split("\\")[:-2])
 
 router = APIRouter()
 router.include_router(ws_router)
@@ -15,6 +15,7 @@ router.include_router(ws_router)
 
 @router.get("/")
 def scan(request: Request):
+    print(request.url.port)
     return templates.TemplateResponse(
         "scan.html", {"request": request, "cur_miners": get_current_miner_list()}
     )
