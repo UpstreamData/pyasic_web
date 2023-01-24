@@ -4,11 +4,11 @@ import datetime
 import websockets.exceptions
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 
-from web_monitor.func import get_current_miner_list
-from web_monitor._settings.func import (  # noqa - Ignore access to _module
+from pyasic_web.func import get_current_miner_list
+from pyasic_web._settings.func import (  # noqa - Ignore access to _module
     get_current_settings,
 )
-from web_monitor.dashboard.func import get_miner_data_dashboard
+from pyasic_web.dashboard.func import get_miner_data_dashboard
 
 
 router = APIRouter()

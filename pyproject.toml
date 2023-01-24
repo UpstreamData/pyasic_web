@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "pyasic-web"
+version = "0.1.0"
+description = ""
+authors = ["UpstreamData <brett@upstreamdata.ca>"]
+readme = "README.md"
+packages = [{include = "pyasic_web"}]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pyasic = "*"
+websockets = "^10.4"
+uvicorn = "^0.20.0"
+fastapi = "^0.89.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

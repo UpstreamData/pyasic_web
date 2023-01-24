@@ -3,7 +3,7 @@ import asyncio
 from fastapi import WebSocket
 
 from pyasic.network import MinerNetwork
-from web_monitor.func import get_current_miner_list
+from pyasic_web.func import get_current_miner_list
 import ipaddress
 
 

@@ -1,7 +1,7 @@
 from fastapi import Request, APIRouter
 
-from web_monitor.template import templates
-from web_monitor.func import get_current_miner_list
+from pyasic_web.template import templates
+from pyasic_web.func import get_current_miner_list
 
 from .ws import router as ws_router
 

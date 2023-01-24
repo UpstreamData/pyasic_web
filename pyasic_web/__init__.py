@@ -1,4 +1,4 @@
-from web_monitor.app import app
+from pyasic_web.app import app
 import uvicorn
 
 

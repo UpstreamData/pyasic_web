@@ -5,10 +5,10 @@ from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from web_monitor.dashboard import router as dashboard_router
-from web_monitor.miner import router as miner_router
-from web_monitor.scan import router as scan_router
-from web_monitor._settings import (  # noqa - Ignore access to _module
+from pyasic_web.dashboard import router as dashboard_router
+from pyasic_web.miner import router as miner_router
+from pyasic_web.scan import router as scan_router
+from pyasic_web._settings import (  # noqa - Ignore access to _module
     router as settings_router,
 )
 

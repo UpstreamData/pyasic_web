@@ -3,7 +3,7 @@ import asyncio
 import websockets.exceptions
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 
-from web_monitor.scan.func import do_websocket_scan
+from pyasic_web.scan.func import do_websocket_scan
 
 
 router = APIRouter()

@@ -1,7 +1,7 @@
 import asyncio
 
 from pyasic.miners.miner_factory import MinerFactory
-from web_monitor._settings.func import (  # noqa - Ignore access to _module
+from pyasic_web._settings.func import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 
