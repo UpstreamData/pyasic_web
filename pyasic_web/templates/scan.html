@@ -1,5 +1,16 @@
 {% extends 'navbar.html'%}
 {% block content %}
+<nav class="navbar bg-dark" data-bs-theme="dark">
+    <div class="row d-flex justify-content-between w-100 align-content-middle">
+        <div class="col-7">
+            <h2 class="ms-3 mt-1 text-light">
+                <svg class="bi me-2 d-none d-sm-inline" width="32" height="32"><use xlink:href="#scan"></use></svg>
+                Add Miners
+            </h2>
+        </div>
+    </div>
+</nav>
+
 <div class="px-lg-4 my-2 mx-4 mx-lg-0">
 <div class="row w-100 my-4">
     <form action="" onsubmit="sendMessage(event)">

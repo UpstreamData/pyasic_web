@@ -4,8 +4,6 @@
 <script src="{{ url_for('static', path='/luxon.min.js')}}"></script>
 <canvas id="line-chart" class="grad-border mt-3 mb-4" width="600" height="360"></canvas>
 {% if cur_miners|length == 0 %}<a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info">Click here to add miners.</a>{% endif %}
-
-
 <div id="errors"></div>
 
 <script>

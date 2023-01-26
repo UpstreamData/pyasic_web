@@ -30,7 +30,7 @@ app.include_router(settings_router, tags=["settings"], prefix="/settings")
 async def remove_all_miners(request: Request):
     file = open("miner_list.txt", "w")
     file.close()
-    return RedirectResponse(request.url_for("settings"))
+    return RedirectResponse(request.url_for("dashboard"))
 
 
 if __name__ == "__main__":

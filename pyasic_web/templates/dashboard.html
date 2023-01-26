@@ -1,4 +1,97 @@
 {% extends 'navbar.html'%}
 {% block content %}
+<nav class="navbar bg-dark" data-bs-theme="dark">
+    <div class="row d-flex justify-content-between w-100 align-content-middle">
+        <div class="col-7">
+            <h2 class="ms-3 mt-1 text-light">
+                <svg class="bi me-2 d-none d-sm-inline" width="32" height="32"><use xlink:href="#dashboard"></use></svg>
+                Home
+            </h2>
+        </div>
+        <div class="col d-flex justify-content-end">
+          <div class="btn-group dropstart">
+            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <svg class="m-0 p-0" style="fill: currentColor; vertical-align: -.25em;" width="20" height="22"><use xlink:href="#action"></use></svg>
+            Actions
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" target="_blank" href="http://{{miner}}" role="button">Web Interface</a></li>
+                <li><hr class="dropdown-divider"></li>
+              <li><button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#removeModal">Remove All Miners</button></li>
+            </ul>
+          </div>
+        </div>
+    </div>
+</nav>
 
+        <div class="modal fade" id="removeModal" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="removeModalLabel">Remove Miners</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Do you really want to remove all miners?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger" href="{{url_for('remove_all_miners')}}" role="button">Remove</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+<div class="px-lg-4 my-2 mx-4 mx-lg-0">
+    <div class="row">
+        <div class="col d-flex align-content-center justify-content-center">
+                <h1 class="hashrate-header" id="total_hashrate">0 TH/s</h1>
+        </div>
+    </div>
+{% if cur_miners|length == 0 %}<a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info">Click here to add miners.</a>{% endif %}
+<div id="errors"></div>
+
+<script>
+if (!window.WebSocket) alert("WebSocket not supported by this browser");
+var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/dashboard/ws");
+let all_data = []
+let all_labels = []
+ws.onmessage = function(event) {
+    var new_data = JSON.parse(event.data)
+    console.log(new_data);
+    if (!new_data["miners"].length == 0) {
+        total_hashrate = parseFloat(0)
+        errors = document.getElementById("errors")
+        for (i = 0; i< new_data["miners"].length; i++) {
+            if (new_data["miners"][i].hasOwnProperty("error")) {
+                if (!document.getElementById(new_data["miners"][i]["ip"] + "_error")) {
+                    errors.innerHTML += "<div id='" + new_data["miners"][i]["ip"] + "_error" +
+                    "' class='d-flex align-items-center p-1 mb-1 alert alert-danger'><strong class='p-0 m-0'>" +
+                    new_data["miners"][i]["ip"] + ": " +
+                    new_data["miners"][i]["error"] +
+                    "</strong><div class='spinner-border spinner-border-sm ms-auto'></div></div>"
+                }
+            } else {
+                if (document.getElementById(new_data["miners"][i]["ip"] + "_error")) {
+                    document.getElementById(new_data["miners"][i]["ip"] + "_error").remove()
+                }
+                total_hashrate += parseFloat(new_data["miners"][i]["hashrate"])
+            }
+        };
+    hr_block = document.getElementById("total_hashrate")
+    if (total_hashrate < 1) {
+        total_hashrate = parseInt(total_hashrate*1000) + " GH/s";
+    } else if (total_hashrate > 1000) {
+        total_hashrate = Number((total_hashrate/1000).toFixed(2)) + " PH/s";
+    } else {
+        total_hashrate = parseInt(total_hashrate) + " TH/s";
+    };
+    hr_block.innerHTML = total_hashrate;
+
+    // console.log(total_hashrate);
+    }
+};
+</script>
+</div>
 {% endblock content %}
