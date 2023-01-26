@@ -4,6 +4,7 @@ import datetime
 import websockets.exceptions
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 
+from pyasic.misc import Singleton
 from pyasic.miners.miner_factory import MinerFactory
 from pyasic_web._settings.func import (  # noqa - Ignore access to _module
     get_current_settings,
@@ -12,6 +13,11 @@ from pyasic_web._settings.func import (  # noqa - Ignore access to _module
 
 router = APIRouter()
 
+class SingleMinerDataManager(metaclass=Singleton):
+    def __init__(self):
+        self.cached_data = None
+
+
 
 @router.websocket("/{miner_ip}/ws")
 async def miner_websocket(websocket: WebSocket, miner_ip):
@@ -19,7 +25,9 @@ async def miner_websocket(websocket: WebSocket, miner_ip):
     settings = get_current_settings()
     miner_identify_timeout = settings["miner_identify_timeout"]
     miner_data_timeout = settings["miner_data_timeout"]
-
+    data_manager = SingleMinerDataManager()
+    if data_manager.cached_data:
+        await websocket.send_json(data_manager.cached_data)
     try:
         while True:
             try:
@@ -45,6 +53,7 @@ async def miner_websocket(websocket: WebSocket, miner_ip):
                         err.error_message for err in data.errors
                     ]
                 }
+                data_manager.cached_data = data
                 await websocket.send_json(data)
                 await asyncio.sleep(settings["graph_data_sleep_time"])
             except asyncio.exceptions.TimeoutError:

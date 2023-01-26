@@ -44,12 +44,57 @@
 
 
 <div class="px-lg-4 my-2 mx-4 mx-lg-0">
-    <div class="row">
-        <div class="col d-flex align-content-center justify-content-center">
-                <h1 class="hashrate-header" id="total_hashrate">0 TH/s</h1>
+
+    {% if not cur_miners|length == 0 %}
+    <div class="row mt-3">
+        <div class="col-sm-6 col-12 d-flex align-content-center justify-content-center">
+                <h1 class="hashrate-header" id="miner_count">Miners: {{cur_miners|length}}</h1>
+        </div>
+        <div class="col-sm-6 col-12 d-flex align-content-center justify-content-center">
+                <h1 class="hashrate-header" id="total_hashrate">Hashrate: 0 TH/s</h1>
         </div>
     </div>
-{% if cur_miners|length == 0 %}<a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info">Click here to add miners.</a>{% endif %}
+    {% endif%}
+
+    <div class="row mt-3">
+        <div class="col col-12 col-md-4 my-0 py-1">
+            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
+                <div class="mx-auto">Wattage:</div>
+                <div class="mx-auto fw-bolder" id="total_watts">0 W</div>
+            </div>
+        </div>
+        <div class="col col-12 col-md-4 my-0 py-1">
+            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
+                <div class="mx-auto">Max Wattage:</div>
+                <div class="mx-auto fw-bolder" id="total_max_watts">0 W</div>
+            </div>
+        </div>
+        <div class="col col-12 col-md-4 my-0 py-1">
+            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
+                <div class="mx-auto">Efficiency:</div>
+                <div class="mx-auto fw-bolder" id="total_efficiency">0 J/TH</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col my-3">
+            <div class="alert alert-secondary p-0">
+                                    <h6 class="px-3 pt-2 pb-1 fw-bolder">Errors:</h6>
+                <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_errors_list">
+                  <!-- <a data-bs-toggle="collapse" href="#errors_192-168-1-1" role="button" class="list-group-item list-group-item-action miner-error">192.168.1.1</a>
+                    <div class="collapse multi-collapse my-0 py-0 ms-5" id="errors_192-168-1-1">
+                        <div class ="list-group-item miner-error-item">Error_1</div>
+                        <div class ="list-group-item miner-error-item">Error_3</div>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% if cur_miners|length == 0 %}
+    <a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info">Click here to add miners.</a>
+{% endif %}
 <div id="errors"></div>
 
 <script>
@@ -62,6 +107,9 @@ ws.onmessage = function(event) {
     console.log(new_data);
     if (!new_data["miners"].length == 0) {
         total_hashrate = parseFloat(0)
+        total_watts = parseInt(0)
+        max_watts = parseInt(0)
+        errors_html = ""
         errors = document.getElementById("errors")
         for (i = 0; i< new_data["miners"].length; i++) {
             if (new_data["miners"][i].hasOwnProperty("error")) {
@@ -77,15 +125,68 @@ ws.onmessage = function(event) {
                     document.getElementById(new_data["miners"][i]["ip"] + "_error").remove()
                 }
                 total_hashrate += parseFloat(new_data["miners"][i]["hashrate"])
+                total_watts += parseFloat(new_data["miners"][i]["wattage"])
+                max_watts += parseFloat(new_data["miners"][i]["wattage_limit"])
+                if (new_data["miners"][i].hasOwnProperty("errors")) {
+                    if (new_data["miners"][i]["errors"].length > 0) {
+                        miner_id_local = new_data["miners"][i]["ip"].replaceAll(".", "-")
+                        err_loc = document.getElementById("errors_" + miner_id_local)
+                        if (err_loc) {
+                            if (err_loc.classList.contains('show')) {
+                                miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition list-group-item-action miner-error" aria-expanded="true">' + new_data["miners"][i]["ip"] + '</a>'
+                                miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5 show" id="errors_' + miner_id_local + '">'
+                                for (err in new_data["miners"][i]["errors"]) {
+                                    miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["miners"][i]["errors"][err]["error_message"] + '</div>'
+                                };
+                                miner_errs_local_html += '</div>'
+
+
+
+
+                            } else {
+                                miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition list-group-item-action miner-error">' + new_data["miners"][i]["ip"] + '</a>'
+                                miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5" id="errors_' + miner_id_local + '">'
+                                for (err in new_data["miners"][i]["errors"]) {
+                                    miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["miners"][i]["errors"][err]["error_message"] + '</div>'
+                                };
+                                miner_errs_local_html += '</div>'
+                            }
+                        } else {
+                            miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition list-group-item-action miner-error">' + new_data["miners"][i]["ip"] + '</a>'
+                            miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5" id="errors_' + miner_id_local + '">'
+                            for (err in new_data["miners"][i]["errors"]) {
+                                miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["miners"][i]["errors"][err]["error_message"] + '</div>'
+                            };
+                            miner_errs_local_html += '</div>'
+                        }
+
+                        errors_html += miner_errs_local_html
+                    };
+                }
             }
         };
     hr_block = document.getElementById("total_hashrate")
-    if (total_hashrate < 1) {
-        total_hashrate = parseInt(total_hashrate*1000) + " GH/s";
-    } else if (total_hashrate > 1000) {
-        total_hashrate = Number((total_hashrate/1000).toFixed(2)) + " PH/s";
+    errs_block = document.getElementById("miner_errors_list")
+    errs_block.innerHTML = errors_html
+    eff_block = document.getElementById("total_efficiency")
+    if (!(total_hashrate == 0)) {
+        eff_block.innerHTML = Number((total_watts/total_hashrate).toFixed(2)) + " J/TH"
     } else {
-        total_hashrate = parseInt(total_hashrate) + " TH/s";
+        eff_block.innerHTML = "0 J/TH"
+    }
+    watts_block = document.getElementById("total_watts")
+    watts_block.innerHTML = total_watts + " W"
+    watts_max_block = document.getElementById("total_max_watts")
+    watts_max_block.innerHTML = max_watts + " W"
+
+    if (total_hashrate == 0) {
+        total_hashrate = "Hashrate: 0 TH/s"
+    } else if (total_hashrate < 1) {
+        total_hashrate = "Hashrate: " + parseInt(total_hashrate*1000) + " GH/s";
+    } else if (total_hashrate > 1000) {
+        total_hashrate = "Hashrate: " + Number((total_hashrate/1000).toFixed(2)) + " PH/s";
+    } else {
+        total_hashrate = "Hashrate: " + parseInt(total_hashrate) + " TH/s";
     };
     hr_block.innerHTML = total_hashrate;
 
