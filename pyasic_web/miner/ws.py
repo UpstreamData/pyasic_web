@@ -40,7 +40,6 @@ async def miner_websocket(websocket: WebSocket, miner_ip):
                     fan if not fan == -1 else 0
                     for fan in [data.fan_1, data.fan_2, data.fan_3, data.fan_4]
                 ]
-
                 data = {
                     "hashrate": data.hashrate,
                     "fans": fan_speeds,
@@ -49,6 +48,7 @@ async def miner_websocket(websocket: WebSocket, miner_ip):
                     "model": data.model,
                     "efficiency": data.efficiency,
                     "wattage": data.wattage,
+                    "fault_light": data.fault_light,
                     "errors": [
                         err.error_message for err in data.errors
                     ]

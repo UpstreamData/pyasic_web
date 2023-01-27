@@ -17,9 +17,23 @@
             Actions
             </button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" target="_blank" href="http://{{miner}}" role="button">Web Interface</a></li>
+              <li><a class="dropdown-item" target="_blank" href="http://{{miner}}" role="button">
+                <svg class="m-0 p-0" style="vertical-align: -.25em;" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="22">
+                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                 <polyline points="15 3 21 3 21 9"/>
+                 <line x1="10" x2="21" y1="14" y2="3"/>
+                </svg>
+                  Web Interface
+              </a></li>
+              <li><a class="dropdown-item" href="http://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/miner/{{miner}}/light" role="button">
+                  <svg class="m-0 p-0" style="fill: currentColor; vertical-align: -.25em;" width="20" height="22" id="svg_fault_light"><use xlink:href="#light-off"></use></svg>
+                  Fault Light
+              </a></li>
                 <li><hr class="dropdown-divider"></li>
-              <li><button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#removeModal">Remove Miner</button></li>
+              <li><button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#removeModal">
+                    <svg class="m-0 p-0" style="vertical-align: -.325em;" width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+                  Remove Miner
+              </button></li>
             </ul>
           </div>
         </div>
@@ -113,6 +127,13 @@
             }
         }
         if (new_data.hasOwnProperty("hashrate")) {
+            fault_light_svg = document.getElementById("svg_fault_light");
+            if (new_data["fault_light"]) {
+                fault_light_svg.innerHTML = '<use xlink:href="#light-on"></use>'
+            } else {
+                fault_light_svg.innerHTML = '<use xlink:href="#light-off"></use>'
+            };
+
             var chart = document.getElementById("hr-chart")
             datetime = luxon.DateTime.fromISO(new_data["datetime"]).toLocal();
             if (minerDataChart.data.labels.length > 50) minerDataChart.data.labels.shift();

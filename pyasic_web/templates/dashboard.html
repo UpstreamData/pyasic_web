@@ -54,7 +54,10 @@
                 <h1 class="hashrate-header" id="total_hashrate">Hashrate: 0 TH/s</h1>
         </div>
     </div>
-    {% endif%}
+    {% else %}
+        <a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info fw-bolder d-flex align-items-center justify-content-center mt-3" style="height:100px;">Click here to add miners.</a>
+    {% endif %}
+
 
     <div class="row mt-3 px-2">
         <div class="col col-12 col-md-6 my-0 px-1 py-1">
@@ -116,9 +119,6 @@
     </div>
 
 
-{% if cur_miners|length == 0 %}
-    <a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info">Click here to add miners.</a>
-{% endif %}
 <div id="errors"></div>
 
 <script>

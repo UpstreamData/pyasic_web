@@ -1,6 +1,8 @@
 from fastapi import Request, APIRouter
 from fastapi.responses import RedirectResponse
 
+import pyasic
+import asyncio
 
 from pyasic_web.template import templates
 from pyasic_web.func import get_current_miner_list
@@ -33,3 +35,14 @@ def remove_miner(request: Request, miner_ip):
             file.write(miner_ip + "\n")
 
     return RedirectResponse(request.url_for("dashboard"))
+
+@router.get("/{miner_ip}/light/")
+async def light_miner(request: Request, miner_ip):
+    miner = await pyasic.get_miner(miner_ip)
+    print(miner.light)
+    if miner.light:
+        asyncio.create_task(miner.fault_light_off())
+    else:
+        asyncio.create_task(miner.fault_light_on())
+
+    return RedirectResponse(request.url_for("get_miner", miner_ip=miner_ip))

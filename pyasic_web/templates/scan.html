@@ -18,13 +18,13 @@
           <span class="input-group-text" id="scan-ip">Subnet</span>
           <input type="text" class="form-control" id="messageText" placeholder="192.168.1.0/24" aria-describedby="scan-ip">
           <button class="btn btn-danger" onclick="cancelScan()" style="display:none;" type="button" id="cancelButton">Cancel</button>
-          <button class="btn btn-primary" onclick="scanMiners()" type="button" id="scanButton">Scan</button>
+          <button class="btn btn-info fw-bolder" onclick="scanMiners()" type="button" id="scanButton">Scan</button>
         </div>
     </form>
 </div>
 
 <div class="row w-100">
-    <button class="btn btn-primary mb-4 mx-1" onclick="addMiners()" type="button" id="addButton">Add Selected Miners</button>
+    <button class="btn btn-info fw-bolder mb-4 mx-1" onclick="addMiners()" type="button" id="addButton">Add Selected Miners</button>
 </div>
 
 <div class="row w-100">
@@ -32,7 +32,7 @@
         <thead>
             <tr>
                 <th class="active col-1">
-                    <input type="checkbox" class="select-all checkbox" name="select-all" id="selectAllCheckbox"/>
+                    <input type="checkbox" class="select-all checkbox bg-gradient" name="select-all" id="selectAllCheckbox"/>
                 </th>
                 <th>IP</th>
                 <th>Model</th>
