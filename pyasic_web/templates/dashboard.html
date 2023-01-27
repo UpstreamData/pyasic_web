@@ -91,15 +91,25 @@
         </div>
     </div>
     <div class="row">
-        <div class="col my-3">
-            <div class="alert alert-secondary p-0">
-                                    <h6 class="px-3 pt-2 pb-1 fw-bolder">Errors:</h6>
+        <div class="col my-1 pb-0">
+            <div class="alert alert-secondary p-0 mb-0">
+                <h6 class="px-3 pt-2 pb-1 fw-bolder">Errors:</h6>
                 <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_errors_list">
                   <!-- <a data-bs-toggle="collapse" href="#errors_192-168-1-1" role="button" class="list-group-item list-group-item-action miner-error">192.168.1.1</a>
                     <div class="collapse multi-collapse my-0 py-0 ms-5" id="errors_192-168-1-1">
                         <div class ="list-group-item miner-error-item">Error_1</div>
                         <div class ="list-group-item miner-error-item">Error_3</div>
                     </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col my-1 pb-0">
+            <div class="alert alert-secondary p-0 mb-0">
+                                    <h6 class="px-3 pt-2 pb-1 fw-bolder">Pool Users:</h6>
+                <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_pools_list">
+
                 </div>
             </div>
         </div>
@@ -125,6 +135,11 @@ ws.onmessage = function(event) {
         max_watts = parseInt(0)
         errors_html = ""
         errors = document.getElementById("errors")
+        pool_users_block = document.getElementById("miner_pools_list")
+        pool_users_block.innerHTML = ""
+        for (item in new_data["pool_users"]) {
+            pool_users_block.innerHTML += '<div class ="list-group-item d-flex justify-content-between">' + item + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["pool_users"][item] + '</span></div>'
+        };
         for (i = 0; i< new_data["miners"].length; i++) {
             if (new_data["miners"][i].hasOwnProperty("error")) {
                 if (!document.getElementById(new_data["miners"][i]["ip"] + "_error")) {
@@ -148,7 +163,7 @@ ws.onmessage = function(event) {
                         err_loc = document.getElementById("errors_" + miner_id_local)
                         if (err_loc) {
                             if (err_loc.classList.contains('show')) {
-                                miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition list-group-item-action miner-error" aria-expanded="true">' + new_data["miners"][i]["ip"] + '</a>'
+                                miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error" aria-expanded="true">' + new_data["miners"][i]["ip"] + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["miners"][i]["errors"].length + '</span></a>'
                                 miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5 show" id="errors_' + miner_id_local + '">'
                                 for (err in new_data["miners"][i]["errors"]) {
                                     miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["miners"][i]["errors"][err]["error_message"] + '</div>'
@@ -159,7 +174,7 @@ ws.onmessage = function(event) {
 
 
                             } else {
-                                miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition list-group-item-action miner-error">' + new_data["miners"][i]["ip"] + '</a>'
+                                miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + new_data["miners"][i]["ip"] + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["miners"][i]["errors"].length + '</span></a>'
                                 miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5" id="errors_' + miner_id_local + '">'
                                 for (err in new_data["miners"][i]["errors"]) {
                                     miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["miners"][i]["errors"][err]["error_message"] + '</div>'
@@ -167,7 +182,7 @@ ws.onmessage = function(event) {
                                 miner_errs_local_html += '</div>'
                             }
                         } else {
-                            miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition list-group-item-action miner-error">' + new_data["miners"][i]["ip"] + '</a>'
+                            miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + new_data["miners"][i]["ip"] + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["miners"][i]["errors"].length + '</span></a>'
                             miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5" id="errors_' + miner_id_local + '">'
                             for (err in new_data["miners"][i]["errors"]) {
                                 miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["miners"][i]["errors"][err]["error_message"] + '</div>'
@@ -188,16 +203,15 @@ ws.onmessage = function(event) {
     eff_block = document.getElementById("total_efficiency")
     if (!(total_hashrate == 0)) {
         eff_block.innerHTML = Number((total_watts/total_hashrate).toFixed(2)) + " J/TH"
+        pct_ideal_hr_block.innerHTML = (Number((total_hashrate/hr_ideal)*100)).toFixed(2) + " %"
     } else {
         eff_block.innerHTML = "0 J/TH"
+        pct_ideal_hr_block.innerHTML = "0 %"
     }
     watts_block = document.getElementById("total_watts")
     watts_block.innerHTML = total_watts + " W"
     watts_max_block = document.getElementById("total_max_watts")
     watts_max_block.innerHTML = max_watts + " W"
-
-    pct_ideal_hr = (Number((total_hashrate/hr_ideal)*100)).toFixed(2) + " %"
-    pct_ideal_hr_block.innerHTML = pct_ideal_hr
 
     if (hr_ideal == 0) {
         hr_ideal = "0 TH/s"
