@@ -36,6 +36,7 @@ def remove_miner(request: Request, miner_ip):
 
     return RedirectResponse(request.url_for("dashboard"))
 
+
 @router.get("/{miner_ip}/light/")
 async def light_miner(request: Request, miner_ip):
     miner = await pyasic.get_miner(miner_ip)
@@ -46,3 +47,12 @@ async def light_miner(request: Request, miner_ip):
         asyncio.create_task(miner.fault_light_on())
 
     return RedirectResponse(request.url_for("get_miner", miner_ip=miner_ip))
+
+
+@router.post("/{miner_ip}/wattage/")
+async def wattage_set_miner(request: Request, miner_ip):
+    d = await request.json()
+    wattage = d["wattage"]
+    if wattage:
+        miner = await pyasic.get_miner(miner_ip)
+        await miner.set_power_limit(int(wattage))

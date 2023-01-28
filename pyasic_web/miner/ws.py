@@ -48,6 +48,7 @@ async def miner_websocket(websocket: WebSocket, miner_ip):
                     "model": data.model,
                     "efficiency": data.efficiency,
                     "wattage": data.wattage,
+                    "max_wattage": data.wattage_limit,
                     "fault_light": data.fault_light,
                     "errors": [
                         err.error_message for err in data.errors

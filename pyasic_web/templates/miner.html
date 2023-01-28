@@ -29,6 +29,13 @@
                   <svg class="m-0 p-0" style="fill: currentColor; vertical-align: -.25em;" width="20" height="22" id="svg_fault_light"><use xlink:href="#light-off"></use></svg>
                   Fault Light
               </a></li>
+              <li>
+                      <button onclick="updateWattage()" id="update_wattage" class="dropdown-item" role="button" value="Update Wattage">
+                        <svg width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                      Update Wattage
+                      </button>
+                      <input type="number" class="form-control border p-1 my-2 w-75 rounded ms-4 me-0" id="miner_input_wattage">
+              </li>
                 <li><hr class="dropdown-divider"></li>
               <li><button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#removeModal">
                     <svg class="m-0 p-0" style="vertical-align: -.325em;" width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
@@ -127,6 +134,20 @@
             }
         }
         if (new_data.hasOwnProperty("hashrate")) {
+            wattage_input = document.getElementById("miner_input_wattage");
+            console.log(new_data["max_wattage"])
+            if (new_data["max_wattage"] == -1) {
+                wattage_set = document.getElementById("update_wattage");
+                wattage_set.disabled = true;
+                wattage_input.disabled = true;
+            } else {
+                if (!(wattage_input.value)) {
+                    wattage_input.value = new_data["max_wattage"]
+                    wattage_set = document.getElementById("update_wattage");
+                    wattage_set.disabled = false;
+                    wattage_input.disabled = false;
+                }
+            }
             fault_light_svg = document.getElementById("svg_fault_light");
             if (new_data["fault_light"]) {
                 fault_light_svg.innerHTML = '<use xlink:href="#light-on"></use>'
@@ -397,6 +418,15 @@
         },
         options: options_fans
     });
+    window.post = function(url, data) {
+      return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
+    }
+
+    function updateWattage(event) {
+        var wattage_input = document.getElementById("miner_input_wattage");
+        set_wattage = wattage_input.value
+        post("{{url_for('wattage_set_miner', miner_ip=miner)}}", {wattage: set_wattage})
+    };
 
     </script>
 </div>
