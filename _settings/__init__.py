@@ -1,15 +1,11 @@
-from fastapi import Request, APIRouter
-from fastapi.responses import RedirectResponse
+from starlette.requests import Request
+from starlette.responses import RedirectResponse
 
 from pyasic_web.template import templates
 from pyasic_web.func import get_current_miner_list
 from pyasic_web._settings.func import get_current_settings, update_settings
 
 
-router = APIRouter()
-
-
-@router.route("/", methods=["GET", "POST"])
 async def settings(request: Request):
     return templates.TemplateResponse(
         "settings.html",
@@ -21,7 +17,6 @@ async def settings(request: Request):
     )
 
 
-@router.post("/update")
 async def update_settings_page(request: Request):
     data = await request.form()
     graph_data_sleep_time = data.get("graph_data_sleep_time")

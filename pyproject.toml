@@ -10,10 +10,9 @@ packages = [{include = "pyasic_web"}]
 python = "^3.8"
 pyasic = "*"
 websockets = "^10.4"
-fastapi = {extras = ["uvicorn"], version = "^0.89.1"}
 uvicorn = "^0.20.0"
+starlette = "*"
 python-multipart = "^0.0.5"
-fastapi-login = "^1.8.3"
 
 [build-system]
 requires = ["poetry-core"]

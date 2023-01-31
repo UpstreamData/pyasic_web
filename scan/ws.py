@@ -1,16 +1,13 @@
 import asyncio
 
+from starlette.websockets import WebSocket, WebSocketDisconnect
+from starlette.responses import RedirectResponse
 import websockets.exceptions
-from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 
 from pyasic_web.scan.func import do_websocket_scan
 
 
-router = APIRouter()
-
-
-@router.websocket("/ws")
-async def websocket_scan(websocket: WebSocket):
+async def scan_websocket(websocket):
     await websocket.accept()
     cur_task = None
     try:
