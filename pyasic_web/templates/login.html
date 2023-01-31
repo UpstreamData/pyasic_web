@@ -28,10 +28,23 @@ background: #6a11cb;
 input {
 	box-sizing: border-box;
 	width: 100%;
-	padding: 1em;
 	border: 0.15em solid #808080;
 	border-radius: 0.5em;
 	text-align: center;
+}
+.pwd-input {
+  padding-left: 65px;
+}
+.form-control:focus {
+  border-color: white;
+  box-shadow: none;
+}
+.btn-outline-light:focus {
+  border-color: white;
+  box-shadow: none;
+}
+.btn:active:hover {
+  box-shadow: none;
 }
 </style>
 </head>
@@ -49,8 +62,11 @@ input {
               <h2 class="fw-bold mb-4 text-uppercase">Login</h2>
 
               <div class="form-outline form-white mb-4">
-                <input placeholder="Username" type="text" id="typeUsernameX" class="form-control form-control-lg" style="border-bottom-right-radius: 0;border-bottom-left-radius: 0;"/>
-                <input placeholder="Password" type="password" id="typePasswordX" class="form-control form-control-lg" style="border-top-left-radius: 0;border-top-right-radius: 0;"/>
+                <input placeholder="Username" type="text" id="UsernameInput" class="form-control form-control-lg" style="border-bottom-right-radius: 0;border-bottom-left-radius: 0;"/>
+                <div class="input-group">
+                <input placeholder="Password" type="password" id="PasswordInput" class="form-control form-control-lg pwd-input" style="border-top-left-radius: 0"/>
+                <button class="btn btn-outline-light" type="button" style="border-top-right-radius: 0; border: 1px solid #ced4da;" id="ShowPWD" onclick="showPWD()"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg></button>
+                </div>
               </div>
 
               <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
@@ -67,4 +83,17 @@ input {
       </div>
     </div>
   </div>
-</section></body>
+</section>
+<script>
+function showPWD() {
+  var pwd_input = document.getElementById("PasswordInput");
+    var show_btn = document.getElementById("ShowPWD");
+  if (pwd_input.type === "password") {
+    pwd_input.type = "text";
+    show_btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
+  } else {
+    pwd_input.type = "password";
+    show_btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye-off"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>'  }
+  }
+</script>
+</body>
