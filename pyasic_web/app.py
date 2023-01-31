@@ -11,6 +11,7 @@ from pyasic_web.scan import router as scan_router
 from pyasic_web._settings import (  # noqa - Ignore access to _module
     router as settings_router,
 )
+from pyasic_web.login import router as login_router
 
 app = FastAPI()
 
@@ -24,6 +25,7 @@ app.include_router(dashboard_router, tags=["dashboard"])
 app.include_router(miner_router, tags=["miner"], prefix="/miner")
 app.include_router(scan_router, tags=["scan"], prefix="/scan")
 app.include_router(settings_router, tags=["settings"], prefix="/settings")
+app.include_router(login_router, tags=["login"], prefix="/login")
 
 
 @app.get("/remove_all_miners")

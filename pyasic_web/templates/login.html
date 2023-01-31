@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="{{ url_for('static', path='/bootstrap.bundle.min.js') }}"></script>
+    <link href="{{ url_for('static', path='/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', path='/navbar.css') }}" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Login - pyasic Web</title>
+    <style>
+.gradient-custom {
+/* fallback for old browsers */
+background: #6a11cb;
+
+/* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(90deg, #760A45 0%, #23449F 99%);
+
+
+/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(90deg, #760A45 0%, #23449F 99%);
+}
+::-webkit-input-placeholder {
+   text-align: center;
+}
+
+:-moz-placeholder {
+   text-align: center;
+}
+input {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 1em;
+	border: 0.15em solid #808080;
+	border-radius: 0.5em;
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<section class="vh-100 gradient-custom">
+  <div class="container pt-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card bg-dark text-white" style="border-radius: 1rem;">
+          <div class="card-body p-5 py-3 text-center">
+            <form>
+            <div class="mb-md-2 mt-md-4 pb-3">
+            <svg class="mb-4" width="20mm" height="20mm" version="1.1" viewBox="0 0 100 100" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><linearGradient id="linearGradient40282" x1="57.5" x2="149.77" y1="148.5" y2="242.85" gradientUnits="userSpaceOnUse"><stop stop-color="#008080" offset="1e-4"/><stop stop-color="#000080" offset="1"/></linearGradient><filter id="filter41748" x="-.02028" y="-.02028" width="1.0406" height="1.0406" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="0.80275"/></filter></defs><g transform="translate(-55 -98.5)"><rect x="57.5" y="101" width="95" height="95" ry="16.935" fill="url(#linearGradient40282)" fill-rule="evenodd" filter="url(#filter41748)" stroke-width=".32803"/><g fill="none" stroke="#000"><path x="57.629097" y="101.12908" width="94.741829" height="94.741829" rx="0" ry="13.846843" d="m71.476 101.13h67.048c7.6712 0 13.847 6.1757 13.847 13.847v67.048c0 7.6712-6.1757 13.847-13.847 13.847h-67.048c-7.6712 0-13.847-6.1757-13.847-13.847v-67.048c0-7.6712 6.1757-13.847 13.847-13.847z" stroke-linecap="round" stroke-linejoin="round" stroke-width="5.2582" style="paint-order:markers stroke fill"/><g stroke-width="5.0876"><path d="m129.51 173.01 18.927 18.927"/><path d="m61.561 105.06 18.927 18.927"/><path d="m129.53 123.97 18.912-18.912"/><path d="m61.561 191.94 18.927-18.927"/></g><path d="m140.61 148.5a35.613 35.613 0 0 1-35.613 35.613 35.613 35.613 0 0 1-35.613-35.613 35.613 35.613 0 0 1 35.613-35.613 35.613 35.613 0 0 1 35.613 35.613z" stroke-linecap="round" stroke-linejoin="round" stroke-width="5.0877" style="paint-order:markers stroke fill"/><g stroke-width="1.6822"><path d="m113.11 156.6 7.8329 7.8329"/><path d="m89.068 132.56 7.8329 7.8329"/><path d="m113.11 140.39 7.8278-7.8278"/><path d="m89.068 164.43 7.8329-7.8329"/></g><path d="m116.78 148.5a11.775 11.775 0 0 1-11.775 11.775 11.775 11.775 0 0 1-11.775-11.775 11.775 11.775 0 0 1 11.775-11.775 11.775 11.775 0 0 1 11.775 11.775z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6822" style="paint-order:markers stroke fill"/><g stroke-width="3.307"><path d="m120.93 164.43 15.398 15.398"/><path d="m73.669 117.17 15.398 15.398"/><path d="m120.94 132.56 15.389-15.389"/><path d="m73.669 179.83 15.398-15.398"/></g><path d="m128.15 148.5a23.149 23.149 0 0 1-23.149 23.149 23.149 23.149 0 0 1-23.149-23.149 23.149 23.149 0 0 1 23.149-23.149 23.149 23.149 0 0 1 23.149 23.149z" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.307" style="paint-order:markers stroke fill"/><circle cx="105" cy="148.5" r="47.5" stroke-linecap="round" stroke-linejoin="round" stroke-width="5" style="paint-order:markers stroke fill"/></g></g></svg>
+
+              <h2 class="fw-bold mb-4 text-uppercase">Login</h2>
+
+              <div class="form-outline form-white mb-4">
+                <input placeholder="Username" type="text" id="typeUsernameX" class="form-control form-control-lg" style="border-bottom-right-radius: 0;border-bottom-left-radius: 0;"/>
+                <input placeholder="Password" type="password" id="typePasswordX" class="form-control form-control-lg" style="border-top-left-radius: 0;border-top-right-radius: 0;"/>
+              </div>
+
+              <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+
+              <div class="d-flex justify-content-center text-center mt-4 pt-1">
+                <a href="https://github.com/UpstreamData/pyasic_web" target="_blank"><svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true" fill="white">
+                  <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                </svg></a>
+              </div>
+            </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section></body>
