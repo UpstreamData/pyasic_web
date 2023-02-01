@@ -1,13 +1,13 @@
-import os
 import ipaddress
+import os
 
-dir_path = "\\".join(os.path.dirname(os.path.realpath(__file__)).split("\\")[:-1])
+from pyasic_web import settings
 
 
 def get_current_miner_list():
     cur_miners = []
-    if os.path.exists(os.path.join(dir_path, "miner_list.txt")):
-        with open(os.path.join(dir_path, "miner_list.txt")) as file:
+    if os.path.exists(settings.MINER_LIST):
+        with open(settings.MINER_LIST) as file:
             for line in file.readlines():
                 cur_miners.append(line.strip())
     cur_miners = sorted(cur_miners, key=lambda x: ipaddress.ip_address(x))

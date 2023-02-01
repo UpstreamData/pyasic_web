@@ -3,14 +3,17 @@ import datetime
 import ipaddress
 
 import websockets.exceptions
+from starlette.requests import Request
+from starlette.responses import RedirectResponse
 from starlette.websockets import WebSocketDisconnect
 
 from pyasic.misc import Singleton
 from pyasic_web.func import get_current_miner_list
-from pyasic_web._settings.func import (  # noqa - Ignore access to _module
+from pyasic_web.func.dashboard import get_miner_data_dashboard, get_pool_users_data
+from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
-from pyasic_web.dashboard.func import get_miner_data_dashboard
+from pyasic_web.templates import templates
 
 
 class MinerDataManager(metaclass=Singleton):
@@ -18,18 +21,15 @@ class MinerDataManager(metaclass=Singleton):
         self.cached_data = None
 
 
-def get_pool_users_data(data: list):
-    users = {}
-    pool_data = [dp.get("pool_1_user") for dp in data]
-    for user in pool_data:
-        if user:
-            if not user in users:
-                users[user] = 0
-            users[user] += 1
-    return users
+def page_dashboard(request: Request):
+    return templates.TemplateResponse(
+        "dashboard.html", {"request": request, "cur_miners": get_current_miner_list()}
+    )
 
+def redirect_dashboard(request: Request):
+    return RedirectResponse(request.url_for("page_dashboard"))
 
-async def dashboard_websocket(websocket):
+async def ws_dashboard(websocket):
     await websocket.accept()
     # while True:
     #     await asyncio.sleep(5)

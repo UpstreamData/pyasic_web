@@ -1,0 +1,252 @@
+{% extends 'navbar.html'%}
+{% block content %}
+<nav class="navbar bg-dark" data-bs-theme="dark">
+    <div class="row d-flex justify-content-between w-100 align-content-middle">
+        <div class="col-7">
+            <h2 class="ms-3 mt-1 text-light">
+                <svg class="bi me-2 d-none d-sm-inline" width="32" height="32">
+                    <use xlink:href="#dashboard"></use>
+                </svg>
+                Home
+            </h2>
+        </div>
+        <div class="col d-flex justify-content-end">
+            <div class="btn-group dropstart">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg class="m-0 p-0" style="fill: currentColor; vertical-align: -.25em;" width="20" height="22">
+                        <use xlink:href="#action"></use>
+                    </svg>
+                    Actions
+                </button>
+                <ul class="dropdown-menu">
+                    <!-- <li><a class="dropdown-item" target="_blank" href="http://{{miner}}" role="button">Web Interface</a></li> -->
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#removeModal">Remove All Miners</button></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="modal fade" id="removeModal" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeModalLabel">Remove Miners</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Do you really want to remove all miners?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger" href="{{url_for('page_remove_all_miners')}}" role="button">Remove</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="px-lg-4 my-2 mx-4 mx-lg-0">
+    {% if not cur_miners|length == 0 %}
+    <div class="row mt-3">
+        <div class="col-sm-6 col-12 d-flex align-content-center justify-content-center">
+            <h1 class="hashrate-header" id="miner_count">Miners: {{cur_miners|length}}</h1>
+        </div>
+        <div class="col-sm-6 col-12 d-flex align-content-center justify-content-center">
+            <h1 class="hashrate-header" id="total_hashrate">Hashrate: 0 TH/s</h1>
+        </div>
+    </div>
+    {% else %}
+    <a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info fw-bolder d-flex align-items-center justify-content-center mt-3" style="height:100px;">Click here to add miners.</a>
+    {% endif %}
+    <div class="row mt-3 px-2">
+        <div class="col col-12 col-md-4 my-0 px-1 py-1">
+            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
+                <div class="mx-auto">Ideal Hashrate:</div>
+                <div class="mx-auto fw-bolder" id="ideal_hashrate">0 TH/s</div>
+            </div>
+        </div>
+        <div class="col col-12 col-md-4 my-0 px-1 py-1">
+            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
+                <div class="mx-auto">% Ideal Hashrate:</div>
+                <div class="mx-auto fw-bolder" id="pct_ideal_hashrate">0 %</div>
+            </div>
+        </div>
+        <div class="col col-12 col-md-4 my-0 px-1 py-1">
+            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
+                <div class="mx-auto">Efficiency:</div>
+                <div class="mx-auto fw-bolder" id="total_efficiency">0 J/TH</div>
+            </div>
+        </div>
+    </div>
+    <div class="row px-2">
+        <div class="col col-12 col-md-4 my-0 px-1 py-1">
+            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
+                <div class="mx-auto">Wattage:</div>
+                <div class="mx-auto fw-bolder" id="total_watts">0 W</div>
+            </div>
+        </div>
+        <div class="col col-12 col-md-4 my-0 px-1 py-1">
+            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
+                <div class="mx-auto">Max Wattage:</div>
+                <div class="mx-auto fw-bolder" id="total_max_watts">0 W</div>
+            </div>
+        </div>
+        <div class="col col-12 col-md-4 my-0 px-1 py-1">
+            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
+                <div class="mx-auto">% Max Wattage:</div>
+                <div class="mx-auto fw-bolder" id="pct_max_wattage">0 %</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col my-1 pb-0">
+            <div class="alert alert-secondary p-0 mb-0">
+                <h6 class="px-3 pt-2 pb-1 fw-bolder">Errors:</h6>
+                <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_errors_list">
+                    <!-- <a data-bs-toggle="collapse" href="#errors_192-168-1-1" role="button" class="list-group-item list-group-item-action miner-error">192.168.1.1</a>
+                        <div class="collapse multi-collapse my-0 py-0 ms-5" id="errors_192-168-1-1">
+                            <div class ="list-group-item miner-error-item">Error_1</div>
+                            <div class ="list-group-item miner-error-item">Error_3</div>
+                        </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col my-1 pb-0">
+            <div class="alert alert-secondary p-0 mb-0">
+                <h6 class="px-3 pt-2 pb-1 fw-bolder">Pool Users:</h6>
+                <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_pools_list">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="errors"></div>
+    <script>
+        if (!window.WebSocket) alert("WebSocket not supported by this browser");
+        var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/dashboard/ws");
+        let all_data = []
+        let all_labels = []
+        ws.onmessage = function(event) {
+            var new_data = JSON.parse(event.data)
+            if (!new_data["miners"].length == 0) {
+                total_hashrate = parseFloat(0)
+                hr_ideal = parseFloat(0)
+                total_watts = parseInt(0)
+                max_watts = parseInt(0)
+                errors_html = ""
+                errors = document.getElementById("errors")
+                pool_users_block = document.getElementById("miner_pools_list")
+                pool_users_block.innerHTML = ""
+                for (item in new_data["pool_users"]) {
+                    pool_users_block.innerHTML += '<div class ="list-group-item d-flex justify-content-between">' + item + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["pool_users"][item] + '</span></div>'
+                };
+                for (i = 0; i< new_data["miners"].length; i++) {
+                    if (new_data["miners"][i].hasOwnProperty("error")) {
+                        if (!document.getElementById(new_data["miners"][i]["ip"] + "_error")) {
+                            errors.innerHTML += "<div id='" + new_data["miners"][i]["ip"] + "_error" +
+                            "' class='d-flex align-items-center p-1 mb-1 alert alert-danger'><strong class='p-0 m-0'>" +
+                            new_data["miners"][i]["ip"] + ": " +
+                            new_data["miners"][i]["error"] +
+                            "</strong><div class='spinner-border spinner-border-sm ms-auto'></div></div>"
+                        }
+                    } else {
+                        if (document.getElementById(new_data["miners"][i]["ip"] + "_error")) {
+                            document.getElementById(new_data["miners"][i]["ip"] + "_error").remove()
+                        }
+                        total_hashrate += parseFloat(new_data["miners"][i]["hashrate"])
+                        hr_ideal += parseFloat(new_data["miners"][i]["nominal_hashrate"])
+                        total_watts += parseFloat(new_data["miners"][i]["wattage"])
+                        max_watts += parseFloat(new_data["miners"][i]["wattage_limit"])
+                        if (new_data["miners"][i].hasOwnProperty("errors")) {
+                            if (new_data["miners"][i]["errors"].length > 0) {
+                                miner_id_local = new_data["miners"][i]["ip"].replaceAll(".", "-")
+                                err_loc = document.getElementById("errors_" + miner_id_local)
+                                if (err_loc) {
+                                    if (err_loc.classList.contains('show')) {
+                                        miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error" aria-expanded="true">' + new_data["miners"][i]["ip"] + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["miners"][i]["errors"].length + '</span></a>'
+                                        miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5 show" id="errors_' + miner_id_local + '">'
+                                        for (err in new_data["miners"][i]["errors"]) {
+                                            miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["miners"][i]["errors"][err]["error_message"] + '</div>'
+                                        };
+                                        miner_errs_local_html += '</div>'
+
+
+
+
+                                    } else {
+                                        miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + new_data["miners"][i]["ip"] + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["miners"][i]["errors"].length + '</span></a>'
+                                        miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5" id="errors_' + miner_id_local + '">'
+                                        for (err in new_data["miners"][i]["errors"]) {
+                                            miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["miners"][i]["errors"][err]["error_message"] + '</div>'
+                                        };
+                                        miner_errs_local_html += '</div>'
+                                    }
+                                } else {
+                                    miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + new_data["miners"][i]["ip"] + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["miners"][i]["errors"].length + '</span></a>'
+                                    miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5" id="errors_' + miner_id_local + '">'
+                                    for (err in new_data["miners"][i]["errors"]) {
+                                        miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["miners"][i]["errors"][err]["error_message"] + '</div>'
+                                    };
+                                    miner_errs_local_html += '</div>'
+                                }
+
+                                errors_html += miner_errs_local_html
+                            };
+                        }
+                    }
+                };
+            hr_block = document.getElementById("total_hashrate")
+            ideal_hr_block = document.getElementById("ideal_hashrate")
+            pct_ideal_hr_block = document.getElementById("pct_ideal_hashrate")
+            pct_max_wattage_block = document.getElementById("pct_max_wattage")
+            errs_block = document.getElementById("miner_errors_list")
+            errs_block.innerHTML = errors_html
+            eff_block = document.getElementById("total_efficiency")
+            if (!(total_hashrate == 0)) {
+                eff_block.innerHTML = Number((total_watts/total_hashrate).toFixed(2)) + " J/TH"
+                pct_ideal_hr_block.innerHTML = (Number((total_hashrate/hr_ideal)*100)).toFixed(2) + " %"
+            } else {
+                eff_block.innerHTML = "0 J/TH"
+                pct_ideal_hr_block.innerHTML = "0 %"
+            }
+            if (!(total_watts == 0)) {
+                pct_max_wattage_block.innerHTML = (Number((total_watts/max_watts)*100)).toFixed(2) + " %"
+            } else {
+                pct_max_wattage_block.innerHTML = "0 %"
+            }
+            watts_block = document.getElementById("total_watts")
+            watts_block.innerHTML = total_watts + " W"
+            watts_max_block = document.getElementById("total_max_watts")
+            watts_max_block.innerHTML = max_watts + " W"
+
+            if (hr_ideal == 0) {
+                hr_ideal = "0 TH/s"
+            } else if (hr_ideal < 1) {
+                hr_ideal = parseInt(hr_ideal*1000) + " GH/s";
+            } else if (hr_ideal > 1000) {
+                hr_ideal = Number((hr_ideal/1000).toFixed(2)) + " PH/s";
+            } else {
+                hr_ideal = parseInt(hr_ideal) + " TH/s";
+            };
+            ideal_hr_block.innerHTML = hr_ideal
+
+
+            if (total_hashrate == 0) {
+                total_hashrate = "Hashrate: 0 TH/s"
+            } else if (total_hashrate < 1) {
+                total_hashrate = "Hashrate: " + parseInt(total_hashrate*1000) + " GH/s";
+            } else if (total_hashrate > 1000) {
+                total_hashrate = "Hashrate: " + Number((total_hashrate/1000).toFixed(2)) + " PH/s";
+            } else {
+                total_hashrate = "Hashrate: " + parseInt(total_hashrate) + " TH/s";
+            };
+            hr_block.innerHTML = total_hashrate;
+
+            // console.log(total_hashrate);
+            }
+        };
+    </script>
+</div>
+{% endblock content %}

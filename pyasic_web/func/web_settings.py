@@ -1,5 +1,6 @@
-import toml
 import os
+
+import toml
 
 
 def get_current_settings():

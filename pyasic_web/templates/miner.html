@@ -1,0 +1,448 @@
+{% extends 'navbar.html'%}
+{% block content %}
+<script src="{{ url_for('static', path='/chart.js')}}"></script>
+<script src="{{ url_for('static', path='/luxon.min.js')}}"></script>
+<nav class="navbar bg-dark" data-bs-theme="dark">
+    <div class="row d-flex justify-content-between w-100 align-content-middle">
+        <div class="col-7">
+            <h2 class="ms-3 mt-1 text-light">
+                <svg class="bi me-2 d-none d-sm-inline" width="32" height="32">
+                    <use xlink:href="#miners"></use>
+                </svg>
+                {{miner}}
+            </h2>
+        </div>
+        <div class="col d-flex justify-content-end">
+            <div class="btn-group dropstart">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg class="m-0 p-0" style="fill: currentColor; vertical-align: -.25em;" width="20" height="22">
+                        <use xlink:href="#action"></use>
+                    </svg>
+                    Actions
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" target="_blank" href="http://{{miner}}" role="button">
+                            <svg class="m-0 p-0" style="vertical-align: -.25em;" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="22">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                <polyline points="15 3 21 3 21 9"/>
+                                <line x1="10" x2="21" y1="14" y2="3"/>
+                            </svg>
+                            Web Interface
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="http://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/miner/{{miner}}/light" role="button">
+                            <svg class="m-0 p-0" style="fill: currentColor; vertical-align: -.25em;" width="20" height="22" id="svg_fault_light">
+                                <use xlink:href="#light-off"></use>
+                            </svg>
+                            Fault Light
+                        </a>
+                    </li>
+                    <li>
+                        <button onclick="updateWattage()" id="update_wattage" class="dropdown-item" role="button" value="Update Wattage">
+                            <svg width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                <polyline points="17 6 23 6 23 12"></polyline>
+                            </svg>
+                            Update Wattage
+                        </button>
+                        <input type="number" class="form-control border p-1 my-2 w-75 rounded ms-4 me-0" id="miner_input_wattage">
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#removeModal">
+                            <svg class="m-0 p-0" style="vertical-align: -.325em;" width="20" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                                <line x1="18" y1="9" x2="12" y2="15"></line>
+                                <line x1="12" y1="9" x2="18" y2="15"></line>
+                            </svg>
+                            Remove Miner
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+<!-- Modal -->
+<div class="modal fade" id="removeModal" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeModalLabel">Remove Miner</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Do you really want to remove this miner?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger" href="{{url_for('page_miner')}}{{miner_ip}}/remove" role="button">Remove</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="px-lg-4 my-2 mx-4 mx-lg-0">
+    <div class="row">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active text-dark" id="hashrate-tab" data-bs-toggle="tab" data-bs-target="#hashrate" type="button" role="tab" aria-controls="hashrate" aria-selected="true">Hashrate</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-dark" id="temp-tab" data-bs-toggle="tab" data-bs-target="#temp" type="button" role="tab" aria-controls="temp" aria-selected="false">Temperature</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="hashrateTempTabs">
+            <div class="tab-pane fade show active" id="hashrate" role="tabpanel" aria-labelledby="hashrate-tab">
+                <div class="col-12 line_chart">
+                    <canvas id="hr-chart" class="grad-border mt-3" width="600" height="200"></canvas>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="temp" role="tabpanel" aria-labelledby="temp-tab">
+                <div class="col-12 line_chart">
+                    <canvas id="temp-chart" class="grad-border mt-3" width="600" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="d-flex justify-content-center text-nowrap" id="fan1">Fan 1</div>
+            <canvas class="mb-2" id="fan-chart-1" width="100" height="100"></canvas>
+        </div>
+        <div class="col-3">
+            <div class="d-flex justify-content-center text-nowrap" id="fan2">Fan 2</div>
+            <canvas class="mb-2" id="fan-chart-2" width="100" height="100"></canvas>
+        </div>
+        <div class="col-3">
+            <div class="d-flex justify-content-center text-nowrap" id="fan3">Fan 3</div>
+            <canvas class="mb-2" id="fan-chart-3" width="100" height="100"></canvas>
+        </div>
+        <div class="col-3">
+            <div class="d-flex justify-content-center text-nowrap" id="fan4">Fan 4</div>
+            <canvas class="mb-2" id="fan-chart-4" width="100" height="100"></canvas>
+        </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-center mt-4 alert alert-secondary">
+        <div class="mx-auto">Model:</div>
+        <div class="mx-auto fw-bolder" id="minerModel">?</div>
+        <div class="mx-auto" style="border-left: 1px solid grey; height: 50px;"></div>
+        <div class="mx-auto">Hashrate:</div>
+        <div class="mx-auto fw-bolder" id="minerHashrate">?</div>
+    </div>
+    <div id="errorContainer">
+    </div>
+    <script>
+        var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/miner/{{miner}}/ws");
+        let all_data = []
+        let all_labels = []
+        ws.onmessage = function(event) {
+            var new_data = JSON.parse(event.data)
+            if (new_data.hasOwnProperty("errors")) {
+                var err_container = document.getElementById("errorContainer")
+                err_container.innerHTML = ""
+                for (i = 0; i< new_data["errors"].length; i++) {
+                    err_container.innerHTML += "<div id='" + i + "_error" +
+                    "' class='d-flex align-items-center p-1 mb-1 alert alert-danger'><strong class='p-0 m-0'>" +
+                    new_data["errors"][i]
+                }
+            }
+            if (new_data.hasOwnProperty("hashrate")) {
+                wattage_input = document.getElementById("miner_input_wattage");
+                console.log(new_data["max_wattage"])
+                if (new_data["max_wattage"] == -1) {
+                    wattage_set = document.getElementById("update_wattage");
+                    wattage_set.disabled = true;
+                    wattage_input.disabled = true;
+                } else {
+                    if (!(wattage_input.value)) {
+                        wattage_input.value = new_data["max_wattage"]
+                        wattage_set = document.getElementById("update_wattage");
+                        wattage_set.disabled = false;
+                        wattage_input.disabled = false;
+                    }
+                }
+                fault_light_svg = document.getElementById("svg_fault_light");
+                if (new_data["fault_light"]) {
+                    fault_light_svg.innerHTML = '<use xlink:href="#light-on"></use>'
+                } else {
+                    fault_light_svg.innerHTML = '<use xlink:href="#light-off"></use>'
+                };
+
+                var chart = document.getElementById("hr-chart")
+                datetime = luxon.DateTime.fromISO(new_data["datetime"]).toLocal();
+                if (minerDataChart.data.labels.length > 50) minerDataChart.data.labels.shift();
+                if (minerDataChart.data.datasets[0].data.length > 50) minerDataChart.data.datasets[0].data.shift();
+                if (minerTempChart.data.labels.length > 50) minerTempChart.data.labels.shift();
+                if (minerTempChart.data.datasets[0].data.length > 50) minerTempChart.data.datasets[0].data.shift();
+                minerDataChart.data.labels.push(datetime.toLocaleString(luxon.DateTime.TIME_WITH_SECONDS));
+                minerDataChart.data.datasets[0].data.push(new_data["hashrate"].toFixed(2));
+                minerTempChart.data.labels.push(datetime.toLocaleString(luxon.DateTime.TIME_WITH_SECONDS));
+                minerTempChart.data.datasets[0].data.push(new_data["temp"].toFixed(2));
+                fan1Chart.data.datasets[0].data = [new_data["fans"][0], 6000-new_data["fans"][0]]
+                fan2Chart.data.datasets[0].data = [new_data["fans"][1], 6000-new_data["fans"][1]]
+                fan3Chart.data.datasets[0].data = [new_data["fans"][2], 6000-new_data["fans"][2]]
+                fan4Chart.data.datasets[0].data = [new_data["fans"][3], 6000-new_data["fans"][3]]
+                document.getElementById("fan1").innerHTML = "Fan 1: " + new_data["fans"][0]
+                document.getElementById("fan2").innerHTML = "Fan 2: " + new_data["fans"][1]
+                document.getElementById("fan3").innerHTML = "Fan 3: " + new_data["fans"][2]
+                document.getElementById("fan4").innerHTML = "Fan 4: " + new_data["fans"][3]
+                fan1Chart.update();
+                fan2Chart.update();
+                fan3Chart.update();
+                fan4Chart.update();
+                minerDataChart.update();
+                minerTempChart.update();
+                var miner_hr = document.getElementById("minerHashrate")
+                miner_hr.innerHTML = new_data["hashrate"].toFixed(2) + " TH/s"
+                var miner_model = document.getElementById("minerModel")
+                miner_model.innerHTML = new_data["model"].replace(" (BOS)", '<svg class="mx-2" style="fill: currentColor; vertical-align: -.25em;" width="44" height="20"><use xlink:href="#BOS"></use></svg>')
+            };
+        };
+
+        var ctx = document.getElementById("hr-chart").getContext("2d");
+        var width = document.getElementById("hr-chart").width;
+        var chartGradient = ctx.createLinearGradient(0, 0, width, 0)
+        chartGradient.addColorStop(0, '#D0368A');
+        chartGradient.addColorStop(1, '#708AD4');
+
+        const chartAreaBorder = {
+          id: 'chartAreaBorder',
+          beforeDraw(chart, args, options) {
+            const {ctx, chartArea: {left, top, width, height}} = chart;
+            ctx.save();
+            ctx.strokeStyle = options.borderColor;
+            ctx.lineWidth = options.borderWidth;
+            ctx.strokeRect(left, top, width, height);
+            ctx.restore();
+          }
+        };
+
+        var minerDataChart = new Chart(document.getElementById("hr-chart"), {
+          type: 'line',
+          data: {
+            labels: [
+            ],
+            datasets: [{
+                  label: "Hashrate",
+                  borderColor: chartGradient,
+                  pointBorderColor: chartGradient,
+                  pointBackgroundColor: chartGradient,
+                  pointHoverBackgroundColor: chartGradient,
+                  pointHoverBorderColor: chartGradient,
+                data: [
+                ],
+              }
+            ]
+          },
+          plugins: [chartAreaBorder],
+          options: {
+              animation: {
+                easing: 'easeInSine',
+                duration: 0
+              },
+              plugins: {
+                chartAreaBorder: {
+                  borderColor: chartGradient,
+                  borderWidth: 1
+                },
+                legend: {
+                    labels: {
+                        color: chartGradient
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(data) {
+                            return data.dataset.data[data.dataIndex] + " TH/s";
+                        }
+                    }
+                }
+              },
+            scales: {
+                y: {
+                    min: 0, // minimum value
+                    suggestedMax: 10,
+                    stepSize: 1,
+                    ticks: {
+                        callback: function(value, index, ticks) {
+                            return value + " TH/s";
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxTicksLimit: 6,
+                        maxRotation: 0
+                    }
+                }
+            }
+          }
+        });
+
+        var minerTempChart = new Chart(document.getElementById("temp-chart"), {
+          type: 'line',
+          data: {
+            labels: [
+            ],
+            datasets: [{
+                  label: "Temperature",
+                  borderColor: chartGradient,
+                  pointBorderColor: chartGradient,
+                  pointBackgroundColor: chartGradient,
+                  pointHoverBackgroundColor: chartGradient,
+                  pointHoverBorderColor: chartGradient,
+                data: [
+                ],
+              }
+            ]
+          },
+          plugins: [chartAreaBorder],
+          options: {
+              animation: {
+                easing: 'easeInSine',
+                duration: 0
+              },
+              plugins: {
+                chartAreaBorder: {
+                  borderColor: chartGradient,
+                  borderWidth: 1
+                },
+                legend: {
+                    labels: {
+                        color: chartGradient
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(data) {
+                            return data.dataset.data[data.dataIndex] + " °C";
+                        }
+                    }
+                }
+              },
+            scales: {
+                y: {
+                    min: 0, // minimum value
+                    suggestedMax: 100,
+                    stepSize: 5,
+                    ticks: {
+                        callback: function(value, index, ticks) {
+                            return value + " °C";
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxTicksLimit: 6,
+                        maxRotation: 0
+                    }
+                }
+            }
+          }
+        });
+
+        var options_fans = {
+            animation: {
+                easing: 'easeInSine',
+                duration: 250,
+            },
+            aspectRatio: 1.5,
+            events: [],
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            }
+        };
+
+        var fanCtx = document.getElementById("fan-chart-1").getContext("2d");
+        var fanWidth = document.getElementById("fan-chart-1").width;
+        var fanChartGradient = fanCtx.createLinearGradient(0, 0, fanWidth, -fanWidth)
+        fanChartGradient.addColorStop(0, '#D0368A');
+        fanChartGradient.addColorStop(1, '#708AD4');
+
+
+        var fan1Chart = new Chart(document.getElementById("fan-chart-1"), {
+            type: "doughnut",
+            data: {
+                labels: ["Fan 1"],
+                datasets: [
+                    {
+                        data: [0, 6000],
+                        // add colors
+                        backgroundColor: [
+                            fanChartGradient,
+                            "rgba(199, 199, 199, 1)"
+                        ]
+                    },
+                ]
+            },
+            options: options_fans
+        });
+        var fan2Chart = new Chart(document.getElementById("fan-chart-2"), {
+            type: "doughnut",
+            data: {
+                labels: ["Fan 2"],
+                datasets: [
+                    {
+                        data: [0, 6000],
+                        // add colors
+                        backgroundColor: [
+                            fanChartGradient,
+                            "rgba(199, 199, 199, 1)"
+                        ]
+                    },
+                ]
+            },
+            options: options_fans
+        });
+        var fan3Chart = new Chart(document.getElementById("fan-chart-3"), {
+            type: "doughnut",
+            data: {
+                labels: ["Fan 3"],
+                datasets: [
+                    {
+                        data: [0, 6000],
+                        // add colors
+                        backgroundColor: [
+                            fanChartGradient,
+                            "rgba(199, 199, 199, 1)"
+                        ]
+                    },
+                ]
+            },
+            options: options_fans
+        });
+        var fan4Chart = new Chart(document.getElementById("fan-chart-4"), {
+            type: "doughnut",
+            data: {
+                labels: ["Fan 4"],
+                datasets: [
+                    {
+                        data: [0, 6000],
+                        // add colors
+                        backgroundColor: [
+                            fanChartGradient,
+                            "rgba(199, 199, 199, 1)"
+                        ]
+                    },
+                ]
+            },
+            options: options_fans
+        });
+        window.post = function(url, data) {
+          return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
+        }
+
+        function updateWattage(event) {
+            var wattage_input = document.getElementById("miner_input_wattage");
+            set_wattage = wattage_input.value
+            post("{{url_for('page_wattage_set_miner', miner_ip=miner)}}", {wattage: set_wattage})
+        };
+
+    </script>
+</div>
+{% endblock content %}

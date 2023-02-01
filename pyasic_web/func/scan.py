@@ -1,10 +1,10 @@
 import asyncio
+import ipaddress
 
 from fastapi import WebSocket
 
 from pyasic.network import MinerNetwork
 from pyasic_web.func import get_current_miner_list
-import ipaddress
 
 
 async def do_websocket_scan(websocket: WebSocket, network_ip: str):

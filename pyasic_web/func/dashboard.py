@@ -2,9 +2,20 @@ import asyncio
 import json
 
 from pyasic.miners.miner_factory import MinerFactory
-from pyasic_web._settings.func import (  # noqa - Ignore access to _module
+from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
+
+
+def get_pool_users_data(data: list):
+    users = {}
+    pool_data = [dp.get("pool_1_user") for dp in data]
+    for user in pool_data:
+        if user:
+            if not user in users:
+                users[user] = 0
+            users[user] += 1
+    return users
 
 
 async def get_miner_data_dashboard(miner_ip):
