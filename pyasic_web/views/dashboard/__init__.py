@@ -8,7 +8,7 @@ from starlette.responses import RedirectResponse
 from starlette.websockets import WebSocketDisconnect
 
 from pyasic.misc import Singleton
-from pyasic_web.func import get_current_miner_list
+from pyasic_web.func import get_current_miner_list, get_user_ip_range
 from pyasic_web.func.dashboard import get_miner_data_dashboard, get_pool_users_data
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
@@ -21,9 +21,9 @@ class MinerDataManager(metaclass=Singleton):
         self.cached_data = None
 
 
-def page_dashboard(request: Request):
+async def page_dashboard(request: Request):
     return templates.TemplateResponse(
-        "dashboard.html", {"request": request, "cur_miners": get_current_miner_list()}
+        "dashboard.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request))}
     )
 
 def redirect_dashboard(request: Request):
@@ -36,7 +36,8 @@ async def ws_dashboard(websocket):
     graph_sleep_time = get_current_settings()["graph_data_sleep_time"]
     data_manager = MinerDataManager()
     try:
-        miners = get_current_miner_list()
+        irange = await get_user_ip_range(websocket)
+        miners = get_current_miner_list(irange)
         if len(miners) > 0:
             if data_manager.cached_data:
                 pool_users = get_pool_users_data(data_manager.cached_data)
@@ -48,7 +49,7 @@ async def ws_dashboard(websocket):
                     }
                 )
         while True:
-            miners = get_current_miner_list()
+            miners = get_current_miner_list(irange)
             all_miner_data = []
             data_gen = asyncio.as_completed(
                 [get_miner_data_dashboard(miner_ip) for miner_ip in miners]

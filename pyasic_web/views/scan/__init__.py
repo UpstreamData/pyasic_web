@@ -6,14 +6,14 @@ from starlette.requests import Request
 from starlette.websockets import WebSocketDisconnect
 
 from pyasic_web import settings
-from pyasic_web.func import get_current_miner_list
+from pyasic_web.func import get_current_miner_list, get_user_ip_range
 from pyasic_web.func.scan import do_websocket_scan
 from pyasic_web.templates import templates
 
 
-def page_scan(request: Request):
+async def page_scan(request: Request):
     return templates.TemplateResponse(
-        "scan.html", {"request": request, "cur_miners": get_current_miner_list()}
+        "scan.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request))}
     )
 
 

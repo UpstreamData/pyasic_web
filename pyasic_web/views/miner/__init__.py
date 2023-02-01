@@ -10,24 +10,24 @@ import pyasic
 from pyasic.miners.miner_factory import MinerFactory
 from pyasic.misc import Singleton
 from pyasic_web import settings
-from pyasic_web.func import get_current_miner_list
+from pyasic_web.func import get_current_miner_list, get_user_ip_range
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 from pyasic_web.templates import templates
 
 
-def page_miner(request: Request):
+async def page_miner(request: Request):
     miner_ip = request.path_params["miner_ip"]
     return templates.TemplateResponse(
         "miner.html",
-        {"request": request, "cur_miners": get_current_miner_list(), "miner": miner_ip},
+        {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request)), "miner": miner_ip},
     )
 
 
-def page_remove_miner(request: Request):
+async def page_remove_miner(request: Request):
     miner_ip = request.path_params["miner_ip"]
-    miners = get_current_miner_list()
+    miners = get_current_miner_list(await get_user_ip_range(request))
     miners.remove(miner_ip)
     with open(settings.MINER_LIST, "w") as file:
         for miner_ip in miners:

@@ -1,5 +1,4 @@
 from starlette.applications import Starlette
-from starlette.middleware import Middleware, sessions
 
 from pyasic_web import routes, auth
 

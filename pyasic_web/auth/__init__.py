@@ -4,7 +4,7 @@ from starlette.middleware import Middleware, sessions
 from pyasic_web.auth.users import USERS
 from passlib.hash import pbkdf2_sha256
 
-from imia import LoginManager,  InMemoryProvider
+from imia import LoginManager,  InMemoryProvider, authentication
 
 key = "SECRET"
 
@@ -17,6 +17,7 @@ class User:
     name: str = "Anon"
     password: str = 'password'
     scopes: list[str] = field(default_factory=list)
+    ip_range: str = "*"
 
     def get_display_name(self) -> str:
         return self.name
@@ -33,11 +34,9 @@ class User:
 
 users = {}
 for user in USERS:
-    users[user] = User(username=user, name=USERS[user]["name"] if USERS[user].get("name") else "Anon", password=USERS[user]["pwd"])
+    users[user] = User(username=user, name=USERS[user]["name"] if USERS[user].get("name") else "Anon", password=USERS[user]["pwd"], ip_range=USERS[user]["ip_range"] if USERS[user].get("ip_range") else "*")
 
-user_provider = InMemoryProvider({
-    'test': User(username='test', name='Test User', password='pass', scopes=[]),
-})
+user_provider = InMemoryProvider(users)
 
 login_manager = LoginManager(user_provider=user_provider, password_verifier=pbkdf2_sha256, secret_key=key)
 
