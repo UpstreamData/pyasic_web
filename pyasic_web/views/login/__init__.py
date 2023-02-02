@@ -2,7 +2,7 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from pyasic_web.templates import templates
-from pyasic_web.auth import login_manager
+from pyasic_web.auth import login_manager, user_provider
 
 
 async def page_login(request: Request):
@@ -18,8 +18,12 @@ async def page_login(request: Request):
             return templates.TemplateResponse("login.html", {"request": request, "err": "Please enter a password."})
         token = await login_manager.login(request, user, pwd)
         if token:
-            return RedirectResponse(request.url_for("page_dashboard"), status_code=303)
+            return RedirectResponse("/dashboard", status_code=303)
         else:
             return templates.TemplateResponse("login.html", {"request": request, "err": "Username or password is incorrect."})
 
     return templates.TemplateResponse("login.html", {"request": request})
+
+async def page_logout(request: Request):
+    await login_manager.logout(request)
+    return RedirectResponse(request.url_for("page_login"))

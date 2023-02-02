@@ -1,0 +1,13 @@
+{%extends 'error_pages/error_base.html'%}
+{%block content%}
+	<div id="notfound">
+		<div class="notfound">
+			<div class="notfound-err">
+				<h1>401</h1>
+				<h2>Unauthorized</h2>
+				<h3>You lack the correct authorization to access this page.</h3>
+			</div>
+			<a href="/dashboard">Homepage</a>
+		</div>
+	</div>
+{% endblock %}

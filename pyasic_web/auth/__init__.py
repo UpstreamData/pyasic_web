@@ -34,10 +34,19 @@ class User:
 
 users = {}
 for user in USERS:
-    users[user] = User(username=user, name=USERS[user]["name"] if USERS[user].get("name") else "Anon", password=USERS[user]["pwd"], ip_range=USERS[user]["ip_range"] if USERS[user].get("ip_range") else "*")
+    users[user] = User(username=user, name=USERS[user].get("name") or "Anon", password=USERS[user]["pwd"], ip_range=USERS[user].get("ip_range") or "*", scopes=USERS[user].get("scopes") or [])
 
 user_provider = InMemoryProvider(users)
 
 login_manager = LoginManager(user_provider=user_provider, password_verifier=pbkdf2_sha256, secret_key=key)
 
-middleware = Middleware(sessions.SessionMiddleware, secret_key=key)
+middleware = [
+    Middleware(sessions.SessionMiddleware, secret_key=key),
+    Middleware(
+        authentication.AuthenticationMiddleware,
+        authenticators=[authentication.SessionAuthenticator(user_provider)],
+        on_failure="redirect",
+        redirect_to="/login",
+        include_patterns=["\/lpage"],
+    )
+]

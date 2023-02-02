@@ -1,0 +1,13 @@
+{%extends 'error_pages/error_base.html'%}
+{%block content%}
+	<div id="notfound">
+		<div class="notfound">
+			<div class="notfound-err">
+				<h1>429</h1>
+				<h2>Too many requests</h2>
+				<h3>You are sending too many requests, please slow down and try again.</h3>
+			</div>
+			<a href="/dashboard">Homepage</a>
+		</div>
+	</div>
+{% endblock %}

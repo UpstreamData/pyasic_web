@@ -15,16 +15,23 @@ from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 from pyasic_web.templates import templates
+from pyasic_web.func.auth import login_req
+from starlette.exceptions import HTTPException
 
 
+@login_req()
 async def page_miner(request: Request):
     miner_ip = request.path_params["miner_ip"]
+    miners = get_current_miner_list(await get_user_ip_range(request))
+    if miner_ip not in miners:
+        raise HTTPException(403)
+
     return templates.TemplateResponse(
         "miner.html",
-        {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request)), "miner": miner_ip},
+        {"request": request, "cur_miners": miners, "miner": miner_ip},
     )
 
-
+@login_req()
 async def page_remove_miner(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miners = get_current_miner_list(await get_user_ip_range(request))
@@ -33,9 +40,9 @@ async def page_remove_miner(request: Request):
         for miner_ip in miners:
             file.write(miner_ip + "\n")
 
-    return RedirectResponse(request.url_for("page_dashboard"))
+    return RedirectResponse("/dashboard")
 
-
+@login_req()
 async def page_light_miner(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miner = await pyasic.get_miner(miner_ip)
@@ -45,9 +52,9 @@ async def page_light_miner(request: Request):
     else:
         asyncio.create_task(miner.fault_light_on())
 
-    return RedirectResponse(request.url_for("page_miner", miner_ip=miner_ip))
+    return RedirectResponse("/miner/" + miner_ip)
 
-
+@login_req()
 async def page_wattage_set_miner(request: Request):
     miner_ip = request.path_params["miner_ip"]
     d = await request.json()
@@ -61,7 +68,7 @@ class SingleMinerDataManager(metaclass=Singleton):
     def __init__(self):
         self.cached_data = None
 
-
+@login_req()
 async def ws_miner(websocket: WebSocket):
     miner_ip = websocket.path_params["miner_ip"]
     await websocket.accept()

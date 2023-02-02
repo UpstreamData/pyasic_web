@@ -141,7 +141,7 @@
                 for (i = 0; i< checkedBoxes.length; i++) {
                     minerList.push(checkedBoxes[i].defaultValue);
                 }
-                post("{{url_for('page_add_miners_scan')}}", {miners: minerList})
+                post("/scan/add_miner", {miners: minerList})
                 for (i = 0; i< minerList.length; i++) {
                     var tr_to_remove = document.getElementById(minerList[i])
                     tr_to_remove.remove()

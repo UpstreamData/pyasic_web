@@ -1,0 +1,13 @@
+{%extends 'error_pages/error_base.html'%}
+{%block content%}
+	<div id="notfound">
+		<div class="notfound">
+			<div class="notfound-err">
+				<h1>400</h1>
+				<h2>Bad Request</h2>
+				<h3>The request sent by the client was corrupt or incorrect, try resending your request.</h3>
+			</div>
+			<a href="/dashboard">Homepage</a>
+		</div>
+	</div>
+{% endblock %}

@@ -8,27 +8,29 @@ from starlette.responses import RedirectResponse
 from starlette.websockets import WebSocketDisconnect
 
 from pyasic.misc import Singleton
-from pyasic_web.func import get_current_miner_list, get_user_ip_range
+from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_current_user
 from pyasic_web.func.dashboard import get_miner_data_dashboard, get_pool_users_data
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 from pyasic_web.templates import templates
+from pyasic_web.func.auth import login_req
 
 
 class MinerDataManager(metaclass=Singleton):
     def __init__(self):
         self.cached_data = None
 
-
+@login_req()
 async def page_dashboard(request: Request):
     return templates.TemplateResponse(
-        "dashboard.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request))}
+        "dashboard.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request)), "user": await get_current_user(request)}
     )
 
 def redirect_dashboard(request: Request):
-    return RedirectResponse(request.url_for("page_dashboard"))
+    return RedirectResponse("/dashboard")
 
+@login_req()
 async def ws_dashboard(websocket):
     await websocket.accept()
     # while True:

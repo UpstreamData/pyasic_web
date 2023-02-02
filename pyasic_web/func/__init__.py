@@ -6,6 +6,8 @@ from pyasic import MinerNetwork
 from pyasic_web.auth import user_provider
 
 def get_current_miner_list(allowed_ips: str = "*"):
+    if not allowed_ips:
+        return []
     cur_miners = []
     if os.path.exists(settings.MINER_LIST):
         with open(settings.MINER_LIST) as file:
@@ -19,6 +21,17 @@ def get_current_miner_list(allowed_ips: str = "*"):
 
 async def get_user_ip_range(request):
     uid = request.session.get("_auth_user_id")
-    user = await user_provider.find_by_id(connection=request, identifier=uid)
-    print(uid)
-    return user.ip_range
+    if uid:
+        user = await user_provider.find_by_id(connection=request, identifier=uid)
+        return user.ip_range
+    else:
+        return None
+
+
+async def get_current_user(request):
+    uid = request.session.get("_auth_user_id")
+    if uid:
+        user = await user_provider.find_by_id(connection=request, identifier=uid)
+        return user.get_display_name()
+    else:
+        return None

@@ -29,10 +29,10 @@ async def page_update_settings(request: Request):
         "miner_identify_timeout": int(miner_identify_timeout),
     }
     update_settings(new_settings)
-    return RedirectResponse(request.url_for("page_settings"))
+    return RedirectResponse("/settings")
 
 
 async def page_remove_all_miners(request: Request):
     file = open(settings.MINER_LIST, "w")
     file.close()
-    return RedirectResponse(request.url_for("page_dashboard"))
+    return RedirectResponse("/dashboard")

@@ -80,7 +80,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a class="btn btn-danger" href="{{url_for('page_miner')}}{{miner_ip}}/remove" role="button">Remove</a>
+                <a class="btn btn-danger" href="/miner/{{miner_ip}}/remove" role="button">Remove</a>
             </div>
         </div>
     </div>
@@ -440,7 +440,7 @@
         function updateWattage(event) {
             var wattage_input = document.getElementById("miner_input_wattage");
             set_wattage = wattage_input.value
-            post("{{url_for('page_wattage_set_miner', miner_ip=miner)}}", {wattage: set_wattage})
+            post("/miner/{{miner}}/wattage", {wattage: set_wattage})
         };
 
     </script>

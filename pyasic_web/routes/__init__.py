@@ -42,4 +42,5 @@ routes = [
         ],
     ),
     Route("/login", views.login.page_login, methods=["GET", "POST"]),
+    Route("/logout", views.login.page_logout, methods=["GET"]),
 ]
