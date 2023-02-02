@@ -9,11 +9,13 @@ routes = [
     Route("/", views.login.page_login,  methods=["GET", "POST"]),
     Route("/remove_all_miners", views.web_settings.page_remove_all_miners),
     Mount("/static", app=static, name="static"),
+    Route("/manage", views.manage.page_manage_miners),
+    Route("/remove_miners", views.manage.page_remove_miners, methods=["POST"]),
     Mount(
         "/scan",
         routes=[
             Route("/", views.scan.page_scan),
-            Route("/add_miners", views.scan.page_add_miners_scan, methods=["POST"]),
+            Route("/add_miner", views.scan.page_add_miners_scan, methods=["POST"]),
             WebSocketRoute("/ws", views.scan.ws_scan),
         ],
     ),

@@ -10,17 +10,17 @@ import pyasic
 from pyasic.miners.miner_factory import MinerFactory
 from pyasic.misc import Singleton
 from pyasic_web import settings
-from pyasic_web.func import get_current_miner_list, get_user_ip_range
+from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_current_user
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 from pyasic_web.templates import templates
-from pyasic_web.func.auth import login_req
+from pyasic_web.func.auth import login_req, ws_login_req
 from starlette.exceptions import HTTPException
 
 
-@login_req()
 async def page_miner(request: Request):
+    await login_req(request)
     miner_ip = request.path_params["miner_ip"]
     miners = get_current_miner_list(await get_user_ip_range(request))
     if miner_ip not in miners:
@@ -28,13 +28,13 @@ async def page_miner(request: Request):
 
     return templates.TemplateResponse(
         "miner.html",
-        {"request": request, "cur_miners": miners, "miner": miner_ip},
+        {"request": request, "cur_miners": miners, "miner": miner_ip, "user": await get_current_user(request)},
     )
 
-@login_req()
 async def page_remove_miner(request: Request):
+    await login_req(request)
     miner_ip = request.path_params["miner_ip"]
-    miners = get_current_miner_list(await get_user_ip_range(request))
+    miners = get_current_miner_list("*")
     miners.remove(miner_ip)
     with open(settings.MINER_LIST, "w") as file:
         for miner_ip in miners:
@@ -42,11 +42,10 @@ async def page_remove_miner(request: Request):
 
     return RedirectResponse("/dashboard")
 
-@login_req()
 async def page_light_miner(request: Request):
+    await login_req(request)
     miner_ip = request.path_params["miner_ip"]
     miner = await pyasic.get_miner(miner_ip)
-    print(miner.light)
     if miner.light:
         asyncio.create_task(miner.fault_light_off())
     else:
@@ -54,8 +53,8 @@ async def page_light_miner(request: Request):
 
     return RedirectResponse("/miner/" + miner_ip)
 
-@login_req()
 async def page_wattage_set_miner(request: Request):
+    await login_req(request)
     miner_ip = request.path_params["miner_ip"]
     d = await request.json()
     wattage = d["wattage"]
@@ -68,8 +67,8 @@ class SingleMinerDataManager(metaclass=Singleton):
     def __init__(self):
         self.cached_data = None
 
-@login_req()
 async def ws_miner(websocket: WebSocket):
+    await ws_login_req(websocket)
     miner_ip = websocket.path_params["miner_ip"]
     await websocket.accept()
     settings = get_current_settings()

@@ -26,7 +26,7 @@ class User:
         return self.username
 
     def get_hashed_password(self) -> str:
-        return str(pbkdf2_sha256.hash(self.password))
+        return self.password
 
     def get_scopes(self) -> list:
         return self.scopes
@@ -34,7 +34,7 @@ class User:
 
 users = {}
 for user in USERS:
-    users[user] = User(username=user, name=USERS[user].get("name") or "Anon", password=USERS[user]["pwd"], ip_range=USERS[user].get("ip_range") or "*", scopes=USERS[user].get("scopes") or [])
+    users[user] = User(username=user, name=USERS[user].get("name") or "Anon", password=pbkdf2_sha256.hash(USERS[user]["pwd"]), ip_range=USERS[user].get("ip_range") or "*", scopes=USERS[user].get("scopes") or [])
 
 user_provider = InMemoryProvider(users)
 

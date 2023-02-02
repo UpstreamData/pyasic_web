@@ -1,4 +1,5 @@
 from pyasic_web.templates import templates
+from starlette.exceptions import HTTPException
 
 
 async def handle_400(request, exc):
@@ -32,8 +33,13 @@ async def handle_429(request, exc):
 
 
 async def handle_500(request, exc):
+    if isinstance(exc, HTTPException):
+        return templates.TemplateResponse(
+            "error_pages/500.html", {"request": request, "title": exc.status_code}, status_code=exc.status_code
+        )
     return templates.TemplateResponse(
-        "error_pages/500.html", {"request": request, "title": exc.status_code}, status_code=exc.status_code
+        "error_pages/500.html", {"request": request, "title": 500},
+        status_code=500
     )
 
 

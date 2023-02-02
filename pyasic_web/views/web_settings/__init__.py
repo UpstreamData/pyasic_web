@@ -2,7 +2,8 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from pyasic_web import settings
-from pyasic_web.func import get_current_miner_list, get_user_ip_range
+from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_current_user
+from pyasic_web.func.auth import login_req
 from pyasic_web.func.web_settings import get_current_settings, update_settings
 from pyasic_web.templates import templates
 
@@ -14,6 +15,7 @@ async def page_settings(request: Request):
             "request": request,
             "cur_miners": get_current_miner_list(await get_user_ip_range(request)),
             "settings": get_current_settings(),
+            "user": await get_current_user(request)
         },
     )
 

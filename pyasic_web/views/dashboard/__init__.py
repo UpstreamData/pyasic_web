@@ -14,15 +14,15 @@ from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 from pyasic_web.templates import templates
-from pyasic_web.func.auth import login_req
+from pyasic_web.func.auth import login_req, ws_login_req
 
 
 class MinerDataManager(metaclass=Singleton):
     def __init__(self):
         self.cached_data = None
 
-@login_req()
 async def page_dashboard(request: Request):
+    await login_req(request)
     return templates.TemplateResponse(
         "dashboard.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request)), "user": await get_current_user(request)}
     )
@@ -30,8 +30,8 @@ async def page_dashboard(request: Request):
 def redirect_dashboard(request: Request):
     return RedirectResponse("/dashboard")
 
-@login_req()
 async def ws_dashboard(websocket):
+    await ws_login_req(websocket)
     await websocket.accept()
     # while True:
     #     await asyncio.sleep(5)

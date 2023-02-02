@@ -32,6 +32,6 @@ async def get_current_user(request):
     uid = request.session.get("_auth_user_id")
     if uid:
         user = await user_provider.find_by_id(connection=request, identifier=uid)
-        return user.get_display_name()
+        return user
     else:
         return None
