@@ -35,12 +35,14 @@ async def page_manage_users(request: Request):
     )
 
 async def page_delete_user(request: Request):
+    await login_req(request, ["admin"])
     data = await request.json()
     uid = data["user_id"]
     user_provider.delete_user(uid)
     return RedirectResponse(request.url_for("page_manage_users"), status_code=302)
 
 async def page_update_user(request: Request):
+    await login_req(request, ["admin"])
     data = await request.form()
     admin = data.get("admin")
     if admin:
@@ -57,6 +59,7 @@ async def page_update_user(request: Request):
     return RedirectResponse(request.url_for("page_manage_users"), status_code=302)
 
 async def page_add_user(request: Request):
+    await login_req(request, ["admin"])
     data = await request.form()
     admin = data.get("admin")
     if admin:
