@@ -21,6 +21,15 @@ class MinerDataManager(metaclass=Singleton):
     def __init__(self):
         self.cached_data = None
 
+    def get_cached_data(self, miners: list):
+        data_ret = []
+        for d in self.cached_data:
+            if d["ip"] in miners:
+                data_ret.append(d)
+        return data_ret
+
+
+
 async def page_dashboard(request: Request):
     await login_req(request)
     return templates.TemplateResponse(
@@ -46,7 +55,7 @@ async def ws_dashboard(websocket):
                 await websocket.send_json(
                     {
                         "datetime": datetime.datetime.now().isoformat(),
-                        "miners": data_manager.cached_data,
+                        "miners": data_manager.get_cached_data(get_current_miner_list(irange)),
                         "pool_users": pool_users,
                     }
                 )
