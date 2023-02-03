@@ -9,7 +9,13 @@ routes = [
     Route("/", views.login.page_login,  methods=["GET", "POST"]),
     Route("/remove_all_miners", views.web_settings.page_remove_all_miners),
     Mount("/static", app=static, name="static"),
-    Route("/manage", views.manage.page_manage_miners),
+    Mount("/manage", routes=[
+        Route("/miners", views.manage.page_manage_miners),
+        Route("/users", views.manage.page_manage_users),
+        Route("/update_user", views.manage.page_update_user, methods=["POST"]),
+        Route("/delete_user", views.manage.page_delete_user, methods=["POST"]),
+        Route("/add_user", views.manage.page_add_user, methods=["POST"])
+    ]),
     Route("/remove_miners", views.manage.page_remove_miners, methods=["POST"]),
     Mount(
         "/scan",

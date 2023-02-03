@@ -35,3 +35,6 @@ async def get_current_user(request):
         return user
     else:
         return None
+
+async def get_all_users():
+    return user_provider.user_map
