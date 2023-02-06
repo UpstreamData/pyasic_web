@@ -86,71 +86,120 @@
     </div>
 </div>
 <div class="px-lg-4 my-2 mx-4 mx-lg-0">
-    <div class="row">
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active text-dark" id="hashrate-tab" data-bs-toggle="tab" data-bs-target="#hashrate" type="button" role="tab" aria-controls="hashrate" aria-selected="true">Hashrate</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link text-dark" id="temp-tab" data-bs-toggle="tab" data-bs-target="#temp" type="button" role="tab" aria-controls="temp" aria-selected="false">Temperature</button>
-            </li>
-        </ul>
-        <div class="tab-content" id="hashrateTempTabs">
-            <div class="tab-pane fade show active" id="hashrate" role="tabpanel" aria-labelledby="hashrate-tab">
-                <div class="col-12 line_chart">
-                    <canvas id="hr-chart" class="grad-border mt-3" width="600" height="200"></canvas>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="temp" role="tabpanel" aria-labelledby="temp-tab">
-                <div class="col-12 line_chart">
-                    <canvas id="temp-chart" class="grad-border mt-3" width="600" height="200"></canvas>
-                </div>
+    <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                Model
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="model">?</div>
+              </div>
             </div>
         </div>
-        <div class="col-3">
-            <div class="d-flex justify-content-center text-nowrap" id="fan1">Fan 1</div>
-            <canvas class="mb-2" id="fan-chart-1" width="100" height="100"></canvas>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                Hashrate
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="total_hashrate">0 TH/s</div>
+              </div>
+            </div>
         </div>
-        <div class="col-3">
-            <div class="d-flex justify-content-center text-nowrap" id="fan2">Fan 2</div>
-            <canvas class="mb-2" id="fan-chart-2" width="100" height="100"></canvas>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                Ideal Hashrate
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="ideal_hashrate">0 TH/s</div>
+              </div>
+            </div>
         </div>
-        <div class="col-3">
-            <div class="d-flex justify-content-center text-nowrap" id="fan3">Fan 3</div>
-            <canvas class="mb-2" id="fan-chart-3" width="100" height="100"></canvas>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                % Ideal Hashrate
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="pct_ideal_hashrate">0 %</div>
+              </div>
+            </div>
         </div>
-        <div class="col-3">
-            <div class="d-flex justify-content-center text-nowrap" id="fan4">Fan 4</div>
-            <canvas class="mb-2" id="fan-chart-4" width="100" height="100"></canvas>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                  Efficiency
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="total_efficiency">0 J/TH</div>
+              </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                  Wattage
+              </div>
+              <div class="card-body hashrate-header display-6">
+                    <div class="mx-auto fw-bolder" id="total_watts">0 W</div>
+              </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                  Max Wattage
+              </div>
+              <div class="card-body hashrate-header display-6">
+                    <div class="mx-auto fw-bolder" id="total_max_watts">0 W</div>
+              </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                  % Max Wattage
+              </div>
+              <div class="card-body hashrate-header display-6">
+                    <div class="mx-auto fw-bolder" id="pct_max_wattage">0 %</div>
+              </div>
+            </div>
         </div>
     </div>
-    <div class="d-flex align-items-center justify-content-center mt-4 alert alert-secondary">
-        <div class="mx-auto">Model:</div>
-        <div class="mx-auto fw-bolder" id="minerModel">?</div>
-        <div class="mx-auto" style="border-left: 1px solid grey; height: 50px;"></div>
-        <div class="mx-auto">Hashrate:</div>
-        <div class="mx-auto fw-bolder" id="minerHashrate">?</div>
+    <div class="row row-cols-1 m-1 my-3">
+        <div class="card">
+          <div class="card-header fw-bold text-center ">
+            Errors
+          </div>
+          <div class="card-body">
+              <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group pe-3" id="miner_errors_list"></div>
+          </div>
+        </div>
     </div>
-    <div id="errorContainer">
-    </div>
+
+    <div id="py_errors"></div>
     <script>
         var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/miner/{{miner}}/ws");
         let all_data = []
         let all_labels = []
         ws.onmessage = function(event) {
             var new_data = JSON.parse(event.data)
-            if (new_data.hasOwnProperty("errors")) {
-                var err_container = document.getElementById("errorContainer")
+            if (new_data.hasOwnProperty("py_errors")) {
+                var err_container = document.getElementById("py_errors")
                 err_container.innerHTML = ""
-                for (i = 0; i< new_data["errors"].length; i++) {
+                for (i = 0; i< new_data["py_errors"].length; i++) {
                     err_container.innerHTML += "<div id='" + i + "_error" +
                     "' class='d-flex align-items-center p-1 mb-1 alert alert-danger'><strong class='p-0 m-0'>" +
-                    new_data["errors"][i]
+                    new_data["py_errors"][i] +
+                    "</strong><div class='spinner-border spinner-border-sm ms-auto'></div></div>"
                 }
             }
             if (new_data.hasOwnProperty("hashrate")) {
+                var err_container = document.getElementById("py_errors")
+                err_container.innerHTML = ""
                 wattage_input = document.getElementById("miner_input_wattage");
-                console.log(new_data["max_wattage"])
                 if (new_data["max_wattage"] == -1) {
                     wattage_set = document.getElementById("update_wattage");
                     wattage_set.disabled = true;
@@ -163,276 +212,84 @@
                         wattage_input.disabled = false;
                     }
                 }
+                errors_html = ""
+                errors = document.getElementById("miner_errors_list")
+                if (new_data.hasOwnProperty("errors")) {
+                    if (new_data["errors"].length > 0) {
+                        miner_id_local = new_data["ip"].replaceAll(".", "-")
+                        err_loc = document.getElementById("errors_" + miner_id_local)
+                        if (err_loc) {
+                            if (err_loc.classList.contains('show')) {
+                                miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error" aria-expanded="true">' + new_data["ip"] + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["errors"].length + '</span></a>'
+                                miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5 show" id="errors_' + miner_id_local + '">'
+                                for (err in new_data["errors"]) {
+                                    miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["errors"][err]["error_message"] + '</div>'
+                                };
+                                miner_errs_local_html += '</div>'
+
+
+
+
+                            } else {
+                                miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + new_data["ip"] + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["errors"].length + '</span></a>'
+                                miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5" id="errors_' + miner_id_local + '">'
+                                for (err in new_data["errors"]) {
+                                    miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["errors"][err]["error_message"] + '</div>'
+                                };
+                                miner_errs_local_html += '</div>'
+                            }
+                        } else {
+                            miner_errs_local_html = '<a data-bs-toggle="collapse" href="#errors_' + miner_id_local + '" role="button" class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + new_data["ip"] + '<span class="badge bg-gradient rounded-pill alight-items-middle p-2 m-0" style="width:50px;">' + new_data["errors"].length + '</span></a>'
+                            miner_errs_local_html += '<div class="collapse no-transition multi-collapse my-0 py-0 ms-5" id="errors_' + miner_id_local + '">'
+                            for (err in new_data["errors"]) {
+                                miner_errs_local_html += '<div class ="list-group-item no-transition miner-error-item">' + new_data["errors"][err]["error_message"] + '</div>'
+                            };
+                            miner_errs_local_html += '</div>'
+                        }
+
+                        errors_html += miner_errs_local_html
+                    };
+                }
+                errors.innerHTML = errors_html;
+
                 fault_light_svg = document.getElementById("svg_fault_light");
                 if (new_data["fault_light"]) {
                     fault_light_svg.innerHTML = '<use xlink:href="#light-on"></use>'
                 } else {
                     fault_light_svg.innerHTML = '<use xlink:href="#light-off"></use>'
                 };
-
-                var chart = document.getElementById("hr-chart")
-                datetime = luxon.DateTime.fromISO(new_data["datetime"]).toLocal();
-                if (minerDataChart.data.labels.length > 50) minerDataChart.data.labels.shift();
-                if (minerDataChart.data.datasets[0].data.length > 50) minerDataChart.data.datasets[0].data.shift();
-                if (minerTempChart.data.labels.length > 50) minerTempChart.data.labels.shift();
-                if (minerTempChart.data.datasets[0].data.length > 50) minerTempChart.data.datasets[0].data.shift();
-                minerDataChart.data.labels.push(datetime.toLocaleString(luxon.DateTime.TIME_WITH_SECONDS));
-                minerDataChart.data.datasets[0].data.push(new_data["hashrate"].toFixed(2));
-                minerTempChart.data.labels.push(datetime.toLocaleString(luxon.DateTime.TIME_WITH_SECONDS));
-                minerTempChart.data.datasets[0].data.push(new_data["temp"].toFixed(2));
-                fan1Chart.data.datasets[0].data = [new_data["fans"][0], 6000-new_data["fans"][0]]
-                fan2Chart.data.datasets[0].data = [new_data["fans"][1], 6000-new_data["fans"][1]]
-                fan3Chart.data.datasets[0].data = [new_data["fans"][2], 6000-new_data["fans"][2]]
-                fan4Chart.data.datasets[0].data = [new_data["fans"][3], 6000-new_data["fans"][3]]
-                document.getElementById("fan1").innerHTML = "Fan 1: " + new_data["fans"][0]
-                document.getElementById("fan2").innerHTML = "Fan 2: " + new_data["fans"][1]
-                document.getElementById("fan3").innerHTML = "Fan 3: " + new_data["fans"][2]
-                document.getElementById("fan4").innerHTML = "Fan 4: " + new_data["fans"][3]
-                fan1Chart.update();
-                fan2Chart.update();
-                fan3Chart.update();
-                fan4Chart.update();
-                minerDataChart.update();
-                minerTempChart.update();
-                var miner_hr = document.getElementById("minerHashrate")
+                var miner_hr = document.getElementById("total_hashrate")
                 miner_hr.innerHTML = new_data["hashrate"].toFixed(2) + " TH/s"
-                var miner_model = document.getElementById("minerModel")
-                miner_model.innerHTML = new_data["model"].replace(" (BOS)", '<svg class="mx-2" style="fill: currentColor; vertical-align: -.25em;" width="44" height="20"><use xlink:href="#BOS"></use></svg>')
+                var miner_model = document.getElementById("model")
+                miner_model.innerHTML = new_data["model"].replace(" (BOS)", '<svg class="ms-3" style="fill: currentColor; vertical-align: -1px;" width="66" height="30"><use xlink:href="#BOS"></use></svg>')
+                var miner_ideal_hr = document.getElementById("ideal_hashrate")
+                miner_ideal_hr.innerHTML = new_data["nominal_hashrate"].toFixed(2) + " TH/s"
+
+                var eff_block = document.getElementById("total_efficiency")
+                var pct_ideal_hr_block = document.getElementById("pct_ideal_hashrate")
+                var eff_block = document.getElementById("total_efficiency")
+                var total_wattage = document.getElementById("total_watts")
+                var max_wattage = document.getElementById("total_max_watts")
+                var pct_max_wattage_block = document.getElementById("pct_max_wattage")
+
+                max_wattage.innerHTML = new_data["wattage_limit"] + " W"
+                total_wattage.innerHTML = new_data["wattage"] + " W"
+
+                if (!(new_data["hashrate"] == 0)) {
+                    eff_block.innerHTML = Number((new_data["wattage"]/new_data["hashrate"]).toFixed(2)) + " J/TH"
+                    pct_ideal_hr_block.innerHTML = (Number((new_data["hashrate"]/new_data["nominal_hashrate"])*100)).toFixed(2) + " %"
+                } else {
+                    eff_block.innerHTML = "0 J/TH"
+                    pct_ideal_hr_block.innerHTML = "0 %"
+                }
+                if (!(total_watts == 0)) {
+                    pct_max_wattage_block.innerHTML = (Number((new_data["wattage"]/new_data["wattage_limit"])*100)).toFixed(2) + " %"
+                } else {
+                    pct_max_wattage_block.innerHTML = "0 %"
+                }
+
             };
         };
-
-        var ctx = document.getElementById("hr-chart").getContext("2d");
-        var width = document.getElementById("hr-chart").width;
-        var chartGradient = ctx.createLinearGradient(0, 0, width, 0)
-        chartGradient.addColorStop(0, '#D0368A');
-        chartGradient.addColorStop(1, '#708AD4');
-
-        const chartAreaBorder = {
-          id: 'chartAreaBorder',
-          beforeDraw(chart, args, options) {
-            const {ctx, chartArea: {left, top, width, height}} = chart;
-            ctx.save();
-            ctx.strokeStyle = options.borderColor;
-            ctx.lineWidth = options.borderWidth;
-            ctx.strokeRect(left, top, width, height);
-            ctx.restore();
-          }
-        };
-
-        var minerDataChart = new Chart(document.getElementById("hr-chart"), {
-          type: 'line',
-          data: {
-            labels: [
-            ],
-            datasets: [{
-                  label: "Hashrate",
-                  borderColor: chartGradient,
-                  pointBorderColor: chartGradient,
-                  pointBackgroundColor: chartGradient,
-                  pointHoverBackgroundColor: chartGradient,
-                  pointHoverBorderColor: chartGradient,
-                data: [
-                ],
-              }
-            ]
-          },
-          plugins: [chartAreaBorder],
-          options: {
-              animation: {
-                easing: 'easeInSine',
-                duration: 0
-              },
-              plugins: {
-                chartAreaBorder: {
-                  borderColor: chartGradient,
-                  borderWidth: 1
-                },
-                legend: {
-                    labels: {
-                        color: chartGradient
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(data) {
-                            return data.dataset.data[data.dataIndex] + " TH/s";
-                        }
-                    }
-                }
-              },
-            scales: {
-                y: {
-                    min: 0, // minimum value
-                    suggestedMax: 10,
-                    stepSize: 1,
-                    ticks: {
-                        callback: function(value, index, ticks) {
-                            return value + " TH/s";
-                        }
-                    }
-                },
-                x: {
-                    ticks: {
-                        maxTicksLimit: 6,
-                        maxRotation: 0
-                    }
-                }
-            }
-          }
-        });
-
-        var minerTempChart = new Chart(document.getElementById("temp-chart"), {
-          type: 'line',
-          data: {
-            labels: [
-            ],
-            datasets: [{
-                  label: "Temperature",
-                  borderColor: chartGradient,
-                  pointBorderColor: chartGradient,
-                  pointBackgroundColor: chartGradient,
-                  pointHoverBackgroundColor: chartGradient,
-                  pointHoverBorderColor: chartGradient,
-                data: [
-                ],
-              }
-            ]
-          },
-          plugins: [chartAreaBorder],
-          options: {
-              animation: {
-                easing: 'easeInSine',
-                duration: 0
-              },
-              plugins: {
-                chartAreaBorder: {
-                  borderColor: chartGradient,
-                  borderWidth: 1
-                },
-                legend: {
-                    labels: {
-                        color: chartGradient
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(data) {
-                            return data.dataset.data[data.dataIndex] + " °C";
-                        }
-                    }
-                }
-              },
-            scales: {
-                y: {
-                    min: 0, // minimum value
-                    suggestedMax: 100,
-                    stepSize: 5,
-                    ticks: {
-                        callback: function(value, index, ticks) {
-                            return value + " °C";
-                        }
-                    }
-                },
-                x: {
-                    ticks: {
-                        maxTicksLimit: 6,
-                        maxRotation: 0
-                    }
-                }
-            }
-          }
-        });
-
-        var options_fans = {
-            animation: {
-                easing: 'easeInSine',
-                duration: 250,
-            },
-            aspectRatio: 1.5,
-            events: [],
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false,
-                }
-            }
-        };
-
-        var fanCtx = document.getElementById("fan-chart-1").getContext("2d");
-        var fanWidth = document.getElementById("fan-chart-1").width;
-        var fanChartGradient = fanCtx.createLinearGradient(0, 0, fanWidth, -fanWidth)
-        fanChartGradient.addColorStop(0, '#D0368A');
-        fanChartGradient.addColorStop(1, '#708AD4');
-
-
-        var fan1Chart = new Chart(document.getElementById("fan-chart-1"), {
-            type: "doughnut",
-            data: {
-                labels: ["Fan 1"],
-                datasets: [
-                    {
-                        data: [0, 6000],
-                        // add colors
-                        backgroundColor: [
-                            fanChartGradient,
-                            "rgba(199, 199, 199, 1)"
-                        ]
-                    },
-                ]
-            },
-            options: options_fans
-        });
-        var fan2Chart = new Chart(document.getElementById("fan-chart-2"), {
-            type: "doughnut",
-            data: {
-                labels: ["Fan 2"],
-                datasets: [
-                    {
-                        data: [0, 6000],
-                        // add colors
-                        backgroundColor: [
-                            fanChartGradient,
-                            "rgba(199, 199, 199, 1)"
-                        ]
-                    },
-                ]
-            },
-            options: options_fans
-        });
-        var fan3Chart = new Chart(document.getElementById("fan-chart-3"), {
-            type: "doughnut",
-            data: {
-                labels: ["Fan 3"],
-                datasets: [
-                    {
-                        data: [0, 6000],
-                        // add colors
-                        backgroundColor: [
-                            fanChartGradient,
-                            "rgba(199, 199, 199, 1)"
-                        ]
-                    },
-                ]
-            },
-            options: options_fans
-        });
-        var fan4Chart = new Chart(document.getElementById("fan-chart-4"), {
-            type: "doughnut",
-            data: {
-                labels: ["Fan 4"],
-                datasets: [
-                    {
-                        data: [0, 6000],
-                        // add colors
-                        backgroundColor: [
-                            fanChartGradient,
-                            "rgba(199, 199, 199, 1)"
-                        ]
-                    },
-                ]
-            },
-            options: options_fans
-        });
         window.post = function(url, data) {
           return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
         }
