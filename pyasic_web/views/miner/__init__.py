@@ -28,8 +28,23 @@ async def page_miner(request: Request):
 
     return templates.TemplateResponse(
         "miner.html",
-        {"request": request, "cur_miners": miners, "miner": miner_ip, "user": await get_current_user(request)},
+        {
+            "request": request,
+            "cur_miners": miners,
+            "miner": miner_ip,
+            "user": await get_current_user(request),
+            "cards": [
+                "hashrate",
+                "ideal_hashrate",
+                "pct_ideal_hashrate",
+                "efficiency",
+                "wattage",
+                "max_wattage",
+                "pct_max_wattage",
+            ],
+        },
     )
+
 
 async def page_remove_miner(request: Request):
     await login_req(request)
@@ -42,6 +57,7 @@ async def page_remove_miner(request: Request):
 
     return RedirectResponse("/dashboard")
 
+
 async def page_light_miner(request: Request):
     await login_req(request)
     miner_ip = request.path_params["miner_ip"]
@@ -52,6 +68,7 @@ async def page_light_miner(request: Request):
         asyncio.create_task(miner.fault_light_on())
 
     return RedirectResponse("/miner/" + miner_ip)
+
 
 async def page_wattage_set_miner(request: Request):
     await login_req(request)
@@ -66,6 +83,7 @@ async def page_wattage_set_miner(request: Request):
 class SingleMinerDataManager(metaclass=Singleton):
     def __init__(self):
         self.cached_data = None
+
 
 async def ws_miner(websocket: WebSocket):
     await ws_login_req(websocket)

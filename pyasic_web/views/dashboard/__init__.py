@@ -29,15 +29,22 @@ class MinerDataManager(metaclass=Singleton):
         return data_ret
 
 
-
 async def page_dashboard(request: Request):
     await login_req(request)
     return templates.TemplateResponse(
-        "dashboard.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request)), "user": await get_current_user(request)}
+        "dashboard.html",
+        {
+            "request": request,
+            "cur_miners": get_current_miner_list(await get_user_ip_range(request)),
+            "user": await get_current_user(request),
+            "cards": ["count", "hashrate", "ideal_hashrate", "pct_ideal_hashrate", "efficiency", "wattage", "max_wattage", "pct_max_wattage"]
+        },
     )
+
 
 def redirect_dashboard(request: Request):
     return RedirectResponse("/dashboard")
+
 
 async def ws_dashboard(websocket):
     await ws_login_req(websocket)
@@ -55,7 +62,9 @@ async def ws_dashboard(websocket):
                 await websocket.send_json(
                     {
                         "datetime": datetime.datetime.now().isoformat(),
-                        "miners": data_manager.get_cached_data(get_current_miner_list(irange)),
+                        "miners": data_manager.get_cached_data(
+                            get_current_miner_list(irange)
+                        ),
                         "pool_users": pool_users,
                     }
                 )

@@ -34,10 +34,10 @@ async def get_miner_data_dashboard(miner_ip):
         return json.loads(data.as_json())
 
     except asyncio.exceptions.TimeoutError:
-        return {"ip": miner_ip, "error": "The miner is not responding."}
+        return {"ip": miner_ip, "py_error": "The miner is not responding."}
 
     except KeyError:
         return {
             "ip": miner_ip,
-            "error": "The miner returned unusable/unsupported data.",
+            "py_error": "The miner returned unusable/unsupported data.",
         }
