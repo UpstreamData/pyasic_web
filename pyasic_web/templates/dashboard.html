@@ -49,81 +49,135 @@
     </div>
 {% endif %}
 <div class="px-lg-4 my-2 mx-4 mx-lg-0">
-    {% if not cur_miners|length == 0 %}
-    <div class="row mt-3">
-        <div class="col-sm-6 col-12 d-flex align-content-center justify-content-center">
-            <h1 class="hashrate-header" id="miner_count">Miners: {{cur_miners|length}}</h1>
-        </div>
-        <div class="col-sm-6 col-12 d-flex align-content-center justify-content-center">
-            <h1 class="hashrate-header" id="total_hashrate">Hashrate: 0 TH/s</h1>
-        </div>
-    </div>
-    {% elif "admin" in user.scopes %}
-    <a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info fw-bolder d-flex align-items-center justify-content-center mt-3" style="height:100px;">Click here to add miners.</a>
+    {% if "admin" in user.scopes and cur_miners|length == 0 %}
+        <a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info fw-bolder d-flex align-items-center justify-content-center mt-3" style="height:100px;">Click here to add miners.</a>
     {% endif %}
-    <div class="row mt-3 px-2">
-        <div class="col col-12 col-md-4 my-0 px-1 py-1">
-            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
-                <div class="mx-auto">Ideal Hashrate:</div>
-                <div class="mx-auto fw-bolder" id="ideal_hashrate">0 TH/s</div>
+    <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                Miner Count
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="miner_count">{{cur_miners|length}}</div>
+              </div>
             </div>
         </div>
-        <div class="col col-12 col-md-4 my-0 px-1 py-1">
-            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
-                <div class="mx-auto">% Ideal Hashrate:</div>
-                <div class="mx-auto fw-bolder" id="pct_ideal_hashrate">0 %</div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                Hashrate
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="total_hashrate">0 TH/s</div>
+              </div>
             </div>
         </div>
-        <div class="col col-12 col-md-4 my-0 px-1 py-1">
-            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
-                <div class="mx-auto">Efficiency:</div>
-                <div class="mx-auto fw-bolder" id="total_efficiency">0 J/TH</div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                Ideal Hashrate
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="ideal_hashrate">0 TH/s</div>
+              </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                % Ideal Hashrate
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="pct_ideal_hashrate">0 %</div>
+              </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                  Efficiency
+              </div>
+              <div class="card-body hashrate-header display-6">
+                  <div class="mx-auto fw-bolder" id="total_efficiency">0 J/TH</div>
+              </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                  Wattage
+              </div>
+              <div class="card-body hashrate-header display-6">
+                    <div class="mx-auto fw-bolder" id="total_watts">0 W</div>
+              </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                  Max Wattage
+              </div>
+              <div class="card-body hashrate-header display-6">
+                    <div class="mx-auto fw-bolder" id="total_max_watts">0 W</div>
+              </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+              <div class="card-header fw-bold">
+                  % Max Wattage
+              </div>
+              <div class="card-body hashrate-header display-6">
+                    <div class="mx-auto fw-bolder" id="pct_max_wattage">0 %</div>
+              </div>
             </div>
         </div>
     </div>
-    <div class="row px-2">
-        <div class="col col-12 col-md-4 my-0 px-1 py-1">
-            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
-                <div class="mx-auto">Wattage:</div>
-                <div class="mx-auto fw-bolder" id="total_watts">0 W</div>
-            </div>
-        </div>
-        <div class="col col-12 col-md-4 my-0 px-1 py-1">
-            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
-                <div class="mx-auto">Max Wattage:</div>
-                <div class="mx-auto fw-bolder" id="total_max_watts">0 W</div>
-            </div>
-        </div>
-        <div class="col col-12 col-md-4 my-0 px-1 py-1">
-            <div class="d-flex align-items-center justify-content-center my-0 alert alert-secondary py-3">
-                <div class="mx-auto">% Max Wattage:</div>
-                <div class="mx-auto fw-bolder" id="pct_max_wattage">0 %</div>
-            </div>
+    <div class="row row-cols-1 m-1 my-3">
+        <div class="card">
+          <div class="card-header fw-bold text-center ">
+            Errors
+          </div>
+          <div class="card-body">
+              <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_errors_list"></div>
+          </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col my-1 pb-0">
-            <div class="alert alert-secondary p-0 mb-0">
-                <h6 class="px-3 pt-2 pb-1 fw-bolder">Errors:</h6>
-                <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_errors_list">
-                    <!-- <a data-bs-toggle="collapse" href="#errors_192-168-1-1" role="button" class="list-group-item list-group-item-action miner-error">192.168.1.1</a>
-                        <div class="collapse multi-collapse my-0 py-0 ms-5" id="errors_192-168-1-1">
-                            <div class ="list-group-item miner-error-item">Error_1</div>
-                            <div class ="list-group-item miner-error-item">Error_3</div>
-                        </div> -->
-                </div>
-            </div>
+<!--    <div class="row">-->
+<!--        <div class="col my-1 pb-0">-->
+<!--            <div class="alert alert-secondary p-0 mb-0">-->
+<!--                <h6 class="px-3 pt-2 pb-1 fw-bolder">Errors:</h6>-->
+<!--                <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_errors_list">-->
+<!--                    &lt;!&ndash; <a data-bs-toggle="collapse" href="#errors_192-168-1-1" role="button" class="list-group-item list-group-item-action miner-error">192.168.1.1</a>-->
+<!--                        <div class="collapse multi-collapse my-0 py-0 ms-5" id="errors_192-168-1-1">-->
+<!--                            <div class ="list-group-item miner-error-item">Error_1</div>-->
+<!--                            <div class ="list-group-item miner-error-item">Error_3</div>-->
+<!--                        </div> &ndash;&gt;-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div class="row row-cols-1 m-1 my-3">
+        <div class="card">
+          <div class="card-header fw-bold text-center">
+            Pools
+          </div>
+          <div class="card-body">
+              <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_pools_list"></div>
+          </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col my-1 pb-0">
-            <div class="alert alert-secondary p-0 mb-0">
-                <h6 class="px-3 pt-2 pb-1 fw-bolder">Pool Users:</h6>
-                <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_pools_list">
-                </div>
-            </div>
-        </div>
-    </div>
+
+<!--    <div class="row">-->
+<!--        <div class="col my-1 pb-0">-->
+<!--            <div class="alert alert-secondary p-0 mb-0">-->
+<!--                <h6 class="px-3 pt-2 pb-1 fw-bolder">Pool Users:</h6>-->
+<!--                <div style="height: 200px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group" id="miner_pools_list">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
     <div id="errors"></div>
     <script>
         if (!window.WebSocket) alert("WebSocket not supported by this browser");
@@ -236,13 +290,13 @@
 
 
             if (total_hashrate == 0) {
-                total_hashrate = "Hashrate: 0 TH/s"
+                total_hashrate = "0 TH/s"
             } else if (total_hashrate < 1) {
-                total_hashrate = "Hashrate: " + parseInt(total_hashrate*1000) + " GH/s";
+                total_hashrate = parseInt(total_hashrate*1000) + " GH/s";
             } else if (total_hashrate > 1000) {
-                total_hashrate = "Hashrate: " + Number((total_hashrate/1000).toFixed(2)) + " PH/s";
+                total_hashrate = Number((total_hashrate/1000).toFixed(2)) + " PH/s";
             } else {
-                total_hashrate = "Hashrate: " + parseInt(total_hashrate) + " TH/s";
+                total_hashrate = parseInt(total_hashrate) + " TH/s";
             };
             hr_block.innerHTML = total_hashrate;
 

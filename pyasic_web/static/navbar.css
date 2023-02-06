@@ -196,7 +196,6 @@ main {
 }
 .hashrate-header {
     background-image: linear-gradient(90deg, #760A45 0%, #23449F 99%);
-
   // background: linear-gradient(90deg, #D0368A 0%, #708AD4 99%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -204,7 +203,6 @@ main {
 
 .miner-error {
     color: #41464b;
-
 }
 .miner-error-item {
   font-size: .75rem;
