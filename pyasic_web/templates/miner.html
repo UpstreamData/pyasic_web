@@ -88,15 +88,17 @@
 <div class="px-lg-4 my-2 mx-4 mx-lg-0">
     <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">
         {% for card_name in cards %}
-            {% include 'cards/' + card_name + '.html' %}
+            {% if card_exists('cards/miner/' + card_name + '.html') %}
+                {% include 'cards/miner/' + card_name + '.html' %}
+            {% endif %}
         {% endfor %}
     </div>
-    <div class="row row-cols-1 m-1 my-3">
-        {% include 'cards/errors.html' %}
-    </div>
-    <div class="row row-cols-1 m-1 my-3">
-        {% include 'cards/pools.html' %}
-    </div>
+        {% if 'errors' in cards %}
+            {% include 'cards/errors.html' %}
+        {% endif %}
+        {% if 'pools' in cards %}
+            {% include 'cards/pools.html' %}
+        {% endif %}
 
     <div id="py_errors"></div>
     <script>
@@ -114,13 +116,16 @@
                     data["py_errors"][i] +
                     "</strong><div class='spinner-border spinner-border-sm ms-auto'></div></div>"
                 }
+            } else {
+                py_errors = document.getElementById("py_errors")
+                py_errors.innerHTML = ""
             }
 
             {% for card_name in cards %}
-                {% include 'cards/scripts/' + card_name + '.js' %}
+                {% if card_exists('cards/scripts/miner/' + card_name + '.js') %}
+                    {% include 'cards/scripts/miner/' + card_name + '.js' %}
+                {% endif %}
             {% endfor %}
-            {% include 'cards/scripts/errors.js' %}
-            {% include 'cards/scripts/pools.js' %}
         }
 
         window.post = function(url, data) {

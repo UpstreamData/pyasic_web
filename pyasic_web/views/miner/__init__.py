@@ -14,7 +14,7 @@ from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_curre
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
-from pyasic_web.templates import templates
+from pyasic_web.templates import templates, card_exists
 from pyasic_web.func.auth import login_req, ws_login_req
 from starlette.exceptions import HTTPException
 
@@ -34,14 +34,26 @@ async def page_miner(request: Request):
             "miner": miner_ip,
             "user": await get_current_user(request),
             "cards": [
-                "hashrate",
-                "ideal_hashrate",
-                "pct_ideal_hashrate",
+                "api_ver",
                 "efficiency",
-                "wattage",
+                "env_temp",
+                "fw_ver",
+                "hashrate",
+                "hostname",
+                "ideal_chips",
+                "ideal_hashrate",
+                "make",
                 "max_wattage",
+                "model",
+                "pct_ideal_chips",
+                "pct_ideal_hashrate",
                 "pct_max_wattage",
+                "temperature_avg",
+                "total_chips",
+                "wattage",
+                "errors", "pools"
             ],
+            "card_exists": card_exists,
         },
     )
 
