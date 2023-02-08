@@ -1,7 +1,7 @@
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_current_user, get_all_users
+from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_current_user, get_all_users, get_available_cards
 from pyasic_web.func.auth import login_req
 from pyasic_web.templates import templates
 from pyasic_web import settings
@@ -78,7 +78,7 @@ async def page_add_user(request: Request):
 
 async def page_manage_cards(request: Request):
     await login_req(request)
-    return templates.TemplateResponse("manage_cards.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request)), "user": await get_current_user(request)})
+    return templates.TemplateResponse("manage_cards.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request)), "user": await get_current_user(request), "miner_available_cards": get_available_cards("miner"), "dashboard_available_cards": get_available_cards("dashboard")})
 
 async def page_update_miner_cards(request: Request):
     await login_req(request)

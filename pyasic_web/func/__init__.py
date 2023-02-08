@@ -38,3 +38,9 @@ async def get_current_user(request):
 
 async def get_all_users():
     return user_provider.user_map
+
+
+def get_available_cards(page):
+    directory = os.path.join(settings.TEMPLATES_DIR, "cards", page)
+    card_names = [str(f).replace(".html", "") for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+    return sorted(card_names)

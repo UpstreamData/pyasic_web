@@ -13,16 +13,26 @@
     </div>
 </nav>
 <div class="row m-4">
-    <div class="col col-6">
+    <div class="col-sm py-2">
         <div class="card">
             <div class="card-header">
                 Dashboard Cards
             </div>
             <div class="card-body">
+                <div class="container mb-2 ms-0 ps-0">
+                    <div class="input-group">
+                      <select class="form-select" id="dashboard_card_add">
+                          {% for card in dashboard_available_cards %}
+                            <option value="{{ card }}">{{ card }}</option>
+                          {% endfor %}
+                      </select>
+                      <button class="btn btn-outline-secondary" type="button" onclick="addDashboardCard()">Add</button>
+                    </div>
+                </div>
                 <form id="form_dashboard_cards" method="post" action="/manage/update_dashboard_cards">
                     <input type="text" id="dashboard_cards" hidden name="dashboard_cards"/>
                     <div style="height: 500px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group pe-3">
-                        <ul id="sortable_dashboard_cards">
+                        <ul id="sortable_dashboard_cards" style="padding: 0px!important;">
                             {% for card in user.dashboard_cards %}
                                 <li class="form-control user-select-none" id="dashboard_{{ card }}_card" type="text">{{ card }}</li>
                             {% endfor %}
@@ -35,16 +45,26 @@
             </div>
         </div>
     </div>
-    <div class="col col-6">
+    <div class="col-sm py-2">
         <div class="card">
             <div class="card-header">
                 Miner Cards
             </div>
             <div class="card-body">
+                <div class="container mb-2 ms-0 ps-0">
+                    <div class="input-group">
+                      <select class="form-select" id="miner_card_add">
+                          {% for card in miner_available_cards %}
+                            <option value="{{ card }}">{{ card }}</option>
+                          {% endfor %}
+                      </select>
+                      <button class="btn btn-outline-secondary" type="button" onclick="addMinerCard()">Add</button>
+                    </div>
+                </div>
                 <form id="form_miner_cards" method="post" action="/manage/update_miner_cards">
                     <input type="text" id="miner_cards" hidden name="miner_cards"/>
                     <div style="height: 500px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group pe-3">
-                        <ul id="sortable_miner_cards">
+                        <ul id="sortable_miner_cards" style="padding: 0px!important;">
                             {% for card in user.miner_cards %}
                                 <li class="form-control user-select-none" id="miner_{{ card }}_card" type="text">{{ card }}</li>
                             {% endfor %}
@@ -65,13 +85,19 @@
       return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
     }
 
-    function updateMinerCards(user) {
-        form = document.getElementById("form_miner_cards");
-        form.submit();
+    function addMinerCard() {
+        list = document.getElementById("sortable_miner_cards");
+        card_name = document.getElementById("miner_card_add").value;
+        if (card_name != "" ) {
+            list.innerHTML += '<li class="form-control user-select-none" id="dashboard_' + card_name + '_card" type="text">' + card_name + '</li>'
+        }
     }
-    function updateDashboardCards(user) {
-        form = document.getElementById("form_dashboard_cards");
-        form.submit();
+    function addDashboardCard() {
+        list = document.getElementById("sortable_dashboard_cards");
+        card_name = document.getElementById("dashboard_card_add").value;
+        if (card_name != "" ) {
+            list.innerHTML += '<li class="form-control user-select-none" id="dashboard_' + card_name + '_card" type="text">' + card_name + '</li>'
+        }
     }
 </script>
 <script>
