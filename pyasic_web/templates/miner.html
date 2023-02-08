@@ -85,6 +85,8 @@
         </div>
     </div>
 </div>
+    <div id="py_errors" class="mx-4 m-0 mt-3"></div>
+
 <div class="px-lg-4 my-2 mx-4 mx-lg-0">
     <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">
         {% for card_name in cards %}
@@ -93,14 +95,6 @@
             {% endif %}
         {% endfor %}
     </div>
-        {% if 'errors' in cards %}
-            {% include 'cards/errors.html' %}
-        {% endif %}
-        {% if 'pools' in cards %}
-            {% include 'cards/pools.html' %}
-        {% endif %}
-
-    <div id="py_errors"></div>
     <script>
         var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/miner/{{miner}}/ws");
         let all_data = []

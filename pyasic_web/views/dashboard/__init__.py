@@ -38,7 +38,7 @@ async def page_dashboard(request: Request):
             "request": request,
             "cur_miners": get_current_miner_list(await get_user_ip_range(request)),
             "user": await get_current_user(request),
-            "cards": ["count", "hashrate", "ideal_hashrate", "pct_ideal_hashrate", "efficiency", "wattage", "max_wattage", "pct_max_wattage", "env_temp", "ideal_chips", "pct_ideal_chips", "temperature_avg", "total_chips", "errors", "pools"],
+            "cards": ["count", "hashrate", "ideal_hashrate", "pct_ideal_hashrate", "efficiency", "wattage", "max_wattage", "pct_max_wattage", "env_temp", "ideal_chips", "pct_ideal_chips", "temperature_avg", "total_chips", "lights", "errors", "pools"],
             "card_exists": card_exists,
         },
     )

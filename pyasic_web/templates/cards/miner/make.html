@@ -1,12 +1,9 @@
-<div class="col">
-    <div class="card text-center">
-        <div class="card-header fw-bold">
-            Make
-        </div>
-        <div class="card-body hashrate-header d-flex align-items-center  h4 p-0 m-0">
-            <div class="mx-auto fw-bolder" id="card_make">
-                ?
-            </div>
-        </div>
-    </div>
+{% extends "/cards/bases/basic_card.html" %}
+{% block header %}
+Make
+{% endblock header %}
+{% block body %}
+<div class="mx-auto fw-bolder" id="card_make">
+?
 </div>
+{% endblock body %}

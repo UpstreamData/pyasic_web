@@ -28,30 +28,27 @@
         </div>
     </div>
 </nav>
+<div id="py_errors" class="mx-4 m-0 mt-3"></div>
 <div class="px-lg-4 my-2 mx-4 mx-lg-0">
     {% if "admin" in user.scopes and cur_miners|length == 0 %}
         <a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info fw-bolder d-flex align-items-center justify-content-center mt-3" style="height:100px;">Click here to add miners.</a>
     {% endif %}
-    <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">
-        {% for card_name in cards %}
-            {% if card_exists('cards/dashboard/' + card_name + '.html') %}
-                {% include 'cards/dashboard/' + card_name + '.html' %}
-            {% endif %}
-        {% endfor %}
+<!--    <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">-->
+    <div class="row" data-masonry='{"percentPosition": true }' id="all_cards">
+        {% if not cur_miners|length == 0 %}
+            {% for card_name in cards %}
+                {% if card_exists('cards/dashboard/' + card_name + '.html') %}
+                    {% include 'cards/dashboard/' + card_name + '.html' %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     </div>
-        {% if 'errors' in cards %}
-            {% include 'cards/errors.html' %}
-        {% endif %}
-        {% if 'pools' in cards %}
-            {% include 'cards/pools.html' %}
-        {% endif %}
-    <div id="errors"></div>
     <script>
         if (!window.WebSocket) alert("WebSocket not supported by this browser");
         var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/dashboard/ws");
         ws.onmessage = function(event) {
             var data = JSON.parse(event.data)
-
+            errors = document.getElementById("py_errors");
             for (i = 0; i< data["miners"].length; i++) {
                 if (data["miners"][i].hasOwnProperty("py_error")) {
                     if (!document.getElementById(data["miners"][i]["ip"] + "_error")) {
@@ -67,11 +64,13 @@
                     }
                 }
             }
-            {% for card_name in cards %}
-                {% if card_exists('cards/scripts/dashboard/' + card_name + '.js') %}
-                    {% include 'cards/scripts/dashboard/' + card_name + '.js' %}
-                {% endif %}
-            {% endfor %}
+            {% if not cur_miners|length == 0 %}
+                {% for card_name in cards %}
+                    {% if card_exists('cards/scripts/dashboard/' + card_name + '.js') %}
+                        {% include 'cards/scripts/dashboard/' + card_name + '.js' %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         }
     </script>
 </div>
