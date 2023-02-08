@@ -3,6 +3,7 @@ import os
 
 import websockets.exceptions
 from starlette.requests import Request
+from starlette.responses import RedirectResponse
 from starlette.websockets import WebSocketDisconnect
 
 from pyasic_web import settings
@@ -25,7 +26,7 @@ async def page_add_miners_scan(request: Request):
     with open(settings.MINER_LIST, "a+") as file:
         for miner_ip in miners["miners"]:
             file.write(miner_ip + "\n")
-    return page_scan(request)
+    return RedirectResponse("/scan")
 
 
 async def ws_scan(websocket):

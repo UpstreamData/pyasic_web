@@ -6,7 +6,7 @@ if (data.hasOwnProperty("miners")) {
     // Dashboard code, multiple miners
     for (i = 0; i< data["miners"].length; i++) {
         if (data["miners"][i].hasOwnProperty("env_temp")) {
-            if (!data["miners"][i]["env_temp"] == -1) {
+            if (data["miners"][i]["env_temp"] != -1) {
                 env_temp += parseFloat(data["miners"][i]["env_temp"])
             }
         }
