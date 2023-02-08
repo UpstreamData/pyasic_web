@@ -1,0 +1,97 @@
+{% extends 'navbar.html'%}
+{% block content %}
+<nav class="navbar bg-dark" data-bs-theme="dark">
+    <div class="row d-flex justify-content-between w-100 align-content-middle">
+        <div class="col-7">
+            <h2 class="ms-3 mt-1 text-light">
+                <svg class="bi me-2 d-none d-sm-inline" width="32" height="32">
+                    <use xlink:href="#cards"></use>
+                </svg>
+                Manage Cards
+            </h2>
+        </div>
+    </div>
+</nav>
+<div class="row m-4">
+    <div class="col col-6">
+        <div class="card">
+            <div class="card-header">
+                Dashboard Cards
+            </div>
+            <div class="card-body">
+                <form id="form_dashboard_cards" method="post" action="/manage/update_dashboard_cards">
+                    <input type="text" id="dashboard_cards" hidden name="dashboard_cards"/>
+                    <div style="height: 500px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group pe-3">
+                        <ul id="sortable_dashboard_cards">
+                            {% for card in user.dashboard_cards %}
+                                <li class="form-control user-select-none" id="dashboard_{{ card }}_card" type="text">{{ card }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="container">
+                        <button type="submit" class="btn btn-info w-100">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col col-6">
+        <div class="card">
+            <div class="card-header">
+                Miner Cards
+            </div>
+            <div class="card-body">
+                <form id="form_miner_cards" method="post" action="/manage/update_miner_cards">
+                    <input type="text" id="miner_cards" hidden name="miner_cards"/>
+                    <div style="height: 500px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group pe-3">
+                        <ul id="sortable_miner_cards">
+                            {% for card in user.miner_cards %}
+                                <li class="form-control user-select-none" id="miner_{{ card }}_card" type="text">{{ card }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="container">
+                        <button type="submit" class="btn btn-info w-100">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    window.post = function(url, data) {
+      return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
+    }
+
+    function updateMinerCards(user) {
+        form = document.getElementById("form_miner_cards");
+        form.submit();
+    }
+    function updateDashboardCards(user) {
+        form = document.getElementById("form_dashboard_cards");
+        form.submit();
+    }
+</script>
+<script>
+    $( function() {
+        $( "#sortable_miner_cards" ).sortable();
+        $( "#sortable_miner_cards" ).disableSelection();
+
+        $('#form_miner_cards').submit(function(){
+            $( '#miner_cards' ).val($( "#sortable_miner_cards" ).sortable("serialize"));
+            $('#form_miner_cards').submit();
+        });
+    });
+    $( function() {
+        $( "#sortable_dashboard_cards" ).sortable();
+        $( "#sortable_dashboard_cards" ).disableSelection();
+
+        $('#form_dashboard_cards').submit(function(){
+            $( '#dashboard_cards' ).val($( "#sortable_dashboard_cards" ).sortable("serialize"));
+            $('#form_dashboard_cards').submit();
+        });
+    });
+</script>
+{% endblock content %}

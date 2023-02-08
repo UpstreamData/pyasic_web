@@ -36,7 +36,7 @@
 <!--    <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">-->
     <div class="row" data-masonry='{"percentPosition": true }' id="all_cards">
         {% if not cur_miners|length == 0 %}
-            {% for card_name in cards %}
+            {% for card_name in user.miner_cards %}
                 {% if card_exists('cards/dashboard/' + card_name + '.html') %}
                     {% include 'cards/dashboard/' + card_name + '.html' %}
                 {% endif %}
@@ -65,7 +65,7 @@
                 }
             }
             {% if not cur_miners|length == 0 %}
-                {% for card_name in cards %}
+                {% for card_name in user.miner_cards %}
                     {% if card_exists('cards/scripts/dashboard/' + card_name + '.js') %}
                         {% include 'cards/scripts/dashboard/' + card_name + '.js' %}
                     {% endif %}

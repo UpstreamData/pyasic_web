@@ -26,7 +26,7 @@ async def page_remove_miners(request: Request):
     with open(settings.MINER_LIST, "w") as file:
         for miner_ip in miners:
             file.write(miner_ip + "\n")
-    return await page_manage_miners(request)
+    return RedirectResponse(request.url_for("page_manage_users"), status_code=302)
 
 async def page_manage_users(request: Request):
     await login_req(request, ["admin"])
@@ -74,3 +74,32 @@ async def page_add_user(request: Request):
         ip_range=data["ip_range"],
     )
     return RedirectResponse(request.url_for("page_manage_users"), status_code=302)
+
+
+async def page_manage_cards(request: Request):
+    await login_req(request)
+    return templates.TemplateResponse("manage_cards.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request)), "user": await get_current_user(request)})
+
+async def page_update_miner_cards(request: Request):
+    await login_req(request)
+    cards_raw = (await request.form())["miner_cards"]
+    cards = cards_raw.split("&")
+    for idx, card in enumerate(cards):
+        card = card.replace("[]=card", "").replace("miner_", "")
+        cards[idx] = card
+    user = await get_current_user(request)
+    user.miner_cards = cards
+    user_provider.update_user_cards(user)
+    return RedirectResponse(request.url_for("page_manage_cards"), status_code=302)
+
+async def page_update_dashboard_cards(request: Request):
+    await login_req(request)
+    cards_raw = (await request.form())["dashboard_cards"]
+    cards = cards_raw.split("&")
+    for idx, card in enumerate(cards):
+        card = card.replace("[]=card", "").replace("dashboard_", "")
+        cards[idx] = card
+    user = await get_current_user(request)
+    user.dashboard_cards = cards
+    user_provider.update_user_cards(user)
+    return RedirectResponse(request.url_for("page_manage_cards"), status_code=302)

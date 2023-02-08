@@ -89,7 +89,7 @@
 
 <div class="px-lg-4 my-2 mx-4 mx-lg-0">
     <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">
-        {% for card_name in cards %}
+        {% for card_name in user.miner_cards %}
             {% if card_exists('cards/miner/' + card_name + '.html') %}
                 {% include 'cards/miner/' + card_name + '.html' %}
             {% endif %}
@@ -115,7 +115,7 @@
                 py_errors.innerHTML = ""
             }
 
-            {% for card_name in cards %}
+            {% for card_name in user.miner_cards %}
                 {% if card_exists('cards/scripts/miner/' + card_name + '.js') %}
                     {% include 'cards/scripts/miner/' + card_name + '.js' %}
                 {% endif %}

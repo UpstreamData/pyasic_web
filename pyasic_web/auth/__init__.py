@@ -4,12 +4,15 @@ from starlette.middleware import Middleware, sessions
 from pyasic_web.auth.users import USERS
 from passlib.hash import pbkdf2_sha256
 
-from imia import LoginManager,  UserProvider, authentication
+from imia import LoginManager, UserProvider, authentication
 import json
 import os
 from copy import copy
 
 key = "SECRET"
+
+DEFAULT_DASHBOARD_CARDS = ["count", "hashrate", "pct_ideal_chips", "temperature_avg", "wattage", "pct_max_wattage", "efficiency", "errors"]
+DEFAULT_MINER_CARDS = ["model", "hashrate", "pct_ideal_chips", "temperature_avg", "wattage", "pct_max_wattage", "efficiency", "errors", "pools"]
 
 @dataclass
 class User:
@@ -18,9 +21,11 @@ class User:
 
     username: str
     name: str = "Anon"
-    password: str = 'password'
+    password: str = "password"
     scopes: list[str] = field(default_factory=list)
     ip_range: str = "*"
+    dashboard_cards: list = field(default_factory=list)
+    miner_cards: list = field(default_factory=list)
 
     def get_display_name(self) -> str:
         return self.name
@@ -34,10 +39,6 @@ class User:
     def get_scopes(self) -> list:
         return self.scopes
 
-
-users = {}
-for user in USERS:
-    users[user] = User(username=user, name=USERS[user].get("name") or "Anon", password=pbkdf2_sha256.hash(USERS[user]["pwd"]), ip_range=USERS[user].get("ip_range") or "*", scopes=USERS[user].get("scopes") or [])
 
 class JsonProvider(UserProvider):
     def __init__(self, file):
@@ -58,24 +59,55 @@ class JsonProvider(UserProvider):
         with open(self.file, "r") as f:
             users_data = json.loads(f.read())
 
+
         for u in users_data:
+            dashboard_cards = users_data[u].get("dashboard_cards")
+            if not dashboard_cards:
+                dashboard_cards = DEFAULT_DASHBOARD_CARDS
+            miner_cards = users_data[u].get("miner_cards")
+            if not miner_cards:
+                miner_cards = DEFAULT_MINER_CARDS
             self.user_map[u] = User(
                 username=users_data[u]["username"],
                 name=users_data[u]["name"],
                 password=users_data[u]["password"],
                 scopes=users_data[u]["scopes"],
                 ip_range=users_data[u]["ip_range"],
+                dashboard_cards=dashboard_cards,
+                miner_cards=miner_cards,
             )
 
-    def add_user(self, username: str, name: str, password: str, scopes: list, ip_range: str):
-        self.user_map[username] = User(username=username, name=name, password=pbkdf2_sha256.hash(password), scopes=scopes, ip_range=ip_range)
+    def add_user(
+        self, username: str, name: str, password: str, scopes: list, ip_range: str
+    ):
+        self.user_map[username] = User(
+            username=username,
+            name=name,
+            password=pbkdf2_sha256.hash(password),
+            scopes=scopes,
+            ip_range=ip_range,
+            dashboard_cards=DEFAULT_DASHBOARD_CARDS,
+            miner_cards=DEFAULT_MINER_CARDS
+        )
         self.dump_users()
 
     def delete_user(self, uid):
         self.user_map.pop(uid)
         self.dump_users()
 
-    def update_user(self, username: str, name: str, scopes: list, ip_range: str, password: str = None):
+    def update_user_cards(self, user: User):
+        if not user.username in self.user_map:
+            return
+        self.user_map[user.username] = user
+
+    def update_user(
+        self,
+        username: str,
+        name: str,
+        scopes: list,
+        ip_range: str,
+        password: str = None,
+    ):
         if not username in self.user_map:
             return
         old_user = self.user_map[username]
@@ -83,7 +115,15 @@ class JsonProvider(UserProvider):
             password = old_user.get_hashed_password()
         else:
             password = pbkdf2_sha256.hash(password)
-        new_user = User(username=username, name=name, password=password, scopes=scopes, ip_range=ip_range)
+        new_user = User(
+            username=username,
+            name=name,
+            password=password,
+            scopes=scopes,
+            ip_range=ip_range,
+            dashboard_cards=old_user.dashboard_cards,
+            miner_cards=old_user.miner_cards
+        )
         self.user_map[username] = new_user  # noqa
         self.dump_users()
 
@@ -98,7 +138,9 @@ class JsonProvider(UserProvider):
 user_provider = JsonProvider(os.path.join(os.path.dirname(__file__), "users.json"))
 user_provider.dump_users()
 
-login_manager = LoginManager(user_provider=user_provider, password_verifier=pbkdf2_sha256, secret_key=key)
+login_manager = LoginManager(
+    user_provider=user_provider, password_verifier=pbkdf2_sha256, secret_key=key
+)
 
 middleware = [
     Middleware(sessions.SessionMiddleware, secret_key=key),
@@ -108,5 +150,5 @@ middleware = [
         on_failure="redirect",
         redirect_to="/login",
         include_patterns=["\/lpage"],
-    )
+    ),
 ]
