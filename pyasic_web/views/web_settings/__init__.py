@@ -15,7 +15,7 @@ async def page_settings(request: Request):
             "request": request,
             "cur_miners": get_current_miner_list(await get_user_ip_range(request)),
             "settings": get_current_settings(),
-            "user": await get_current_user(request)
+            "user": await get_current_user(request),
         },
     )
 

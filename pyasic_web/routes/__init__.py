@@ -6,20 +6,39 @@ from pyasic_web import settings, views
 static = StaticFiles(directory=settings.STATIC_DIR)
 
 routes = [
-    Route("/", views.login.page_login,  methods=["GET", "POST"]),
+    Route("/", views.login.page_login, methods=["GET", "POST"]),
     Route("/remove_all_miners", views.web_settings.page_remove_all_miners),
     Mount("/static", app=static, name="static"),
-    Mount("/manage", routes=[
-        Route("/miners", views.manage.page_manage_miners),
-        Route("/users", views.manage.page_manage_users),
-        Route("/cards", views.manage.page_manage_cards),
-        Route("/update_miner_cards", views.manage.page_update_miner_cards, methods=["POST"]),
-        Route("/update_dashboard_cards", views.manage.page_update_dashboard_cards, methods=["POST"]),
-        Route("/reset_cards", views.manage.page_reset_cards, methods=["POST"]),
-        Route("/update_user", views.manage.page_update_user, methods=["POST"]),
-        Route("/delete_user", views.manage.page_delete_user, methods=["POST"]),
-        Route("/add_user", views.manage.page_add_user, methods=["POST"]),
-    ]),
+    Mount(
+        "/manage",
+        routes=[
+            Route("/miners", views.manage.page_manage_miners),
+            Route("/users", views.manage.page_manage_users),
+            Route("/cards", views.manage.page_manage_cards),
+            Route(
+                "/update_miner_cards",
+                views.manage.page_update_miner_cards,
+                methods=["POST"],
+            ),
+            Route(
+                "/update_dashboard_cards",
+                views.manage.page_update_dashboard_cards,
+                methods=["POST"],
+            ),
+            Route("/reset_cards", views.manage.page_reset_cards, methods=["POST"]),
+            Route("/update_user", views.manage.page_update_user, methods=["POST"]),
+            Route("/delete_user", views.manage.page_delete_user, methods=["POST"]),
+            Route("/add_user", views.manage.page_add_user, methods=["POST"]),
+            WebSocketRoute("/manage_miners/ws", views.manage.ws_manage_miners),
+            Route("/light_miners", views.manage.page_light_miners, methods=["POST"]),
+            Route("/reboot_miners", views.manage.page_reboot_miners, methods=["POST"]),
+            Route(
+                "/restart_backend_miners",
+                views.manage.page_restart_backend_miners,
+                methods=["POST"],
+            ),
+        ],
+    ),
     Route("/remove_miners", views.manage.page_remove_miners, methods=["POST"]),
     Mount(
         "/scan",

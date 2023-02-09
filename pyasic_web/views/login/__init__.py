@@ -13,16 +13,24 @@ async def page_login(request: Request):
         user = data["username"]
         pwd = data["password"]
         if not user:
-            return templates.TemplateResponse("login.html", {"request": request, "err": "Please enter a username."})
+            return templates.TemplateResponse(
+                "login.html", {"request": request, "err": "Please enter a username."}
+            )
         if not pwd:
-            return templates.TemplateResponse("login.html", {"request": request, "err": "Please enter a password."})
+            return templates.TemplateResponse(
+                "login.html", {"request": request, "err": "Please enter a password."}
+            )
         token = await login_manager.login(request, user, pwd)
         if token:
             return RedirectResponse("/dashboard", status_code=303)
         else:
-            return templates.TemplateResponse("login.html", {"request": request, "err": "Username or password is incorrect."})
+            return templates.TemplateResponse(
+                "login.html",
+                {"request": request, "err": "Username or password is incorrect."},
+            )
 
     return templates.TemplateResponse("login.html", {"request": request})
+
 
 async def page_logout(request: Request):
     await login_manager.logout(request)

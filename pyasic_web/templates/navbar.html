@@ -121,16 +121,16 @@
                                                     Add Miners
                                                 </a>
                                             </li>
-                                            {% if cur_miners|length > 0 %}
-                                                <li>
-                                                    <a href="/manage/miners" class="nav-link navbar-link {% if request.url.path.strip('/') == 'manage' %}active{% else %}text-white{% endif %}">
-                                                        <svg class="bi me-2 mt-1" width="16" height="16">
-                                                            <use xlink:href="#edit"></use>
-                                                        </svg>
-                                                        Manage Miners
-                                                    </a>
-                                                </li>
-                                            {% endif %}
+                                        {% endif %}
+                                        {% if cur_miners|length > 0 %}
+                                            <li>
+                                                <a href="/manage/miners" class="nav-link navbar-link {% if request.url.path.strip('/') == 'manage' %}active{% else %}text-white{% endif %}">
+                                                    <svg class="bi me-2 mt-1" width="16" height="16">
+                                                        <use xlink:href="#edit"></use>
+                                                    </svg>
+                                                    Manage Miners
+                                                </a>
+                                            </li>
                                         {% endif %}
                                         {% for miner in cur_miners %}
                                         <li id="nav_{{miner}}">

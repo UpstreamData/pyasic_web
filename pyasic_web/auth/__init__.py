@@ -11,8 +11,28 @@ from copy import copy
 
 key = "SECRET"
 
-DEFAULT_DASHBOARD_CARDS = ["count", "hashrate", "pct_ideal_chips", "temperature_avg", "wattage", "pct_max_wattage", "efficiency", "errors"]
-DEFAULT_MINER_CARDS = ["model", "hashrate", "pct_ideal_chips", "temperature_avg", "wattage", "pct_max_wattage", "efficiency", "errors", "pools"]
+DEFAULT_DASHBOARD_CARDS = [
+    "count",
+    "hashrate",
+    "pct_ideal_chips",
+    "temperature_avg",
+    "wattage",
+    "pct_max_wattage",
+    "efficiency",
+    "errors",
+]
+DEFAULT_MINER_CARDS = [
+    "model",
+    "hashrate",
+    "pct_ideal_chips",
+    "temperature_avg",
+    "wattage",
+    "pct_max_wattage",
+    "efficiency",
+    "errors",
+    "pools",
+]
+
 
 @dataclass
 class User:
@@ -59,7 +79,6 @@ class JsonProvider(UserProvider):
         with open(self.file, "r") as f:
             users_data = json.loads(f.read())
 
-
         for u in users_data:
             dashboard_cards = users_data[u].get("dashboard_cards")
             if not dashboard_cards:
@@ -87,7 +106,7 @@ class JsonProvider(UserProvider):
             scopes=scopes,
             ip_range=ip_range,
             dashboard_cards=DEFAULT_DASHBOARD_CARDS,
-            miner_cards=DEFAULT_MINER_CARDS
+            miner_cards=DEFAULT_MINER_CARDS,
         )
         self.dump_users()
 
@@ -123,7 +142,7 @@ class JsonProvider(UserProvider):
             scopes=scopes,
             ip_range=ip_range,
             dashboard_cards=old_user.dashboard_cards,
-            miner_cards=old_user.miner_cards
+            miner_cards=old_user.miner_cards,
         )
         self.user_map[username] = new_user  # noqa
         self.dump_users()

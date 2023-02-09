@@ -16,7 +16,12 @@ from pyasic_web.templates import templates
 async def page_scan(request: Request):
     await login_req(request, ["admin"])
     return templates.TemplateResponse(
-        "scan.html", {"request": request, "cur_miners": get_current_miner_list(await get_user_ip_range(request)), "user": await get_current_user(request)}
+        "scan.html",
+        {
+            "request": request,
+            "cur_miners": get_current_miner_list(await get_user_ip_range(request)),
+            "user": await get_current_user(request),
+        },
     )
 
 

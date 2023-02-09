@@ -6,5 +6,5 @@ app = Starlette(
     middleware=[*auth.middleware],
     routes=routes.routes,
     exception_handlers=errors.exception_handlers,
-    debug=True
+    debug=True,
 )
