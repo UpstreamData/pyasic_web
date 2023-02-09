@@ -12,7 +12,12 @@
         </div>
     </div>
 </nav>
-<div class="row m-4">
+<div class="row mx-4 m-3">
+    <div class="col">
+        <button class="btn btn-outline-danger w-100" onclick="resetCards()">Reset to Defaults</button>
+    </div>
+</div>
+<div class="row m-4 mt-2">
     <div class="col-sm py-2">
         <div class="card">
             <div class="card-header">
@@ -95,6 +100,10 @@
 <script>
     window.post = function(url, data) {
       return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
+    }
+    function resetCards() {
+        post("/manage/reset_cards", "reset");
+        window.location.reload();
     }
 
     function addMinerCard() {

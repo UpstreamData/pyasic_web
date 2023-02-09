@@ -15,6 +15,7 @@ routes = [
         Route("/cards", views.manage.page_manage_cards),
         Route("/update_miner_cards", views.manage.page_update_miner_cards, methods=["POST"]),
         Route("/update_dashboard_cards", views.manage.page_update_dashboard_cards, methods=["POST"]),
+        Route("/reset_cards", views.manage.page_reset_cards, methods=["POST"]),
         Route("/update_user", views.manage.page_update_user, methods=["POST"]),
         Route("/delete_user", views.manage.page_delete_user, methods=["POST"]),
         Route("/add_user", views.manage.page_add_user, methods=["POST"]),

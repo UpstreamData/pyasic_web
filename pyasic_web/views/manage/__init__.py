@@ -5,7 +5,7 @@ from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_curre
 from pyasic_web.func.auth import login_req
 from pyasic_web.templates import templates
 from pyasic_web import settings
-from pyasic_web.auth import user_provider
+from pyasic_web.auth import user_provider, DEFAULT_DASHBOARD_CARDS, DEFAULT_MINER_CARDS
 
 
 async def page_manage_miners(request: Request):
@@ -84,6 +84,8 @@ async def page_update_miner_cards(request: Request):
     await login_req(request)
     cards_raw = (await request.form())["miner_cards"]
     cards = cards_raw.split("&")
+    if cards == [""]:
+        cards = []
     for idx, card in enumerate(cards):
         card = card.replace("[]=card", "").replace("miner_", "")
         cards[idx] = card
@@ -96,10 +98,20 @@ async def page_update_dashboard_cards(request: Request):
     await login_req(request)
     cards_raw = (await request.form())["dashboard_cards"]
     cards = cards_raw.split("&")
+    if cards == [""]:
+        cards = []
     for idx, card in enumerate(cards):
         card = card.replace("[]=card", "").replace("dashboard_", "")
         cards[idx] = card
     user = await get_current_user(request)
     user.dashboard_cards = cards
+    user_provider.update_user_cards(user)
+    return RedirectResponse(request.url_for("page_manage_cards"), status_code=302)
+
+async def page_reset_cards(request: Request):
+    await login_req(request)
+    user = await get_current_user(request)
+    user.miner_cards = DEFAULT_MINER_CARDS
+    user.dashboard_cards = DEFAULT_DASHBOARD_CARDS
     user_provider.update_user_cards(user)
     return RedirectResponse(request.url_for("page_manage_cards"), status_code=302)
