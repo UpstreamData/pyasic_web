@@ -99,6 +99,7 @@ class JsonProvider(UserProvider):
         if not user.username in self.user_map:
             return
         self.user_map[user.username] = user
+        self.dump_users()
 
     def update_user(
         self,
