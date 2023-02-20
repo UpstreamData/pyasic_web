@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field, asdict
 from starlette.middleware import Middleware, sessions
 
-from pyasic_web.auth.users import USERS
 from passlib.hash import pbkdf2_sha256
 
 from imia import LoginManager, UserProvider, authentication
