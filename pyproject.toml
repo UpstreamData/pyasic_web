@@ -16,6 +16,12 @@ python-multipart = "^0.0.5"
 imia = "^0.5.3"
 itsdangerous = "2.1.2"
 
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+djlint = "^1.19.17"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

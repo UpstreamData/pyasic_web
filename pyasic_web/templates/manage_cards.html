@@ -1,103 +1,111 @@
-{% extends 'navbar.html'%}
+{% extends 'navbar.html' %}
 {% block content %}
-<nav class="navbar bg-dark" data-bs-theme="dark">
-    <div class="row d-flex justify-content-between w-100 align-content-middle">
-        <div class="col-7">
-            <h2 class="ms-3 mt-1 text-light">
-                <svg class="bi me-2 d-none d-sm-inline" width="32" height="32">
-                    <use xlink:href="#cards"></use>
-                </svg>
-                Manage Cards
-            </h2>
+    <nav class="navbar bg-dark" data-bs-theme="dark">
+        <div class="row d-flex justify-content-between w-100 align-content-middle">
+            {% import "macros/header.html" as header_macros %}
+            {{ header_macros.create_header_item(text="Manage Cards", icon="cards") }}
+        </div>
+    </nav>
+    <div class="row mx-4 m-3">
+        <div class="col">
+            <button class="btn btn-outline-danger w-100" onclick="resetCards()">Reset to Defaults</button>
         </div>
     </div>
-</nav>
-<div class="row mx-4 m-3">
-    <div class="col">
-        <button class="btn btn-outline-danger w-100" onclick="resetCards()">Reset to Defaults</button>
-    </div>
-</div>
-<div class="row m-4 mt-2">
-    <div class="col-sm py-2">
-        <div class="card">
-            <div class="card-header">
-                Dashboard Cards
-            </div>
-            <div class="card-body">
-                <div class="container mb-2 ms-0 ps-0">
-                    <div class="input-group">
-                      <select class="form-select" id="dashboard_card_add">
-                          {% for card in dashboard_available_cards %}
-                            <option value="{{ card }}">{{ card }}</option>
-                          {% endfor %}
-                      </select>
-                      <button class="btn btn-outline-secondary" type="button" onclick="addDashboardCard()">Add</button>
-                    </div>
-                </div>
-                <form id="form_dashboard_cards" method="post" action="/manage/update_dashboard_cards">
-                    <input type="text" id="dashboard_cards" hidden name="dashboard_cards"/>
-                    <div style="height: 500px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group pe-3">
-                        <ul id="sortable_dashboard_cards" style="padding: 0px!important;">
-                            {% for card in user.dashboard_cards %}
-                                <li class="form-control user-select-none d-flex justify-content-between" id="dashboard_{{ card }}_card" type="text">
-                                    {{ card }}
-                                    <button type="button" class="btn-close" onclick="removeItem('dashboard_{{ card }}_card')"></button>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <div class="container">
-                        <div class="btn-group w-100">
-                            <button type="submit" class="btn btn-info">Submit</button>
-                            <a role="button" class="btn btn-danger" onclick="window.location.reload();">Cancel</a>
+    <div class="row m-4 mt-2">
+        <div class="col-sm py-2">
+            <div class="card">
+                <div class="card-header">Dashboard Cards</div>
+                <div class="card-body">
+                    <div class="container mb-2 ms-0 ps-0">
+                        <div class="input-group">
+                            <select class="form-select" id="dashboard_card_add">
+                                {% for card in dashboard_available_cards %}<option value="{{ card }}">{{ card }}</option>{% endfor %}
+                            </select>
+                            <button class="btn btn-outline-secondary"
+                                    type="button"
+                                    onclick="addDashboardCard()">Add</button>
                         </div>
                     </div>
-                </form>
+                    <form id="form_dashboard_cards"
+                          method="post"
+                          action="/manage/update_dashboard_cards">
+                        <input type="text" id="dashboard_cards" hidden name="dashboard_cards"/>
+                        <div style="height: 500px;
+                                    overflow-y:scroll"
+                             class="p-0 thick-fancy-scroll list-group pe-3">
+                            <ul id="sortable_dashboard_cards" style="padding: 0px!important;">
+                                {% for card in user.dashboard_cards %}
+                                    <li class="form-control user-select-none d-flex justify-content-between"
+                                        id="dashboard_{{ card }}_card"
+                                        type="text">
+                                        {{ card }}
+                                        <button type="button"
+                                                class="btn-close"
+                                                onclick="removeItem('dashboard_{{ card }}_card')"></button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="container">
+                            <div class="btn-group w-100">
+                                <button type="submit" class="btn btn-info">Submit</button>
+                                <a role="button"
+                                   class="btn btn-danger"
+                                   onclick="window.location.reload();">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-sm py-2">
-        <div class="card">
-            <div class="card-header">
-                Miner Cards
-            </div>
-            <div class="card-body">
-                <div class="container mb-2 ms-0 ps-0">
-                    <div class="input-group">
-                      <select class="form-select" id="miner_card_add">
-                          {% for card in miner_available_cards %}
-                            <option value="{{ card }}">{{ card }}</option>
-                          {% endfor %}
-                      </select>
-                      <button class="btn btn-outline-secondary" type="button" onclick="addMinerCard()">Add</button>
-                    </div>
-                </div>
-                <form id="form_miner_cards" method="post" action="/manage/update_miner_cards">
-                    <input type="text" id="miner_cards" hidden name="miner_cards"/>
-                    <div style="height: 500px; overflow-y:scroll;" class="p-0 thick-fancy-scroll list-group pe-3">
-                        <ul id="sortable_miner_cards" style="padding: 0px!important;">
-                            {% for card in user.miner_cards %}
-                                <li class="form-control user-select-none d-flex justify-content-between" id="miner_{{ card }}_card" type="text">
-                                    {{ card }}
-                                    <button type="button" class="btn-close" onclick="removeItem('miner_{{ card }}_card')"></button>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <div class="container">
-                        <div class="btn-group w-100">
-                            <button type="submit" class="btn btn-info">Submit</button>
-                            <a role="button" class="btn btn-danger" onclick="window.location.reload();">Cancel</a>
+        <div class="col-sm py-2">
+            <div class="card">
+                <div class="card-header">Miner Cards</div>
+                <div class="card-body">
+                    <div class="container mb-2 ms-0 ps-0">
+                        <div class="input-group">
+                            <select class="form-select" id="miner_card_add">
+                                {% for card in miner_available_cards %}<option value="{{ card }}">{{ card }}</option>{% endfor %}
+                            </select>
+                            <button class="btn btn-outline-secondary"
+                                    type="button"
+                                    onclick="addMinerCard()">Add</button>
                         </div>
                     </div>
-                </form>
+                    <form id="form_miner_cards"
+                          method="post"
+                          action="/manage/update_miner_cards">
+                        <input type="text" id="miner_cards" hidden name="miner_cards"/>
+                        <div style="height: 500px;
+                                    overflow-y:scroll"
+                             class="p-0 thick-fancy-scroll list-group pe-3">
+                            <ul id="sortable_miner_cards" style="padding: 0px!important;">
+                                {% for card in user.miner_cards %}
+                                    <li class="form-control user-select-none d-flex justify-content-between"
+                                        id="miner_{{ card }}_card"
+                                        type="text">
+                                        {{ card }}
+                                        <button type="button"
+                                                class="btn-close"
+                                                onclick="removeItem('miner_{{ card }}_card')"></button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="container">
+                            <div class="btn-group w-100">
+                                <button type="submit" class="btn btn-info">Submit</button>
+                                <a role="button"
+                                   class="btn btn-danger"
+                                   onclick="window.location.reload();">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-
-<script>
+    <script>
     window.post = function(url, data) {
       return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
     }
@@ -124,8 +132,8 @@
         item = document.getElementById(item_id);
         item.remove()
     }
-</script>
-<script>
+    </script>
+    <script>
     $( function() {
         $( "#sortable_miner_cards" ).sortable();
         $( "#sortable_miner_cards" ).disableSelection();
@@ -144,5 +152,5 @@
             $('#form_dashboard_cards').submit();
         });
     });
-</script>
+    </script>
 {% endblock content %}

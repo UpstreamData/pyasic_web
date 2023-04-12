@@ -1,94 +1,87 @@
-{% extends 'navbar.html'%}
+{% extends 'navbar.html' %}
 {% block content %}
-<nav class="navbar bg-dark" data-bs-theme="dark">
-    <div class="row d-flex justify-content-between w-100 align-content-middle">
-        <div class="col-7">
-            <h2 class="ms-3 mt-1 text-light">
-                <svg class="bi me-2 d-none d-sm-inline" width="32" height="32">
-                    <use xlink:href="#edit"></use>
-                </svg>
-                Manage Miners
-            </h2>
+    <nav class="navbar bg-dark" data-bs-theme="dark">
+        <div class="row d-flex justify-content-between w-100 align-content-middle">
+            {% import "macros/header.html" as header_macros %}
+            {{ header_macros.create_header_item(text="Manage Miners", icon="edit") }}
         </div>
-    </div>
-</nav>
-<div class="px-lg-4 my-2 mx-4 mx-lg-0">
-    <div class="row mb-4">
-        <div class="btn-group-vertical mt-2">
-
-        {% if "admin" in user.scopes %}
+    </nav>
+    <div class="px-lg-4 my-2 mx-4 mx-lg-0">
+        <div class="row mb-4">
+            <div class="btn-group-vertical mt-2">
+                {% if "admin" in user.scopes %}
                     <button class="btn btn-outline-danger" onclick="removeMiners()" type="button">Remove Miners</button>
-        {% endif %}
-            <button class="btn btn-outline-info" onclick="lightMiners()" type="button">Light Miners</button>
-            <button class="btn btn-outline-danger" onclick="rebootMiners()" type="button">Reboot Miners</button>
-            <button class="btn btn-outline-warning" onclick="restartBackendMiners()" type="button">Restart Backend Miners</button>
-            <input type="checkbox" class="btn-check select-all checkbox" id="selectAllCheckbox" name="select-all"/><label class="btn btn-outline-success w-100" for="selectAllCheckbox">Select All</label>
-        </div>
-    </div>
-    <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">
-        {% for miner in cur_miners %}
-            <div class="col col-xs-6 col-sm-4 col-md-3 my-2">
-                <div class="card text-center">
-                    <div class="card-header fw-bold">
-                        <div class="input-group">
-                          <div class="input-group-text">
-                            <input type="checkbox" class="select-item checkbox" name="minerCheckboxes" value="{{miner}}" />
-                          </div>
-                            <div class="form-control">{{miner}}</div>
-                        </div>
-                    </div>
-                    <div class="card-body d-flex align-items-center p-0 m-0">
-                        <table class="table py-0 my-0">
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        Model
-                                    </td>
-                                    <td id="{{miner}}_model">
-                                        <div class="spinner-grow spinner-grow-sm" role="status"></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Hashrate
-                                    </td>
-                                    <td id="{{miner}}_hashrate">
-                                        <div class="spinner-grow spinner-grow-sm" role="status"></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        % Ideal
-                                    </td>
-                                    <td id="{{miner}}_chip_pct">
-                                        <div class="spinner-grow spinner-grow-sm" role="status"></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Errors
-                                    </td>
-                                    <td id="{{miner}}_errors">
-                                        <div class="spinner-grow spinner-grow-sm" role="status"></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Light
-                                    </td>
-                                    <td id="{{miner}}_light">
-                                        <div class="spinner-grow spinner-grow-sm" role="status"></div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                {% endif %}
+                <button class="btn btn-outline-info" onclick="lightMiners()" type="button">Light Miners</button>
+                <button class="btn btn-outline-danger" onclick="rebootMiners()" type="button">Reboot Miners</button>
+                <button class="btn btn-outline-warning"
+                        onclick="restartBackendMiners()"
+                        type="button">Restart Backend Miners</button>
+                <input type="checkbox"
+                       class="btn-check select-all checkbox"
+                       id="selectAllCheckbox"
+                       name="select-all"/>
+                <label class="btn btn-outline-success w-100" for="selectAllCheckbox">Select All</label>
             </div>
         </div>
-        {% endfor %}
-    </div>
-    <script src="{{ url_for('static', path='/jquery.min.js')}}"></script>
-    <script>
+        <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3"
+             id="all_cards">
+            {% for miner in cur_miners %}
+                <div class="col col-xs-6 col-sm-4 col-md-3 my-2" id="{{ miner }}">
+                    <div class="card text-center">
+                        <div class="card-header fw-bold">
+                            <div class="input-group">
+                                <div class="input-group-text">
+                                    <input type="checkbox"
+                                           class="select-item checkbox"
+                                           name="minerCheckboxes"
+                                           value="{{ miner }}"/>
+                                </div>
+                                <div class="form-control">{{ miner }}</div>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex align-items-center p-0 m-0">
+                            <table class="table py-0 my-0">
+                                <tbody>
+                                    <tr>
+                                        <td>Model</td>
+                                        <td id="{{ miner }}_model">
+                                            <div class="spinner-grow spinner-grow-sm" role="status"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Hashrate</td>
+                                        <td id="{{ miner }}_hashrate">
+                                            <div class="spinner-grow spinner-grow-sm" role="status"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>% Ideal</td>
+                                        <td id="{{ miner }}_chip_pct">
+                                            <div class="spinner-grow spinner-grow-sm" role="status"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Errors</td>
+                                        <td id="{{ miner }}_errors">
+                                            <div class="spinner-grow spinner-grow-sm" role="status"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Light</td>
+                                        <td id="{{ miner }}_light">
+                                            <div class="spinner-grow spinner-grow-sm" role="status"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <script src="{{ url_for('static', path='/jquery.min.js')}}"></script>
+        <script>
         $(function(){
             //column checkbox select all or cancel
             $("input.select-all").click(function () {
@@ -107,8 +100,8 @@
                 all.checked = len===total;
             });
         });
-    </script>
-    <script>
+        </script>
+        <script>
         var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/manage/manage_miners/ws");
         let all_data = []
         let all_labels = []
@@ -145,7 +138,6 @@
                     var nav_to_remove = document.getElementById("nav_" + minerList[i])
                     nav_to_remove.remove()
                 }
-                document.getElementById("scanStatus").innerHTML = document.getElementById('minerTable').rows.length + " Miners"
             };
         };
         {% endif %}
@@ -161,6 +153,6 @@
         };
 
 
-    </script>
-</div>
+        </script>
+    </div>
 {% endblock content %}

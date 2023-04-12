@@ -1,13 +1,13 @@
-{%extends 'error_pages/error_base.html'%}
-{%block content%}
-	<div id="notfound">
-		<div class="notfound">
-			<div class="notfound-err">
-				<h1>504</h1>
-				<h2>Gateway Timeout</h2>
-				<h3>The connection to the server and any servers upstream of it timed out, please resend your request.</h3>
-			</div>
-			<a href="/dashboard">Homepage</a>
-		</div>
-	</div>
+{% extends 'error_pages/error_base.html' %}
+{% block content %}
+    <div id="notfound">
+        <div class="notfound">
+            <div class="notfound-err">
+                <h1>504</h1>
+                <h2>Gateway Timeout</h2>
+                <h3>The connection to the server and any servers upstream of it timed out, please resend your request.</h3>
+            </div>
+            <a href="/dashboard">Homepage</a>
+        </div>
+    </div>
 {% endblock %}

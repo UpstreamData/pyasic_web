@@ -1,0 +1,11 @@
+{% macro create_navbar_item(text, ref, icon, request) %}
+    <li class="nav-item mb-1 mx-2">
+        <a href="/{{ ref }}"
+           class="nav-link navbar-link {% if request.url.path.strip('/') == ref %}active{% else %}text-white{% endif %}">
+            <svg class="bi me-2 mt-1" width="16" height="16">
+                <use xlink:href="#{{ icon }}"></use>
+            </svg>
+            {{ text }}
+        </a>
+    </li>
+{% endmacro %}

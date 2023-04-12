@@ -95,7 +95,6 @@ async def ws_miner(websocket: WebSocket):
                 )
                 data = await asyncio.wait_for(cur_miner.get_data(), miner_data_timeout)
                 data = data.as_json()
-
                 data_manager.cached_data = data
                 await websocket.send_text(data)
                 await asyncio.sleep(settings["graph_data_sleep_time"])

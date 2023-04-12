@@ -1,0 +1,10 @@
+{% macro create_header_item(text, icon) %}
+    <div class="col-7">
+        <h2 class="ms-3 mt-1 text-light">
+            <svg class="bi me-2 d-none d-sm-inline" width="32" height="32">
+                <use xlink:href="#{{ icon }}"></use>
+            </svg>
+            {{ text }}
+        </h2>
+    </div>
+{% endmacro %}

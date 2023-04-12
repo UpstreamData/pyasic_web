@@ -1,13 +1,13 @@
-{%extends 'error_pages/error_base.html'%}
-{%block content%}
-	<div id="notfound">
-		<div class="notfound">
-			<div class="notfound-err">
-				<h1>403</h1>
-				<h2>Bad Permissions</h2>
-				<h3>You do not have high enough permissions to access this page.</h3>
-			</div>
-			<a href="/dashboard">Homepage</a>
-		</div>
-	</div>
+{% extends 'error_pages/error_base.html' %}
+{% block content %}
+    <div id="notfound">
+        <div class="notfound">
+            <div class="notfound-err">
+                <h1>403</h1>
+                <h2>Bad Permissions</h2>
+                <h3>You do not have high enough permissions to access this page.</h3>
+            </div>
+            <a href="/dashboard">Homepage</a>
+        </div>
+    </div>
 {% endblock %}

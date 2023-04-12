@@ -1,9 +1,7 @@
 {% extends "/cards/bases/basic_card.html" %}
 {% block header %}
-Miner Count
+    Miner Count
 {% endblock header %}
 {% block body %}
-<div class="mx-auto fw-bolder" id="card_count">
-    {{cur_miners|length}}
-</div>
+    <div class="mx-auto fw-bolder" id="card_count">{{ cur_miners|length }}</div>
 {% endblock body %}

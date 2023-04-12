@@ -68,7 +68,7 @@ routes = [
     Mount(
         "/settings",
         routes=[
-            Route("/", views.web_settings.page_settings),
+            Route("/", views.web_settings.page_settings, methods=["GET", "POST"]),
             Route("/update", views.web_settings.page_update_settings, methods=["POST"]),
         ],
     ),

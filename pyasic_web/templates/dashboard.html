@@ -1,49 +1,55 @@
-{% extends 'navbar.html'%}
+{% extends 'navbar.html' %}
 {% block content %}
-<nav class="navbar bg-dark" data-bs-theme="dark">
-    <div class="row d-flex justify-content-between w-100 align-content-middle">
-        <div class="col-7">
-            <h2 class="ms-3 mt-1 text-light">
-                <svg class="bi me-2 d-none d-sm-inline" width="32" height="32">
-                    <use xlink:href="#dashboard"></use>
-                </svg>
-                Home
-            </h2>
-        </div>
-        <div class="col d-flex justify-content-end">
-            <div class="btn-group dropstart">
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <svg class="m-0 p-0" style="fill: currentColor; vertical-align: -.25em;" width="20" height="22">
-                        <use xlink:href="#action"></use>
-                    </svg>
-                    Actions
-                </button>
-                <ul class="dropdown-menu">
-                    <!-- <li><a class="dropdown-item" target="_blank" href="http://{{miner}}" role="button">Web Interface</a></li> -->
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                </ul>
+    <nav class="navbar bg-dark" data-bs-theme="dark">
+        <div class="row d-flex justify-content-between w-100 align-content-middle">
+            {% import "macros/header.html" as header_macros %}
+            {{ header_macros.create_header_item(text="Home", icon="dashboard") }}
+            <div class="col d-flex justify-content-end">
+                <div class="btn-group dropstart">
+                    <button type="button"
+                            class="btn btn-secondary dropdown-toggle"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        <svg class="m-0 p-0"
+                             style="fill: currentColor;
+                                    vertical-align: -.25em"
+                             width="20"
+                             height="22">
+                            <use xlink:href="#action"></use>
+                        </svg>
+                        Actions
+                    </button>
+                    <ul class="dropdown-menu">
+                        <!-- <li><a class="dropdown-item" target="_blank" href="http://{{miner}}" role="button">Web Interface</a></li> -->
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
-<div id="py_errors" class="mx-4 m-0 mt-3"></div>
-<div class="px-lg-4 my-2 mx-4 mx-lg-0">
-    {% if "admin" in user.scopes and cur_miners|length == 0 %}
-        <a role="button" href="/scan" id="noMiners" class="w-100 btn btn-info fw-bolder d-flex align-items-center justify-content-center mt-3" style="height:100px;">Click here to add miners.</a>
-    {% endif %}
-<!--    <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3" id="all_cards">-->
-    <div class="row" data-masonry='{"percentPosition": true }' id="all_cards">
-        {% if not cur_miners|length == 0 %}
-            {% for card_name in user.dashboard_cards %}
-                {% if card_exists('cards/dashboard/' + card_name + '.html') %}
-                    {% include 'cards/dashboard/' + card_name + '.html' %}
-                {% endif %}
-            {% endfor %}
+    </nav>
+    <div id="py_errors" class="mx-4 m-0 mt-3"></div>
+    <div class="px-lg-4 my-2 mx-4 mx-lg-0">
+        {% if "admin" in user.scopes and cur_miners|length == 0 %}
+            <a role="button"
+               href="/scan"
+               id="noMiners"
+               class="w-100 btn btn-info fw-bolder d-flex align-items-center justify-content-center mt-3"
+               style="height:100px">Click here to add miners.</a>
         {% endif %}
-    </div>
-    <script>
+        <!--    <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3"
+         id="all_cards">-->
+        <div class="row" data-masonry='{"percentPosition": true }' id="all_cards">
+            {% if not cur_miners|length == 0 %}
+                {% for card_name in user.dashboard_cards %}
+                    {% if card_exists('cards/dashboard/' + card_name + '.html') %}
+                        {% include 'cards/dashboard/' + card_name + '.html' %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        <script>
         if (!window.WebSocket) alert("WebSocket not supported by this browser");
         var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/dashboard/ws");
         ws.onmessage = function(event) {
@@ -72,6 +78,6 @@
                 {% endfor %}
             {% endif %}
         }
-    </script>
-</div>
+        </script>
+    </div>
 {% endblock content %}
