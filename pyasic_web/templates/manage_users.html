@@ -109,10 +109,10 @@
         add_card.remove();
         cards_div = document.getElementById("all_cards");
         cards_div.innerHTML += '<div class="col d-flex justify-content-center" id="card_new_user" ><div class="card text-white bg-dark mb-3" style="max-width: 18rem;"><div class="card-header">New User</div><div class="card-body"><form method="POST" action="/manage/add_user" id="form_new_user"><div class="input-group mb-3"><span class="input-group-text">Username</span><input required autocomplete="off"name="username" id="username_new_user" class="form-control" type="text" placeholder="Username"></div><div class="input-group mb-3"><span class="input-group-text">Name</span><input required autocomplete="off" name="name" id="name_new_user" class="form-control" type="text" placeholder="Friendly Name"></div><div class="input-group mb-3"><span class="input-group-text">Password</span><input required autocomplete="off" name="password" id="password_new_user" class="form-control" type="text" placeholder="Password"></div><div class="input-group mb-3"><span class="input-group-text w-50">Admin</span><input type="checkbox" class="btn-check" id="admin_new_user" type="checkbox" class="select-item checkbox" name="admin"/><label class="btn btn-outline-success w-50" for="admin_new_user"></label></div><div class="input-group mb-3"><span class="input-group-text">IP Range</span><textarea id="iprange_new_user" name="ip_range" class="form-control" placeholder="IP Range"></textarea></div><div class="input-group mb-3"><button class="btn btn-success w-100" id="update_new_user">Add</button></div></form></div></div></div>'
-                                                            cards_div.innerHTML += '<div class="col d-flex justify-content-center" id="card_add"><div class="card text-white bg-dark mb-3"
-                                                     style="max-width: 18rem;
-                                                            width: 300px;
-                                                            height: 425px"><div class="card-header">Add User</div><div class="card-body"><button type="button" class="btn btn-dark w-100 h-100" onclick="addUser()"><svg class="bi me-2" width="100" height="100"><use xlink:href="#users_add"></use></svg></button></div></div></div>'
-                                                        }
+                                                                    cards_div.innerHTML += '<div class="col d-flex justify-content-center" id="card_add"><div class="card text-white bg-dark mb-3"
+                                                             style="max-width: 18rem;
+                                                                    width: 300px;
+                                                                    height: 425px"><div class="card-header">Add User</div><div class="card-body"><button type="button" class="btn btn-dark w-100 h-100" onclick="addUser()"><svg class="bi me-2" width="100" height="100"><use xlink:href="#users_add"></use></svg></button></div></div></div>'
+                                                                }
     </script>
 {% endblock content %}
