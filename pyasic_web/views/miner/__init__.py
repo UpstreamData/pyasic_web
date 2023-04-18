@@ -17,6 +17,7 @@ from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
 from pyasic_web.templates import templates, card_exists
 from pyasic_web.func.auth import login_req, ws_login_req
 from starlette.exceptions import HTTPException
+from pyasic_web.errors.miner import MinerDataError
 
 
 async def page_miner(request: Request):
@@ -99,12 +100,12 @@ async def ws_miner(websocket: WebSocket):
                 await websocket.send_text(data)
                 await asyncio.sleep(settings["graph_data_sleep_time"])
             except asyncio.exceptions.TimeoutError:
-                data = {"py_errors": ["The miner is not responding."]}
+                data = {"py_errors": [MinerDataError.NO_RESPONSE]}
                 await websocket.send_json(data)
                 await asyncio.sleep(0.5)
             except KeyError as e:
                 print(e)
-                data = {"py_errors": ["The miner returned unusable/unsupported data."]}
+                data = {"py_errors": [MinerDataError.BAD_DATA]}
                 await websocket.send_json(data)
                 await asyncio.sleep(0.5)
     except WebSocketDisconnect:

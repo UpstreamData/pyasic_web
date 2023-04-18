@@ -156,7 +156,9 @@
                     {% endif %}
                 {% endfor %}
             </div>
-            <script>
+        </div>
+    </div>
+    <script>
         var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/miner/{{miner}}/ws");
         let all_data = []
         let all_labels = []
@@ -191,7 +193,5 @@
             set_wattage = wattage_input.value
             post("/miner/{{miner}}/wattage", {wattage: set_wattage})
         };
-            </script>
-        </div>
-    </div>
+    </script>
 {% endblock content %}

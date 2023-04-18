@@ -5,6 +5,7 @@ from pyasic.miners.miner_factory import MinerFactory
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
+from pyasic_web.errors.miner import MinerDataError
 
 
 def get_pool_users_data(data: list):
@@ -34,10 +35,10 @@ async def get_miner_data_dashboard(miner_ip):
         return json.loads(data.as_json())
 
     except asyncio.exceptions.TimeoutError:
-        return {"ip": miner_ip, "py_error": "The miner is not responding."}
+        return {"ip": miner_ip, "py_error": MinerDataError.NO_RESPONSE}
 
     except KeyError:
         return {
             "ip": miner_ip,
-            "py_error": "The miner returned unusable/unsupported data.",
+            "py_error": MinerDataError.BAD_DATA,
         }

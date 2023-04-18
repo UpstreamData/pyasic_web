@@ -29,7 +29,6 @@
             </div>
         </div>
     </nav>
-    <div id="py_errors" class="mx-4 m-0 mt-3"></div>
     <div class="px-lg-4 my-2 mx-4 mx-lg-0">
         {% if "admin" in user.scopes and cur_miners|length == 0 %}
             <a role="button"
@@ -49,35 +48,33 @@
                 {% endfor %}
             {% endif %}
         </div>
-        <script>
+        {% include 'toasts.html' %}
+    </div>
+    <script>
         if (!window.WebSocket) alert("WebSocket not supported by this browser");
         var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/dashboard/ws");
         ws.onmessage = function(event) {
             var data = JSON.parse(event.data)
             errors = document.getElementById("py_errors");
-            for (i = 0; i< data["miners"].length; i++) {
-                if (data["miners"][i].hasOwnProperty("py_error")) {
-                    if (!document.getElementById(data["miners"][i]["ip"] + "_error")) {
-                        errors.innerHTML += "<div id='" + data["miners"][i]["ip"] + "_error" +
-                        "' class='d-flex align-items-center p-1 mb-1 alert alert-danger'><strong class='p-0 m-0'>" +
-                        data["miners"][i]["ip"] + ": " +
-                        data["miners"][i]["py_error"] +
-                        "</strong><div class='spinner-border spinner-border-sm ms-auto'></div></div>"
-                    }
-                } else {
-                    if (document.getElementById(data["miners"][i]["ip"] + "_error")) {
-                        document.getElementById(data["miners"][i]["ip"] + "_error").remove()
-                    }
+            // Query all current toasts
+            currentToasts = getToasts();
+            for (i = 0; i< data["py_errors"].length; i++) {
+                handleToastMessage(data["py_errors"][i]["err"]["msg"], data["py_errors"][i]["err"]["name"] + "_error", data["py_errors"][i]["count"]);
+                var indexToRemove = currentToasts.indexOf(data["py_errors"][i]["err"]["name"] + "_error");
+                if (indexToRemove !== -1) {
+                  currentToasts.splice(indexToRemove, 1);
                 }
             }
+            for (i = 0; i< currentToasts.length; i++) {
+                hideToastMessage(currentToasts[i]);
+            }
             {% if not cur_miners|length == 0 %}
-                {% for card_name in user.miner_cards %}
+                {% for card_name in user.dashboard_cards %}
                     {% if card_exists('cards/scripts/dashboard/' + card_name + '.js') %}
                         {% include 'cards/scripts/dashboard/' + card_name + '.js' %}
                     {% endif %}
                 {% endfor %}
             {% endif %}
         }
-        </script>
-    </div>
+    </script>
 {% endblock content %}
