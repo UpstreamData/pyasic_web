@@ -164,7 +164,6 @@
         let all_labels = []
         ws.onmessage = function(event) {
             var data = JSON.parse(event.data)
-            console.log(data);
             const py_errors = document.getElementById("err-cover")
             const content = document.getElementById("content");
             if (data.hasOwnProperty("py_errors")) {

@@ -7,6 +7,10 @@ if (data.hasOwnProperty("hashrate")) {
     ideal_hashrate = parseFloat(data["nominal_hashrate"])
     hashrate = parseFloat(data["hashrate"])
     pct_ideal_hashrate = (Number((hashrate/ideal_hashrate)*100)).toFixed(2)
+    if (isNaN(pct_ideal_hashrate)) {
+        pct_ideal_hashrate = 0
+    }
+
 }
 
 if (!!pct_ideal_hashrate_card) {

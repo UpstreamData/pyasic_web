@@ -117,15 +117,19 @@
     function addMinerCard() {
         list = document.getElementById("sortable_miner_cards");
         card_name = document.getElementById("miner_card_add").value;
-        if (card_name != "" ) {
-            list.innerHTML += '<li class="form-control user-select-none" id="dashboard_' + card_name + '_card" type="text">' + card_name + '</li>'
+        if (document.getElementById("miner_" + card_name + "_card") == null) {
+            if (card_name != "" ) {
+                list.innerHTML += `<li class="form-control user-select-none d-flex justify-content-between" id="miner_${card_name}_card" type="text">${card_name}<button type="button"class="btn-close"onclick="removeItem('miner_${card_name}_card')"></button></li>`
+            }
         }
     }
     function addDashboardCard() {
         list = document.getElementById("sortable_dashboard_cards");
         card_name = document.getElementById("dashboard_card_add").value;
-        if (card_name != "" ) {
-            list.innerHTML += '<li class="form-control user-select-none" id="dashboard_' + card_name + '_card" type="text">' + card_name + '</li>'
+        if (document.getElementById("dashboard_" + card_name + "_card") == null) {
+            if (card_name != "" ) {
+                list.innerHTML += `<li class="form-control user-select-none d-flex justify-content-between" id="dashboard_${card_name}_card" type="text">${card_name}<button type="button"class="btn-close"onclick="removeItem('dashboard_${card_name}_card')"></button></li>`
+            }
         }
     }
     function removeItem(item_id) {

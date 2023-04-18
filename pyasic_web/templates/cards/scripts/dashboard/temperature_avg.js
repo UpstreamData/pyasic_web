@@ -10,6 +10,10 @@ if (data.hasOwnProperty("miners")) {
         }
     }
     temperature_avg = (Number(temperature_avg/data["miners"].length)).toFixed(2)
+    if (isNaN(temperature_avg)) {
+        temperature_avg = 0
+    }
+
 }
 if (!!temperature_avg_card) {
     temperature_avg_card.innerHTML = temperature_avg + " °C"

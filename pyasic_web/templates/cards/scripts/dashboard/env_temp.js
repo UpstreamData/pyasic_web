@@ -12,6 +12,9 @@ if (data.hasOwnProperty("miners")) {
         }
     }
     env_temp = (Number(env_temp/data["miners"].length)).toFixed(2)
+    if (isNaN(env_temp)) {
+        env_temp = 0
+    }
     if (env_temp == 0) {
         env_temp = "?"
     }

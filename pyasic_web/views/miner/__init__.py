@@ -86,8 +86,11 @@ async def ws_miner(websocket: WebSocket):
     miner_identify_timeout = settings["miner_identify_timeout"]
     miner_data_timeout = settings["miner_data_timeout"]
     data_manager = SingleMinerDataManager()
-    if data_manager.cached_data:
-        await websocket.send_text(data_manager.cached_data)
+    try:
+        if data_manager.cached_data["ip"] == miner_ip:
+            await websocket.send_text(data_manager.cached_data)
+    except (TypeError, KeyError):
+        pass
     try:
         while True:
             try:
@@ -100,12 +103,12 @@ async def ws_miner(websocket: WebSocket):
                 await websocket.send_text(data)
                 await asyncio.sleep(settings["graph_data_sleep_time"])
             except asyncio.exceptions.TimeoutError:
-                data = {"py_errors": [MinerDataError.NO_RESPONSE]}
+                data = {"py_errors": [MinerDataError.NO_RESPONSE.value]}
                 await websocket.send_json(data)
                 await asyncio.sleep(0.5)
             except KeyError as e:
                 print(e)
-                data = {"py_errors": [MinerDataError.BAD_DATA]}
+                data = {"py_errors": [MinerDataError.BAD_DATA.value]}
                 await websocket.send_json(data)
                 await asyncio.sleep(0.5)
     except WebSocketDisconnect:

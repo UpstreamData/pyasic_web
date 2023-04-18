@@ -62,11 +62,9 @@
         var toastCount = document.getElementById(t_id + "_count")
         toastCount.innerHTML = count
         t_element = document.getElementById(t_id);
-        console.log(t_element);
         var toast = new bootstrap.Toast(t_element, {
             autohide: false
         });
-        console.log(toast);
         toast.show();
     }
 </script>
