@@ -52,15 +52,33 @@
     </div>
     <script>
         if (!window.WebSocket) alert("WebSocket not supported by this browser");
-        var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/dashboard/ws");
+        var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/api/realtime/all");
         ws.onmessage = function(event) {
             var data = JSON.parse(event.data)
+            console.log(data);
+
+            const pyErrors = [];
+            const pyErrorsCount = {};
+            for (const item of Object.values(data)) {
+              if (item.hasOwnProperty("py_error")) {
+                const errorName = item["py_error"]["name"];
+                const errorMessage = item["py_error"]["msg"];
+                pyErrorsCount[errorName] = pyErrorsCount.hasOwnProperty(errorName) ? pyErrorsCount[errorName] + 1 : 1;
+              }
+            }
+
+            for (const errorName of Object.keys(pyErrorsCount)) {
+              const errorMessage = Object.values(data).find(item => item.hasOwnProperty("py_error") && item["py_error"]["name"] === errorName)["py_error"]["msg"];
+              const errorCount = pyErrorsCount[errorName];
+              pyErrors.push({ name: errorName, msg: errorMessage, count: errorCount });
+            }
+
             errors = document.getElementById("py_errors");
             // Query all current toasts
             currentToasts = getToasts();
-            for (i = 0; i< data["py_errors"].length; i++) {
-                handleToastMessage(data["py_errors"][i]["err"]["msg"], data["py_errors"][i]["err"]["name"] + "_error", data["py_errors"][i]["count"]);
-                var indexToRemove = currentToasts.indexOf(data["py_errors"][i]["err"]["name"] + "_error");
+            for (i = 0; i< pyErrors.length; i++) {
+                handleToastMessage(pyErrors[i]["msg"], pyErrors[i]["name"] + "_error", pyErrors[i]["count"]);
+                var indexToRemove = currentToasts.indexOf(pyErrors[i]["name"] + "_error");
                 if (indexToRemove !== -1) {
                   currentToasts.splice(indexToRemove, 1);
                 }

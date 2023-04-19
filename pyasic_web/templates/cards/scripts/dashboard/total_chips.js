@@ -1,13 +1,10 @@
-
 // total_chips
 total_chips_card = document.getElementById("card_total_chips")
 total_chips = parseFloat(0)
-if (data.hasOwnProperty("miners")) {
-    // Dashboard code, multiple miners
-    for (i = 0; i< data["miners"].length; i++) {
-        if (data["miners"][i].hasOwnProperty("total_chips")) {
-            total_chips += parseFloat(data["miners"][i]["total_chips"])
-        }
+// Dashboard code, multiple miners
+for (const i of Object.values(data)) {
+    if (i.hasOwnProperty("total_chips")) {
+        total_chips += parseFloat(i["total_chips"])
     }
 }
 if (!!total_chips_card) {

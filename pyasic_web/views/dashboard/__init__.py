@@ -37,7 +37,7 @@ async def page_dashboard(request: Request):
         "dashboard.html",
         {
             "request": request,
-            "cur_miners": get_current_miner_list(await get_user_ip_range(request)),
+            "cur_miners": await get_current_miner_list(await get_user_ip_range(request)),
             "user": await get_current_user(request),
             "card_exists": card_exists,
         },
@@ -57,7 +57,7 @@ async def ws_dashboard(websocket):
     data_manager = MinerDataManager()
     try:
         irange = await get_user_ip_range(websocket)
-        miners = get_current_miner_list(irange)
+        miners = await get_current_miner_list(irange)
         if len(miners) > 0:
             if data_manager.cached_data:
                 pool_users = get_pool_users_data(data_manager.cached_data)
@@ -65,13 +65,13 @@ async def ws_dashboard(websocket):
                     {
                         "datetime": datetime.datetime.now().isoformat(),
                         "miners": data_manager.get_cached_data(
-                            get_current_miner_list(irange)
+                            await get_current_miner_list(irange)
                         ),
                         "pool_users": pool_users,
                     }
                 )
         while True:
-            miners = get_current_miner_list(irange)
+            miners = await get_current_miner_list(irange)
             all_miner_data = []
             py_errors = {}
             data_gen = asyncio.as_completed(

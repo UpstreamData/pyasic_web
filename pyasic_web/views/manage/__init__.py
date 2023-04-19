@@ -26,7 +26,7 @@ async def page_manage_miners(request: Request):
         "manage_miners.html",
         {
             "request": request,
-            "cur_miners": get_current_miner_list(await get_user_ip_range(request)),
+            "cur_miners": await get_current_miner_list(await get_user_ip_range(request)),
             "user": await get_current_user(request),
         },
     )
@@ -40,7 +40,7 @@ async def ws_manage_miners(websocket: WebSocket):
     try:
         while True:
             try:
-                miners = get_current_miner_list(await get_user_ip_range(websocket))
+                miners = await get_current_miner_list(await get_user_ip_range(websocket))
                 miners = await asyncio.gather(*[get_miner(miner) for miner in miners])
                 data_tasks = asyncio.as_completed(
                     [
@@ -113,7 +113,7 @@ async def page_remove_miners(request: Request):
     miners_remove = (await request.json())["miners"]
     if not miners_remove:
         return RedirectResponse(request.url_for("page_manage_miners"))
-    miners = get_current_miner_list("*")
+    miners = await get_current_miner_list("*")
     for miner_ip in miners_remove:
         miners.remove(miner_ip)
     with open(settings.MINER_LIST, "w") as file:
@@ -128,7 +128,7 @@ async def page_manage_users(request: Request):
         "manage_users.html",
         {
             "request": request,
-            "cur_miners": get_current_miner_list(await get_user_ip_range(request)),
+            "cur_miners": await get_current_miner_list(await get_user_ip_range(request)),
             "user": await get_current_user(request),
             "users": await get_all_users(),
         },
@@ -189,7 +189,7 @@ async def page_manage_cards(request: Request):
         "manage_cards.html",
         {
             "request": request,
-            "cur_miners": get_current_miner_list(await get_user_ip_range(request)),
+            "cur_miners": await get_current_miner_list(await get_user_ip_range(request)),
             "user": await get_current_user(request),
             "miner_available_cards": get_available_cards("miner"),
             "dashboard_available_cards": get_available_cards("dashboard"),

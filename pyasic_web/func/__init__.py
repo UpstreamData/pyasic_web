@@ -4,15 +4,15 @@ import os
 from pyasic_web import settings
 from pyasic import MinerNetwork
 from pyasic_web.auth import user_provider
+import aiofiles
 
-
-def get_current_miner_list(allowed_ips: str = "*"):
+async def get_current_miner_list(allowed_ips: str = "*"):
     if not allowed_ips:
         return []
     cur_miners = []
     if os.path.exists(settings.MINER_LIST):
-        with open(settings.MINER_LIST) as file:
-            for line in file.readlines():
+        async with aiofiles.open(settings.MINER_LIST) as file:
+            async for line in file:
                 cur_miners.append(line.strip())
     if not allowed_ips == "*":
         network = MinerNetwork(allowed_ips)

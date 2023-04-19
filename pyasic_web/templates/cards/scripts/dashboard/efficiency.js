@@ -1,17 +1,16 @@
 // efficiency
 efficiency_card = document.getElementById("card_efficiency")
-efficiency = parseFloat(0)
-if (data.hasOwnProperty("miners")) {
-    // Dashboard code, multiple miners
-    for (i = 0; i< data["miners"].length; i++) {
-        if (data["miners"][i].hasOwnProperty("efficiency")) {
-            efficiency += parseFloat(data["miners"][i]["efficiency"])
-        }
+efficiencyArr = [];
+// Dashboard code, multiple miners
+for (const i of Object.values(data)) {
+    if (i.hasOwnProperty("efficiency")) {
+        efficiencyArr.push(parseFloat(i["efficiency"]))
     }
-    efficiency = (Number(efficiency/data["miners"].length)).toFixed(2)
-    if (isNaN(efficiency)) {
-        efficiency = 0
-    }
+}
+sum = efficiencyArr.reduce((acc, curr) => acc + curr, 0);
+efficiency = (Number(sum / efficiencyArr.length)).toFixed(2);
+if (isNaN(efficiency)) {
+    efficiency = 0
 }
 if (!!efficiency_card) {
     efficiency_card.innerHTML = efficiency + " J/TH"

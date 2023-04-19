@@ -1,13 +1,10 @@
-
 // hashrate
 hashrate_card = document.getElementById("card_hashrate")
 hashrate = parseFloat(0)
-if (data.hasOwnProperty("miners")) {
-    // Dashboard code, multiple miners
-    for (i = 0; i< data["miners"].length; i++) {
-        if (data["miners"][i].hasOwnProperty("efficiency")) {
-            hashrate += parseFloat(data["miners"][i]["hashrate"])
-        }
+// Dashboard code, multiple miners
+for (const i of Object.values(data)) {
+    if (i.hasOwnProperty("hashrate")) {
+        hashrate += parseFloat(i["hashrate"])
     }
 }
 if (hashrate == 0) {

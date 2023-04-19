@@ -1,23 +1,20 @@
-
 // ideal_hashrate
 ideal_hashrate_card = document.getElementById("card_ideal_hashrate")
 ideal_hashrate = parseFloat(0)
-if (data.hasOwnProperty("miners")) {
-    // Dashboard code, multiple miners
-    for (i = 0; i< data["miners"].length; i++) {
-        if (data["miners"][i].hasOwnProperty("nominal_hashrate")) {
-            ideal_hashrate += parseFloat(data["miners"][i]["nominal_hashrate"])
-        }
+// Dashboard code, multiple miners
+for (const i of Object.values(data)) {
+    if (i.hasOwnProperty("nominal_hashrate")) {
+        ideal_hashrate += parseFloat(i["nominal_hashrate"])
     }
 }
 if (ideal_hashrate == 0) {
-    // no ideal hashrate, measure as TH/s
+    // no ideal_hashrate, measure as TH/s
     ideal_hashrate = "0 TH/s"
 } else if (ideal_hashrate < 1) {
-    // Low ideal hashrate, measure as GH/s
+    // Low ideal_hashrate, measure as GH/s
     ideal_hashrate = parseInt(ideal_hashrate*1000) + " GH/s";
 } else if (ideal_hashrate > 1000) {
-    // High ideal hashrate, measure as PH/s
+    // High ideal_hashrate, measure as PH/s
     ideal_hashrate = Number((ideal_hashrate/1000).toFixed(2)) + " PH/s";
 } else {
     // Measure as TH/s
