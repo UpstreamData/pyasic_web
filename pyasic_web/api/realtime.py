@@ -36,6 +36,7 @@ class MinerDataManager(metaclass=Singleton):
             self.data = {str(i["ip"]): i for i in d}
             await self.publish()
             await asyncio.sleep(graph_sleep_time)
+
     async def publish(self):
         self._publish.set()
         await asyncio.sleep(0) # yield to event loop
@@ -47,6 +48,14 @@ class MinerDataManager(metaclass=Singleton):
         while True:
             await self._publish.wait()
             yield self.data
+            await asyncio.sleep(0) # yield to event loop
+
+    async def subscribe_to_updates(self):
+        if not self.data == {}:
+            yield True
+        while True:
+            await self._publish.wait()
+            yield True
             await asyncio.sleep(0) # yield to event loop
 
 async def get_miner_data(miner_ip):
@@ -92,6 +101,26 @@ async def all_data(websocket: WebSocket):
         try:
             await websocket.send_json(
                 {d: data[d] for d in data if d in allowed_miners}
+            )
+        except WebSocketDisconnect:
+            print("Websocket disconnected.")
+            return
+        except websockets.exceptions.ConnectionClosedError:
+            print("Websocket disconnected.")
+            return
+        except websockets.exceptions.ConnectionClosedOK:
+            return
+
+
+@router.websocket("/updates")
+async def all_data(websocket: WebSocket):
+    await ws_login_req(websocket)
+    await websocket.accept()
+    data_manager = MinerDataManager()
+    async for update in data_manager.subscribe_to_updates():
+        try:
+            await websocket.send_json(
+                {"update": update}
             )
         except WebSocketDisconnect:
             print("Websocket disconnected.")

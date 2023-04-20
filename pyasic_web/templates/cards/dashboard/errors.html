@@ -1,10 +1,78 @@
-{% extends '/cards/bases/scroll_card.html' %}
-{% block header %}
-    Errors
-{% endblock header %}
-{% block body %}
-    <div style="height: 200px;
-                overflow-y:scroll"
-         class="p-0 thick-fancy-scroll list-group pe-3"
-         id="card_errors"></div>
-{% endblock body %}
+<div class="col col-12 my-2">
+    <div class="card">
+        <div class="card-header fw-bold text-center ">
+            Errors
+        </div>
+        <div class="card-body">
+            <div style="height: 200px;
+                        overflow-y:scroll"
+                 class="p-0 thick-fancy-scroll list-group pe-3"
+                 id="card_errors"></div>
+        </div>
+    </div>
+</div>
+<script>
+    update_ws.addEventListener('message', (event) => {
+        getAPIData("errors", 'all')
+        .then((data) => {
+            const errorsCard = document.getElementById("card_errors");
+            let errorsHtml = "";
+
+            for (const ip of Object.keys(data)) {
+                const errors = data[ip];
+                if (errors.length > 0) {
+                    const minerId = ip.replaceAll(".", "-");
+                    const errorsElem = document.getElementById(`errors_${minerId}`);
+                    let minerErrorsHtml = "";
+
+                    if (errorsElem && errorsElem.classList.contains("show")) {
+                        minerErrorsHtml += `
+              <a
+                data-bs-toggle="collapse"
+                href="#errors_${minerId}"
+                role="button"
+                class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error"
+                aria-expanded="true"
+              >
+                ${ip}
+                <span class="badge bg-fancy-gradient rounded-pill align-items-middle p-2 m-0" style="width:50px;">
+                  ${errors.length}
+                </span>
+              </a>
+              <div class="collapse no-transition multi-collapse my-0 py-0 ms-5 show" id="errors_${minerId}">
+            `;
+                    } else {
+                        minerErrorsHtml += `
+              <a
+                data-bs-toggle="collapse"
+                href="#errors_${minerId}"
+                role="button"
+                class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error"
+              >
+                ${ip}
+                <span class="badge bg-fancy-gradient rounded-pill align-items-middle p-2 m-0" style="width:50px;">
+                  ${errors.length}
+                </span>
+              </a>
+              <div class="collapse no-transition multi-collapse my-0 py-0 ms-5" id="errors_${minerId}">
+            `;
+                    }
+
+                    for (const error of errors) {
+                        minerErrorsHtml += `
+              <div class="list-group-item no-transition miner-error-item">
+                ${error.error_message}
+              </div>
+            `;
+                    }
+
+                    minerErrorsHtml += "</div>";
+                    errorsHtml += minerErrorsHtml;
+                }
+            }
+
+            errorsCard.innerHTML = errorsHtml;
+        })
+        .catch((error) => console.error(error));
+    });
+</script>

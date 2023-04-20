@@ -31,6 +31,12 @@ async def get_user_ip_range(request):
     else:
         return None
 
+async def get_api_ip_range(api_key: str) -> str:
+    user = await user_provider.find_by_api_key(api_key)
+    if not user:
+        return ""
+    return user.ip_range
+
 
 async def get_current_user(request):
     uid = request.session.get("_auth_user_id")

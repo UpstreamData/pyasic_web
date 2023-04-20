@@ -1,10 +1,33 @@
-{% extends '/cards/bases/scroll_card.html' %}
-{% block header %}
-    Pools
-{% endblock header %}
-{% block body %}
-    <div style="height: 200px;
-                overflow-y:scroll"
-         class="p-0 thick-fancy-scroll list-group pe-3"
-         id="card_pools"></div>
-{% endblock body %}
+<div class="col col-12 my-2">
+    <div class="card">
+        <div class="card-header fw-bold text-center ">
+            Pools
+        </div>
+        <div class="card-body">
+            <div style="height: 200px;
+                        overflow-y:scroll"
+                 class="p-0 thick-fancy-scroll list-group pe-3"
+                 id="card_pools"></div>
+        </div>
+    </div>
+</div>
+<script>
+update_ws.addEventListener('message', (event) => {
+    pools_card = document.getElementById("card_pools")
+    getAPIData("pools", 'all')
+    .then(data => {
+        pools_card.innerHTML = ""
+        const poolUsers = {};
+        if (!!pools_card) {
+            for (const item of Object.values(data)) {
+                poolUsers[item] = poolUsers.hasOwnProperty(item) ? poolUsers[item] + 1 : 1;
+            }
+            // Dashboard code, multiple miners
+            for (item in poolUsers) {
+                pools_card.innerHTML += '<div class ="list-group-item d-flex justify-content-between">' + item + '<span class="badge bg-fancy-gradient rounded-pill align-items-middle p-2 m-0" style="width:50px;">' + poolUsers[item] + '</span></div>'
+            };
+        }
+    })
+    .catch(error => console.error(error));
+});
+</script>

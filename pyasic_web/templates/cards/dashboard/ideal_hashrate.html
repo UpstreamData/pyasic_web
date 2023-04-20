@@ -1,7 +1,2 @@
-{% extends "/cards/bases/basic_card.html" %}
-{% block header %}
-    Ideal Hashrate
-{% endblock header %}
-{% block body %}
-    <div class="mx-auto fw-bolder" id="card_ideal_hashrate">0 TH/s</div>
-{% endblock body %}
+{% import '/cards/dashboard_macros.html' as dashboard %}
+{{ dashboard.create_basic_card("Ideal Hashrate", "ideal_hashrate") }}
