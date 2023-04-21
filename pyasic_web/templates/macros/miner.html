@@ -14,7 +14,6 @@
                 .then(data => {
                     if (!!{{data_name}}_card) {
                         if (data.hasOwnProperty("value")) {
-                        console.log(data["value"]);
                             if (data["unit"] == "") {
                                 {{data_name}}_card.innerHTML = data["value"]
                             } else {

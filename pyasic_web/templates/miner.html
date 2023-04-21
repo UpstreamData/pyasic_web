@@ -163,6 +163,24 @@
         </div>
     </div>
     <script>
+    update_ws.addEventListener('message', (event) => {
+        getAPIData("py_errors", [minerIP])
+        .then(data => {
+            const py_errors = document.getElementById("err-cover")
+            const content = document.getElementById("content");
+            if (data.hasOwnProperty(minerIP)) {
+                var err_container = document.getElementById("err-status")
+                err_container.innerHTML = data[minerIP]["msg"]
+                py_errors.classList.remove("d-none");
+                content.classList.add("d-none");
+            } else {
+                py_errors.classList.add("d-none");
+                content.classList.remove("d-none");
+            }
+        })
+        .catch(error => console.log(error));
+    });
+
         window.post = function(url, data) {
           return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
         }
