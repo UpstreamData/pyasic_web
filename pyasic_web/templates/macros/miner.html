@@ -1,0 +1,38 @@
+{% macro create_basic_card(card_header, data_name) -%}
+    <div class="col col-xs-6 col-sm-4 col-md-3 my-2">
+        <div class="card text-center">
+            <div class="card-header fw-bold">{{ card_header }}</div>
+            <div class="card-body hashrate-header d-flex align-items-center h4 p-0 m-0">
+                <div class="mx-auto fw-bolder" id="card_{{ data_name }}"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        update_ws.addEventListener('message', (event) => {
+            {{data_name}}_card = document.getElementById("card_{{data_name}}")
+            getAPIData("{{data_name}}", [minerIP])
+                .then(data => {
+                    if (!!{{data_name}}_card) {
+                        if (data.hasOwnProperty("value")) {
+                        console.log(data["value"]);
+                            if (data["unit"] == "") {
+                                {{data_name}}_card.innerHTML = data["value"]
+                            } else {
+                                {{data_name}}_card.innerHTML = data["value"] + " " + data["unit"]
+                            }
+                        } else if (data.hasOwnProperty(minerIP)) {
+                            {{data_name}}_card.innerHTML = data[minerIP]
+                        }
+                    }
+                })
+                .catch(error => console.error(error));
+        });
+    </script>
+{%- endmacro %}
+{% macro create_update_ws(request, ip) -%}
+    <script>
+        if (!window.WebSocket) alert("WebSocket not supported by this browser");
+        var update_ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/api/realtime/updates");
+        const minerIP = "{{ip}}"
+    </script>
+{%- endmacro %}

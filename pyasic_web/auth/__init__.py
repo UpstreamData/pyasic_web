@@ -47,7 +47,7 @@ class User:
     ip_range: str = "*"
     dashboard_cards: list = field(default_factory=list)
     miner_cards: list = field(default_factory=list)
-    api_key: str = ''.join(secrets.choice(ALPHABET) for _ in range(32))
+    api_key: str = "".join(secrets.choice(ALPHABET) for _ in range(32))
 
     def get_display_name(self) -> str:
         return self.name
@@ -82,7 +82,9 @@ class JsonProvider(UserProvider):
 
     async def find_by_api_key(self, api_key: str):
         if any([user for user in self.user_map.values() if user.api_key == api_key]):
-            return [user for user in self.user_map.values() if user.api_key == api_key][0]
+            return [user for user in self.user_map.values() if user.api_key == api_key][
+                0
+            ]
 
     def load_users(self):
         with open(self.file, "r") as f:
@@ -117,7 +119,7 @@ class JsonProvider(UserProvider):
             ip_range=ip_range,
             dashboard_cards=DEFAULT_DASHBOARD_CARDS,
             miner_cards=DEFAULT_MINER_CARDS,
-            api_key=''.join(secrets.choice(ALPHABET) for _ in range(32))
+            api_key="".join(secrets.choice(ALPHABET) for _ in range(32)),
         )
         self.dump_users()
 
@@ -154,7 +156,7 @@ class JsonProvider(UserProvider):
             ip_range=ip_range,
             dashboard_cards=old_user.dashboard_cards,
             miner_cards=old_user.miner_cards,
-            api_key=old_user.api_key
+            api_key=old_user.api_key,
         )
         self.user_map[username] = new_user  # noqa
         self.dump_users()

@@ -1,7 +1,2 @@
-{% extends "/cards/bases/basic_card.html" %}
-{% block header %}
-    % Max Wattage
-{% endblock header %}
-{% block body %}
-    <div class="mx-auto fw-bolder" id="card_pct_max_wattage">0 %</div>
-{% endblock body %}
+{% import '/macros/miner.html' as miner %}
+{{ miner.create_basic_card("% Max Wattage", "pct_ideal_wattage") }}

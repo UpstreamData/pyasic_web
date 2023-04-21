@@ -1,7 +1,2 @@
-{% extends "/cards/bases/basic_card.html" %}
-{% block header %}
-    Hostname
-{% endblock header %}
-{% block body %}
-    <div class="mx-auto fw-bolder" id="card_hostname">?</div>
-{% endblock body %}
+{% import '/macros/miner.html' as miner %}
+{{ miner.create_basic_card("Hostname", "hostname") }}

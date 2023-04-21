@@ -15,6 +15,10 @@
 # ------------------------------------------------------------------------------
 from enum import Enum
 
+
 class MinerDataError(Enum):
     NO_RESPONSE = {"msg": "The miner is not responding.", "name": "no_resp"}
-    BAD_DATA = {"msg": "The miner returned unusable/unsupported data.", "name": "bad_data"}
+    BAD_DATA = {
+        "msg": "The miner returned unusable/unsupported data.",
+        "name": "bad_data",
+    }

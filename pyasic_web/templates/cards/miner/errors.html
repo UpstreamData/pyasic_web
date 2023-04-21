@@ -1,10 +1,32 @@
-{% extends '/cards/bases/scroll_card.html' %}
-{% block header %}
-    Errors
-{% endblock header %}
-{% block body %}
-    <div style="height: 200px;
-                overflow-y:scroll"
-         class="p-0 thick-fancy-scroll list-group pe-3"
-         id="card_errors"></div>
-{% endblock body %}
+<div class="col col-12 my-2">
+    <div class="card">
+        <div class="card-header fw-bold text-center ">
+            Errors
+        </div>
+        <div class="card-body">
+            <div style="height: 200px;
+                        overflow-y:scroll"
+                 class="p-0 thick-fancy-scroll list-group pe-3"
+                 id="card_errors"></div>
+        </div>
+    </div>
+</div>
+<script>
+    update_ws.addEventListener('message', (event) => {
+        getAPIData("errors", [minerIP])
+        .then((data) => {
+            const errors_card = document.getElementById("card_errors");
+            let errorsHtml = "";
+            for (const ip of Object.keys(data)) {
+                const errors = data[ip];
+                for (i = 0; i < errors.length; i++) {
+                    errorsHtml += '<div class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + errors[i]["error_message"] + '</div>'
+                };
+                if (!!errors_card) {
+                    errors_card.innerHTML = errorsHtml
+                }
+            }
+        })
+        .catch((error) => console.error(error));
+    });
+</script>

@@ -19,6 +19,7 @@ from pyasic_web.errors.miner import MinerDataError
 
 router = APIRouter(prefix="/realtime")
 
+
 class MinerDataManager(metaclass=Singleton):
     def __init__(self):
         self.data = {}
@@ -36,7 +37,7 @@ class MinerDataManager(metaclass=Singleton):
 
     async def publish(self):
         self._publish.set()
-        await asyncio.sleep(0) # yield to event loop
+        await asyncio.sleep(0)  # yield to event loop
         self._publish.clear()
 
     async def subscribe(self):
@@ -45,7 +46,7 @@ class MinerDataManager(metaclass=Singleton):
         while True:
             await self._publish.wait()
             yield self.data
-            await asyncio.sleep(0) # yield to event loop
+            await asyncio.sleep(0)  # yield to event loop
 
     async def subscribe_to_updates(self):
         if not self.data == {}:
@@ -53,7 +54,8 @@ class MinerDataManager(metaclass=Singleton):
         while True:
             await self._publish.wait()
             yield True
-            await asyncio.sleep(0) # yield to event loop
+            await asyncio.sleep(0)  # yield to event loop
+
 
 async def get_miner_data(miner_ip):
     try:
@@ -79,13 +81,15 @@ async def get_miner_data(miner_ip):
             "py_error": MinerDataError.BAD_DATA.value,
         }
 
+
 users = {}
 pool_data = [dp.get("pool_1_user") for dp in users]
-for user in pool_data: # data
+for user in pool_data:  # data
     if user:
         if not user in users:
             users[user] = 0
         users[user] += 1
+
 
 @router.websocket("/all")
 async def all_data(websocket: WebSocket):
@@ -96,9 +100,7 @@ async def all_data(websocket: WebSocket):
     allowed_miners = await get_current_miner_list(irange)
     async for data in data_manager.subscribe():
         try:
-            await websocket.send_json(
-                {d: data[d] for d in data if d in allowed_miners}
-            )
+            await websocket.send_json({d: data[d] for d in data if d in allowed_miners})
         except WebSocketDisconnect:
             print("Websocket disconnected.")
             return
@@ -116,9 +118,7 @@ async def all_data(websocket: WebSocket):
     data_manager = MinerDataManager()
     async for update in data_manager.subscribe_to_updates():
         try:
-            await websocket.send_json(
-                {"update": update}
-            )
+            await websocket.send_json({"update": update})
         except WebSocketDisconnect:
             print("Websocket disconnected.")
             return

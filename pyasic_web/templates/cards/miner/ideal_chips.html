@@ -1,7 +1,2 @@
-{% extends "/cards/bases/basic_card.html" %}
-{% block header %}
-    Ideal Chips
-{% endblock header %}
-{% block body %}
-    <div class="mx-auto fw-bolder" id="card_ideal_chips">0</div>
-{% endblock body %}
+{% import '/macros/miner.html' as miner %}
+{{ miner.create_basic_card("Ideal Chips", "ideal_chips") }}

@@ -13,6 +13,7 @@ app = FastAPI(
 )
 app.include_router(api.router)
 
-@app.on_event('startup')
+
+@app.on_event("startup")
 async def app_startup():
     asyncio.create_task(MinerDataManager().run())

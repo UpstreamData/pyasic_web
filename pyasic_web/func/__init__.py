@@ -6,6 +6,7 @@ from pyasic import MinerNetwork
 from pyasic_web.auth import user_provider
 import aiofiles
 
+
 async def get_current_miner_list(allowed_ips: str = "*"):
     if not allowed_ips:
         return []
@@ -30,6 +31,7 @@ async def get_user_ip_range(request):
         return user.ip_range
     else:
         return None
+
 
 async def get_api_ip_range(api_key: str) -> str:
     user = await user_provider.find_by_api_key(api_key)

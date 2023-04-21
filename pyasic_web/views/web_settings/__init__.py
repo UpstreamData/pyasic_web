@@ -13,7 +13,9 @@ async def page_settings(request: Request):
         "settings.html",
         {
             "request": request,
-            "cur_miners": await get_current_miner_list(await get_user_ip_range(request)),
+            "cur_miners": await get_current_miner_list(
+                await get_user_ip_range(request)
+            ),
             "settings": get_current_settings(),
             "user": await get_current_user(request),
         },

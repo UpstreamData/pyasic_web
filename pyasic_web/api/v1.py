@@ -10,7 +10,7 @@ router = APIRouter(prefix="/v1", tags=["v1"])
 
 
 class MinerResponse(BaseModel):
-    value: Union[int, str, float]
+    value: Union[float, int, str]
     unit: str = ""
 
 
@@ -54,19 +54,17 @@ async def get_allowed_miners(
     allowed_range = await get_api_ip_range(api_key=api_key)
     if selector == "all":
         return await get_current_miner_list(allowed_range)
+    if allowed_range == "*":
+        return [ip for ip in await get_current_miner_list(selector)]
     return [ip for ip in await get_current_miner_list(selector) if ip in allowed_range]
 
 
 @router.post("/py_errors/")
-async def miners(selector: MinerSelector) -> dict:
+async def py_errors(selector: MinerSelector) -> dict:
     allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
     miner_data = MinerDataManager().data
-    data = {
-        d: miner_data[d].get("py_error") for d in miner_data if d in allowed_miners
-    }
+    data = {d: miner_data[d].get("py_error") for d in miner_data if d in allowed_miners}
     return {k: v for k, v in data.items() if v is not None}
-
-
 
 
 @router.post("/miners/")
@@ -77,6 +75,14 @@ async def miners(selector: MinerSelector) -> List[str]:
 @router.post("/count/")
 async def count(selector: MinerSelector) -> MinerResponse:
     return MinerResponse(value=len(await get_allowed_miners(selector.api_key)))
+
+
+@router.post("/api_ver/")
+async def api_ver(selector: MinerSelector) -> dict:
+    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+    miner_data = MinerDataManager().data
+    data = {d: miner_data[d].get("api_ver") for d in miner_data if d in allowed_miners}
+    return {k: v for k, v in data.items() if v is not None}
 
 
 @router.post("/efficiency/")
@@ -120,6 +126,14 @@ async def errors(selector: MinerSelector) -> dict:
     return data
 
 
+@router.post("/fw_ver/")
+async def fw_ver(selector: MinerSelector) -> dict:
+    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+    miner_data = MinerDataManager().data
+    data = {d: miner_data[d].get("fw_ver") for d in miner_data if d in allowed_miners}
+    return {k: v for k, v in data.items() if v is not None}
+
+
 @router.post("/hashrate/")
 async def hashrate(selector: MinerSelector) -> MinerResponse:
     allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
@@ -127,6 +141,14 @@ async def hashrate(selector: MinerSelector) -> MinerResponse:
     hr, unit = convert_hashrate(sum(data))
 
     return MinerResponse(value=round(hr, 2), unit=unit)
+
+
+@router.post("/hostname/")
+async def hostname(selector: MinerSelector) -> dict:
+    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+    miner_data = MinerDataManager().data
+    data = {d: miner_data[d].get("hostname") for d in miner_data if d in allowed_miners}
+    return {k: v for k, v in data.items() if v is not None}
 
 
 @router.post("/ideal_chips/")
@@ -160,12 +182,28 @@ async def lights(selector: MinerSelector) -> dict:
     return data
 
 
+@router.post("/make/")
+async def make(selector: MinerSelector) -> dict:
+    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+    miner_data = MinerDataManager().data
+    data = {d: miner_data[d].get("make") for d in miner_data if d in allowed_miners}
+    return {k: v for k, v in data.items() if v is not None}
+
+
 @router.post("/max_wattage/")
 async def ideal_hashrate(selector: MinerSelector) -> MinerResponse:
     allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
     data = get_data_by_selector("wattage_limit", allowed_miners)
 
     return MinerResponse(value=sum(data), unit="W")
+
+
+@router.post("/model/")
+async def model(selector: MinerSelector) -> dict:
+    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+    miner_data = MinerDataManager().data
+    data = {d: miner_data[d].get("model") for d in miner_data if d in allowed_miners}
+    return {k: v for k, v in data.items() if v is not None}
 
 
 @router.post("/pct_ideal_chips/")

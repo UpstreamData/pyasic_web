@@ -28,23 +28,8 @@
             </div>
         </div>
     </nav>
-    <script>
-        function getAPIData(path, selector) {
-          const url = `http://localhost:8080/api/v1/${path}/`;
-
-          const options = {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'accept': 'application/json'
-            },
-            body: JSON.stringify({"api_key": "{{user.api_key}}", "miner_selector": selector})
-          };
-
-          return fetch(url, options)
-            .then(response => response.json());
-        }
-    </script>
+    {% import '/macros/scripts.html' as scripts %}
+    {{ scripts.create_get_api_data(user.api_key) }}
     {% import '/macros/dashboard.html' as dashboard %}
     {{ dashboard.create_update_ws(request) }}
     <div class="px-lg-4 my-2 mx-4 mx-lg-0">

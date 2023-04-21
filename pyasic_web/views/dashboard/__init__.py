@@ -37,7 +37,9 @@ async def page_dashboard(request: Request):
         "dashboard.html",
         {
             "request": request,
-            "cur_miners": await get_current_miner_list(await get_user_ip_range(request)),
+            "cur_miners": await get_current_miner_list(
+                await get_user_ip_range(request)
+            ),
             "user": await get_current_user(request),
             "card_exists": card_exists,
         },
@@ -86,7 +88,9 @@ async def ws_dashboard(websocket):
                         py_errors[data_point["py_error"]] = 1
                 else:
                     all_miner_data.append(data_point)
-            py_errors = [{"err": item.value, "count": py_errors[item]} for item in py_errors]
+            py_errors = [
+                {"err": item.value, "count": py_errors[item]} for item in py_errors
+            ]
             all_miner_data.sort(key=lambda x: ipaddress.ip_address(x["ip"]))
             data_manager.cached_data = all_miner_data
             pool_users = get_pool_users_data(data_manager.cached_data)
