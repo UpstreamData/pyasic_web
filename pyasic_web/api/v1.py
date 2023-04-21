@@ -167,7 +167,7 @@ async def ideal_hashrate(selector: MinerSelector) -> MinerResponse:
     data = get_data_by_selector("nominal_hashrate", allowed_miners)
     hr, unit = convert_hashrate(sum(data))
 
-    return MinerResponse(value=hr, unit=unit)
+    return MinerResponse(value=round(hr, 2), unit=unit)
 
 
 @router.post("/lights/")
