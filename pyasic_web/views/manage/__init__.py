@@ -16,6 +16,7 @@ from pyasic_web.func.web_settings import get_current_settings
 from pyasic_web.templates import templates
 from pyasic_web import settings
 from pyasic_web.auth import user_provider, DEFAULT_DASHBOARD_CARDS, DEFAULT_MINER_CARDS
+from pyasic_web.api.realtime import MinerDataManager
 
 from pyasic import get_miner
 
