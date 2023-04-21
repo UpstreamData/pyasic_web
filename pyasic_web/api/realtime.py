@@ -1,6 +1,4 @@
 import asyncio
-import datetime
-import ipaddress
 
 from fastapi import APIRouter, WebSocket
 import websockets
@@ -12,7 +10,6 @@ from pyasic.misc import Singleton
 from pyasic_web.func import get_current_miner_list
 from pyasic_web.func import get_user_ip_range
 from pyasic_web.func.auth import ws_login_req
-from pyasic_web.func.dashboard import get_miner_data_dashboard, get_pool_users_data
 from pyasic_web.func.web_settings import (
     get_current_settings,
 )
