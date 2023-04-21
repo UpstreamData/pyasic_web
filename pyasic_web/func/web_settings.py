@@ -11,7 +11,7 @@ def get_current_settings():
             settings = toml.loads(settings_file.read())
     except:
         settings = {
-            "graph_data_sleep_time": 1,
+            "data_sleep_time": 1,
             "miner_data_timeout": 5,
             "miner_identify_timeout": 5,
         }

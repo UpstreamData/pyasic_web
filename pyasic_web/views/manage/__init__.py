@@ -67,7 +67,7 @@ async def ws_manage_miners(websocket: WebSocket):
                 for task in data_tasks:
                     ret = await task
                     await websocket.send_text(ret.as_json())
-                await asyncio.sleep(current_settings["graph_data_sleep_time"])
+                await asyncio.sleep(current_settings["data_sleep_time"])
             except asyncio.exceptions.TimeoutError:
                 pass
     except WebSocketDisconnect:

@@ -27,7 +27,7 @@ class MinerDataManager(metaclass=Singleton):
         self._publish = asyncio.Event()
 
     async def run(self):
-        graph_sleep_time = get_current_settings()["graph_data_sleep_time"]
+        graph_sleep_time = get_current_settings()["data_sleep_time"]
         while True:
             self.miners = await get_current_miner_list()
             d = await asyncio.gather(*[get_miner_data(m) for m in self.miners])
@@ -37,6 +37,7 @@ class MinerDataManager(metaclass=Singleton):
 
     async def publish(self):
         self._publish.set()
+        print("Published")
         await asyncio.sleep(0)  # yield to event loop
         self._publish.clear()
 

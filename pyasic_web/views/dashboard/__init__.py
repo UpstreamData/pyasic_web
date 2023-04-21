@@ -55,7 +55,7 @@ async def ws_dashboard(websocket):
     await websocket.accept()
     # while True:
     #     await asyncio.sleep(5)
-    graph_sleep_time = get_current_settings()["graph_data_sleep_time"]
+    graph_sleep_time = get_current_settings()["data_sleep_time"]
     data_manager = MinerDataManager()
     try:
         irange = await get_user_ip_range(websocket)

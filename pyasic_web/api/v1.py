@@ -74,6 +74,9 @@ async def miners(selector: MinerSelector) -> List[str]:
 
 @router.post("/count/")
 async def count(selector: MinerSelector) -> MinerResponse:
+    print(selector)
+    print(selector.api_key)
+    print(selector.miner_selector)
     return MinerResponse(value=len(await get_allowed_miners(selector.api_key)))
 
 

@@ -24,11 +24,11 @@ async def page_settings(request: Request):
 
 async def page_update_settings(request: Request):
     data = await request.form()
-    graph_data_sleep_time = data.get("graph_data_sleep_time")
+    data_sleep_time = data.get("data_sleep_time")
     miner_data_timeout = data.get("miner_data_timeout")
     miner_identify_timeout = data.get("miner_identify_timeout")
     new_settings = {
-        "graph_data_sleep_time": int(graph_data_sleep_time),
+        "data_sleep_time": int(data_sleep_time),
         "miner_data_timeout": int(miner_data_timeout),
         "miner_identify_timeout": int(miner_identify_timeout),
     }

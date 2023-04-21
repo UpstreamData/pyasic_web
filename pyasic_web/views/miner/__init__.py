@@ -101,7 +101,7 @@ async def ws_miner(websocket: WebSocket):
                 data = data.as_json()
                 data_manager.cached_data = data
                 await websocket.send_text(data)
-                await asyncio.sleep(settings["graph_data_sleep_time"])
+                await asyncio.sleep(settings["data_sleep_time"])
             except asyncio.exceptions.TimeoutError:
                 data = {"py_errors": [MinerDataError.NO_RESPONSE.value]}
                 await websocket.send_json(data)
