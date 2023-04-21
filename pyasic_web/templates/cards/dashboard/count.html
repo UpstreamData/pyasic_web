@@ -1,7 +1,2 @@
-{% extends "/cards/bases/basic_card.html" %}
-{% block header %}
-    Miner Count
-{% endblock header %}
-{% block body %}
-    <div class="mx-auto fw-bolder" id="card_count">{{ cur_miners|length }}</div>
-{% endblock body %}
+{% import '/macros/dashboard.html' as dashboard %}
+{{ dashboard.create_basic_card("Count", "count") }}

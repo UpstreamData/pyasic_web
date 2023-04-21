@@ -18,3 +18,22 @@
         </div>
     </div>
 </div>
+<script>
+update_ws.addEventListener('message', (event) => {
+    lights_on_card = document.getElementById("card_lights_on")
+    lights_off_card = document.getElementById("card_lights_off")
+    getAPIData("lights", 'all')
+        .then(data => {
+            lights_on_card.innerHTML = ""
+            lights_off_card.innerHTML = ""
+            for (const ip of Object.keys(data)) {
+                    if (data[ip]) {
+                        lights_on_card.innerHTML += '<div class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + ip + '</div>'
+                    } else {
+                        lights_off_card.innerHTML += '<div class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + ip + '</div>'
+                }
+            }
+        })
+    .catch(error => console.error(error));
+});
+</script>

@@ -1,7 +1,2 @@
-{% extends "/cards/bases/basic_card.html" %}
-{% block header %}
-    ENV Temperature
-{% endblock header %}
-{% block body %}
-    <div class="mx-auto fw-bolder" id="card_env_temp">0 °C</div>
-{% endblock body %}
+{% import '/macros/dashboard.html' as dashboard %}
+{{ dashboard.create_basic_card("Env Temp", "env_temp") }}

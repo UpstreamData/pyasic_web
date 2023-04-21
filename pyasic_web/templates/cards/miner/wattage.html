@@ -1,7 +1,2 @@
-{% extends "/cards/bases/basic_card.html" %}
-{% block header %}
-    Wattage
-{% endblock header %}
-{% block body %}
-    <div class="mx-auto fw-bolder" id="card_wattage">0 W</div>
-{% endblock body %}
+{% import '/macros/miner.html' as miner %}
+{{ miner.create_basic_card("Wattage", "total_wattage") }}

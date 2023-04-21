@@ -23,7 +23,7 @@ from pyasic_web.errors.miner import MinerDataError
 async def page_miner(request: Request):
     await login_req(request)
     miner_ip = request.path_params["miner_ip"]
-    miners = get_current_miner_list(await get_user_ip_range(request))
+    miners = await get_current_miner_list(await get_user_ip_range(request))
     if miner_ip not in miners:
         raise HTTPException(403)
 
@@ -42,7 +42,7 @@ async def page_miner(request: Request):
 async def page_remove_miner(request: Request):
     await login_req(request)
     miner_ip = request.path_params["miner_ip"]
-    miners = get_current_miner_list("*")
+    miners = await get_current_miner_list("*")
     miners.remove(miner_ip)
     with open(settings.MINER_LIST, "w") as file:
         for miner_ip in miners:

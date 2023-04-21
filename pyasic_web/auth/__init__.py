@@ -3,6 +3,9 @@ from starlette.middleware import Middleware, sessions
 
 from passlib.hash import pbkdf2_sha256
 
+import secrets
+import string
+
 from imia import LoginManager, UserProvider, authentication
 import json
 import os
@@ -32,12 +35,11 @@ DEFAULT_MINER_CARDS = [
     "pools",
 ]
 
+ALPHABET = string.ascii_letters + string.digits
+
 
 @dataclass
 class User:
-    """This is our user model. It may be an ORM model, or any python class, the library does not care of it,
-    it only expects that the class has methods defined by the UserLike protocol."""
-
     username: str
     name: str = "Anon"
     password: str = "password"
@@ -45,6 +47,7 @@ class User:
     ip_range: str = "*"
     dashboard_cards: list = field(default_factory=list)
     miner_cards: list = field(default_factory=list)
+    api_key: str = "".join(secrets.choice(ALPHABET) for _ in range(32))
 
     def get_display_name(self) -> str:
         return self.name
@@ -57,6 +60,9 @@ class User:
 
     def get_scopes(self) -> list:
         return self.scopes
+
+    def get_api_key(self) -> str:
+        return self.api_key
 
 
 class JsonProvider(UserProvider):
@@ -73,6 +79,12 @@ class JsonProvider(UserProvider):
 
     async def find_by_token(self, connection, token: str):
         return self.user_map.get(token)
+
+    async def find_by_api_key(self, api_key: str):
+        if any([user for user in self.user_map.values() if user.api_key == api_key]):
+            return [user for user in self.user_map.values() if user.api_key == api_key][
+                0
+            ]
 
     def load_users(self):
         with open(self.file, "r") as f:
@@ -93,6 +105,7 @@ class JsonProvider(UserProvider):
                 ip_range=users_data[u]["ip_range"],
                 dashboard_cards=dashboard_cards,
                 miner_cards=miner_cards,
+                api_key=users_data[u]["api_key"],
             )
 
     def add_user(
@@ -106,6 +119,7 @@ class JsonProvider(UserProvider):
             ip_range=ip_range,
             dashboard_cards=DEFAULT_DASHBOARD_CARDS,
             miner_cards=DEFAULT_MINER_CARDS,
+            api_key="".join(secrets.choice(ALPHABET) for _ in range(32)),
         )
         self.dump_users()
 
@@ -142,6 +156,7 @@ class JsonProvider(UserProvider):
             ip_range=ip_range,
             dashboard_cards=old_user.dashboard_cards,
             miner_cards=old_user.miner_cards,
+            api_key=old_user.api_key,
         )
         self.user_map[username] = new_user  # noqa
         self.dump_users()

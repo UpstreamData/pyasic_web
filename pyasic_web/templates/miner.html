@@ -146,6 +146,10 @@
             {{ logo_macros.create_logo() }}
         </div>
     </div>
+    {% import '/macros/scripts.html' as scripts %}
+    {{ scripts.create_get_api_data(user.api_key) }}
+    {% import '/macros/miner.html' as miner_macro %}
+    {{ miner_macro.create_update_ws(request, miner) }}
     <div id="content">
         <div class="px-lg-4 my-2 mx-4 mx-lg-0">
             <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3"
@@ -159,29 +163,23 @@
         </div>
     </div>
     <script>
-        var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/miner/{{miner}}/ws");
-        let all_data = []
-        let all_labels = []
-        ws.onmessage = function(event) {
-            var data = JSON.parse(event.data)
+    update_ws.addEventListener('message', (event) => {
+        getAPIData("py_errors", [minerIP])
+        .then(data => {
             const py_errors = document.getElementById("err-cover")
             const content = document.getElementById("content");
-            if (data.hasOwnProperty("py_errors")) {
+            if (data.hasOwnProperty(minerIP)) {
                 var err_container = document.getElementById("err-status")
-                err_container.innerHTML = data["py_errors"][0]
+                err_container.innerHTML = data[minerIP]["msg"]
                 py_errors.classList.remove("d-none");
                 content.classList.add("d-none");
             } else {
                 py_errors.classList.add("d-none");
                 content.classList.remove("d-none");
             }
-
-            {% for card_name in user.miner_cards %}
-                {% if card_exists('cards/scripts/miner/' + card_name + '.js') %}
-                    {% include 'cards/scripts/miner/' + card_name + '.js' %}
-                {% endif %}
-            {% endfor %}
-        }
+        })
+        .catch(error => console.log(error));
+    });
 
         window.post = function(url, data) {
           return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});

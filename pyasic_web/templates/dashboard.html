@@ -1,6 +1,6 @@
 {% extends 'navbar.html' %}
 {% block content %}
-    <nav class="navbar bg-dark" data-bs-theme="dark">
+<nav class="navbar bg-dark" data-bs-theme="dark" xmlns="">
         <div class="row d-flex justify-content-between w-100 align-content-middle">
             {% import "macros/header.html" as header_macros %}
             {{ header_macros.create_header_item(text="Home", icon="dashboard") }}
@@ -20,7 +20,6 @@
                         Actions
                     </button>
                     <ul class="dropdown-menu">
-                        <!-- <li><a class="dropdown-item" target="_blank" href="http://{{miner}}" role="button">Web Interface</a></li> -->
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -29,6 +28,10 @@
             </div>
         </div>
     </nav>
+    {% import '/macros/scripts.html' as scripts %}
+    {{ scripts.create_get_api_data(user.api_key) }}
+    {% import '/macros/dashboard.html' as dashboard %}
+    {{ dashboard.create_update_ws(request) }}
     <div class="px-lg-4 my-2 mx-4 mx-lg-0">
         {% if "admin" in user.scopes and cur_miners|length == 0 %}
             <a role="button"
@@ -37,8 +40,6 @@
                class="w-100 btn btn-info fw-bolder d-flex align-items-center justify-content-center mt-3"
                style="height:100px">Click here to add miners.</a>
         {% endif %}
-        <!--    <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3"
-         id="all_cards">-->
         <div class="row" data-masonry='{"percentPosition": true }' id="all_cards">
             {% if not cur_miners|length == 0 %}
                 {% for card_name in user.dashboard_cards %}
@@ -49,32 +50,39 @@
             {% endif %}
         </div>
         {% include 'toasts.html' %}
+        <script>
+            update_ws.addEventListener('message', (event) => {
+                getAPIData("py_errors", 'all')
+                .then(data => {
+                    currentToasts = getToasts();
+                    summary = []
+                    pyErrors = [];
+                    pyErrorsCount = {};
+                    for (const item of Object.values(data)) {
+                      if (item.hasOwnProperty("msg")) {
+                        const errorName = item["name"];
+                        const errorMessage = item["msg"];
+                        pyErrorsCount[errorName] = pyErrorsCount.hasOwnProperty(errorName) ? pyErrorsCount[errorName] + 1 : 1;
+                      }
+                    }
+                    for (const errorName of Object.keys(pyErrorsCount)) {
+                      const errorMessage = Object.values(data).find(item => item.hasOwnProperty("msg") && item["name"] === errorName)["msg"];
+                      const errorCount = pyErrorsCount[errorName];
+                      pyErrors.push({ name: errorName, msg: errorMessage, count: errorCount });
+                    }
+                    for (i = 0; i< pyErrors.length; i++) {
+                        handleToastMessage(pyErrors[i]["msg"], pyErrors[i]["name"] + "_error", pyErrors[i]["count"]);
+                        var indexToRemove = currentToasts.indexOf(pyErrors[i]["name"] + "_error");
+                        if (indexToRemove !== -1) {
+                          currentToasts.splice(indexToRemove, 1);
+                        }
+                    }
+                    for (i = 0; i< currentToasts.length; i++) {
+                        hideToastMessage(currentToasts[i]);
+                    }
+                })
+                .catch(error => console.log(error));
+            });
+        </script>
     </div>
-    <script>
-        if (!window.WebSocket) alert("WebSocket not supported by this browser");
-        var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/dashboard/ws");
-        ws.onmessage = function(event) {
-            var data = JSON.parse(event.data)
-            errors = document.getElementById("py_errors");
-            // Query all current toasts
-            currentToasts = getToasts();
-            for (i = 0; i< data["py_errors"].length; i++) {
-                handleToastMessage(data["py_errors"][i]["err"]["msg"], data["py_errors"][i]["err"]["name"] + "_error", data["py_errors"][i]["count"]);
-                var indexToRemove = currentToasts.indexOf(data["py_errors"][i]["err"]["name"] + "_error");
-                if (indexToRemove !== -1) {
-                  currentToasts.splice(indexToRemove, 1);
-                }
-            }
-            for (i = 0; i< currentToasts.length; i++) {
-                hideToastMessage(currentToasts[i]);
-            }
-            {% if not cur_miners|length == 0 %}
-                {% for card_name in user.dashboard_cards %}
-                    {% if card_exists('cards/scripts/dashboard/' + card_name + '.js') %}
-                        {% include 'cards/scripts/dashboard/' + card_name + '.js' %}
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
-        }
-    </script>
 {% endblock content %}
