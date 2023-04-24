@@ -37,7 +37,6 @@ class MinerDataManager(metaclass=Singleton):
 
     async def publish(self):
         self._publish.set()
-        print("Published")
         await asyncio.sleep(0)  # yield to event loop
         self._publish.clear()
 

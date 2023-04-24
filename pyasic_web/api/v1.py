@@ -59,14 +59,6 @@ async def get_allowed_miners(
     return [ip for ip in await get_current_miner_list(selector) if ip in allowed_range]
 
 
-@router.post("/py_errors/")
-async def py_errors(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
-    miner_data = MinerDataManager().data
-    data = {d: miner_data[d].get("py_error") for d in miner_data if d in allowed_miners}
-    return {k: v for k, v in data.items() if v is not None}
-
-
 @router.post("/miners/")
 async def miners(selector: MinerSelector) -> List[str]:
     return await get_allowed_miners(selector.api_key)
@@ -74,11 +66,14 @@ async def miners(selector: MinerSelector) -> List[str]:
 
 @router.post("/count/")
 async def count(selector: MinerSelector) -> MinerResponse:
-    print(selector)
-    print(selector.api_key)
-    print(selector.miner_selector)
     return MinerResponse(value=len(await get_allowed_miners(selector.api_key)))
 
+@router.post("/py_errors/")
+async def py_errors(selector: MinerSelector) -> dict:
+    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+    miner_data = MinerDataManager().data
+    data = {d: miner_data[d].get("py_error") for d in miner_data if d in allowed_miners}
+    return {k: v for k, v in data.items() if v is not None}
 
 @router.post("/api_ver/")
 async def api_ver(selector: MinerSelector) -> dict:
