@@ -9,7 +9,7 @@ import pyasic
 from pyasic.misc import Singleton
 from pyasic_web.func import get_current_miner_list
 from pyasic_web.func import get_user_ip_range
-from pyasic_web.func.auth import ws_login_req
+from pyasic_web.func.auth import login_req
 from pyasic_web.func.web_settings import (
     get_current_settings,
 )
@@ -91,9 +91,9 @@ for user in pool_data:  # data
         users[user] += 1
 
 
+@login_req()
 @router.websocket("/all")
 async def all_data(websocket: WebSocket):
-    await ws_login_req(websocket)
     await websocket.accept()
     data_manager = MinerDataManager()
     irange = await get_user_ip_range(websocket)
@@ -110,10 +110,9 @@ async def all_data(websocket: WebSocket):
         except websockets.exceptions.ConnectionClosedOK:
             return
 
-
+@login_req()
 @router.websocket("/updates")
 async def all_data(websocket: WebSocket):
-    await ws_login_req(websocket)
     await websocket.accept()
     data_manager = MinerDataManager()
     async for update in data_manager.subscribe_to_updates():

@@ -9,6 +9,27 @@
         <script src="{{ url_for('static', path='/masonry.min.js') }}"></script>
         <link href="{{ url_for('static', path='/bootstrap.min.css') }}"
               rel="stylesheet">
+        <script src="{{ url_for('static', path='/chart.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/luxon@^2"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@^1"></script>
+        <script>
+            function getGradient(ctx, chartArea) {
+            let width, height, gradient;
+              const chartWidth = chartArea.right - chartArea.left;
+              const chartHeight = chartArea.bottom - chartArea.top;
+              if (!gradient || width !== chartWidth || height !== chartHeight) {
+                // Create the gradient because this is either the first render
+                // or the size of the chart has changed
+                width = chartWidth;
+                height = chartHeight;
+                gradient = ctx.createLinearGradient(chartArea.right, 0, chartArea.left, 0);
+                gradient.addColorStop(0, '#D0368A');
+                gradient.addColorStop(1, '#708AD4');
+              }
+
+              return gradient;
+            }
+        </script>
         <link href="{{ url_for('static', path='/navbar.css') }}" rel="stylesheet">
         <meta charset="UTF-8">
         <title>Title</title>

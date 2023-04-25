@@ -1,10 +1,8 @@
-<div class="col col-12 my-2">
+<div class="col col-12 col-sm-6 my-2">
     <div class="card">
-        <div class="card-header fw-bold text-center ">
-            Errors
-        </div>
+        <div class="card-header fw-bold text-center ">Errors</div>
         <div class="card-body">
-            <div style="height: 200px;
+            <div style="height: 187.5px;
                         overflow-y:scroll"
                  class="p-0 thick-fancy-scroll list-group pe-3"
                  id="card_errors"></div>
@@ -60,9 +58,7 @@
 
                     for (const error of errors) {
                         minerErrorsHtml += `
-              <div class="list-group-item no-transition miner-error-item">
-                ${error.error_message}
-              </div>
+              <div class="list-group-item no-transition miner-error-item">${error.error_message}</div>
             `;
                     }
 

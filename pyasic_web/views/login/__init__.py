@@ -2,11 +2,14 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from pyasic_web.templates import templates
+from pyasic_web.func import get_current_user
 from pyasic_web.auth import login_manager, user_provider
 
 
 async def page_login(request: Request):
     if request.method == "GET":
+        if await get_current_user(request):
+            return RedirectResponse("/dashboard")
         return templates.TemplateResponse("login.html", {"request": request})
     elif request.method == "POST":
         data = await request.form()

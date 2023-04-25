@@ -5,7 +5,6 @@ from pyasic_web.api.realtime import MinerDataManager
 
 from pyasic_web import routes, auth, errors, api
 
-# app.include_router(api.router)
 app = Starlette(
     middleware=[*auth.middleware],
     routes=routes.routes,

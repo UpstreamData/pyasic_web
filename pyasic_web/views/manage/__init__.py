@@ -11,7 +11,7 @@ from pyasic_web.func import (
     get_all_users,
     get_available_cards,
 )
-from pyasic_web.func.auth import login_req, ws_login_req
+from pyasic_web.func.auth import login_req
 from pyasic_web.func.web_settings import get_current_settings
 from pyasic_web.templates import templates
 from pyasic_web import settings
@@ -20,9 +20,8 @@ from pyasic_web.api.realtime import MinerDataManager
 
 from pyasic import get_miner
 
-
+@login_req()
 async def page_manage_miners(request: Request):
-    await login_req(request)
     return templates.TemplateResponse(
         "manage_miners.html",
         {
@@ -34,9 +33,8 @@ async def page_manage_miners(request: Request):
         },
     )
 
-
+@login_req()
 async def ws_manage_miners(websocket: WebSocket):
-    await ws_login_req(websocket)
     await websocket.accept()
     current_settings = get_current_settings()
     miner_data_timeout = current_settings["miner_data_timeout"]
@@ -75,7 +73,7 @@ async def ws_manage_miners(websocket: WebSocket):
     except websockets.exceptions.ConnectionClosedOK:
         pass
 
-
+@login_req()
 async def page_light_miners(request: Request):
     await login_req(request)
     miners_light = (await request.json())["miners"]
@@ -92,9 +90,8 @@ async def page_light_miners(request: Request):
     await asyncio.gather(*tasks)
     return RedirectResponse(request.url_for("page_manage_miners"))
 
-
+@login_req()
 async def page_reboot_miners(request: Request):
-    await login_req(request)
     miners_light = (await request.json())["miners"]
     if not miners_light:
         return RedirectResponse(request.url_for("page_manage_miners"))
@@ -102,9 +99,8 @@ async def page_reboot_miners(request: Request):
     await asyncio.gather(*[miner.reboot() for miner in miners])
     return RedirectResponse(request.url_for("page_manage_miners"))
 
-
+@login_req()
 async def page_restart_backend_miners(request: Request):
-    await login_req(request)
     miners_light = (await request.json())["miners"]
     if not miners_light:
         return RedirectResponse(request.url_for("page_manage_miners"))
@@ -112,9 +108,8 @@ async def page_restart_backend_miners(request: Request):
     await asyncio.gather(*[miner.restart_backend() for miner in miners])
     return RedirectResponse(request.url_for("page_manage_miners"))
 
-
+@login_req(["admin"])
 async def page_remove_miners(request: Request):
-    await login_req(request, ["admin"])
     miners_remove = (await request.json())["miners"]
     if not miners_remove:
         return RedirectResponse(request.url_for("page_manage_miners"))
@@ -126,9 +121,8 @@ async def page_remove_miners(request: Request):
             file.write(miner_ip + "\n")
     return RedirectResponse(request.url_for("page_manage_users"), status_code=302)
 
-
+@login_req(["admin"])
 async def page_manage_users(request: Request):
-    await login_req(request, ["admin"])
     return templates.TemplateResponse(
         "manage_users.html",
         {
@@ -141,17 +135,15 @@ async def page_manage_users(request: Request):
         },
     )
 
-
+@login_req(["admin"])
 async def page_delete_user(request: Request):
-    await login_req(request, ["admin"])
     data = await request.json()
     uid = data["user_id"]
     user_provider.delete_user(uid)
     return RedirectResponse(request.url_for("page_manage_users"), status_code=302)
 
-
+@login_req(["admin"])
 async def page_update_user(request: Request):
-    await login_req(request, ["admin"])
     data = await request.form()
     admin = data.get("admin")
     if admin:
@@ -169,9 +161,8 @@ async def page_update_user(request: Request):
     )
     return RedirectResponse(request.url_for("page_manage_users"), status_code=302)
 
-
+@login_req(["admin"])
 async def page_add_user(request: Request):
-    await login_req(request, ["admin"])
     data = await request.form()
     admin = data.get("admin")
     if admin:
@@ -189,9 +180,8 @@ async def page_add_user(request: Request):
     )
     return RedirectResponse(request.url_for("page_manage_users"), status_code=302)
 
-
+@login_req()
 async def page_manage_cards(request: Request):
-    await login_req(request)
     return templates.TemplateResponse(
         "manage_cards.html",
         {
@@ -205,9 +195,8 @@ async def page_manage_cards(request: Request):
         },
     )
 
-
+@login_req()
 async def page_update_miner_cards(request: Request):
-    await login_req(request)
     cards_raw = (await request.form())["miner_cards"]
     cards = cards_raw.split("&")
     if cards == [""]:
@@ -220,9 +209,8 @@ async def page_update_miner_cards(request: Request):
     user_provider.update_user_cards(user)
     return RedirectResponse(request.url_for("page_manage_cards"), status_code=302)
 
-
+@login_req()
 async def page_update_dashboard_cards(request: Request):
-    await login_req(request)
     cards_raw = (await request.form())["dashboard_cards"]
     cards = cards_raw.split("&")
     if cards == [""]:
@@ -235,9 +223,8 @@ async def page_update_dashboard_cards(request: Request):
     user_provider.update_user_cards(user)
     return RedirectResponse(request.url_for("page_manage_cards"), status_code=302)
 
-
+@login_req()
 async def page_reset_cards(request: Request):
-    await login_req(request)
     user = await get_current_user(request)
     user.miner_cards = DEFAULT_MINER_CARDS
     user.dashboard_cards = DEFAULT_DASHBOARD_CARDS

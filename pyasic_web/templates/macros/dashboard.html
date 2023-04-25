@@ -24,6 +24,91 @@
         });
     </script>
 {%- endmacro %}
+{% macro create_graph_card(card_header, data_name) -%}
+<div class="col col-12 col-sm-6 my-2">
+    <div class="card">
+        <div class="card-header fw-bold text-center">{{ card_header }}</div>
+        <div class="card-body">
+            <canvas id="card_{{ data_name }}_graph" class="w-100 h-100" style="max-height:187.5px;"></canvas>
+        </div>
+    </div>
+</div>
+<script>
+const graph_{{ data_name }}_ctx = document.getElementById('card_{{ data_name }}_graph').getContext('2d');
+const graph_{{ data_name }}_gradient = graph_{{ data_name }}_ctx.createLinearGradient(0, 0, graph_{{ data_name }}_ctx.canvas.width, 0);
+graph_{{ data_name }}_gradient.addColorStop(0, '#D0368A');
+graph_{{ data_name }}_gradient.addColorStop(0.99, '#708AD4');
+const {{ data_name }}_chart = new Chart(graph_{{ data_name }}_ctx, {
+    type: 'line',
+    data: {
+        datasets: [{
+            label: '{{ card_header }}',
+            data: [],
+            borderColor: function(context) {
+                const {{ data_name }}_ctx_chart = context.chart;
+                const {ctx, chartArea} = {{ data_name }}_ctx_chart;
+
+                if (!chartArea) {
+                    return;
+                }
+                return getGradient(ctx, chartArea);
+            },
+            borderWidth: 4, // increase the line width for better visibility
+            pointRadius: 2, // set pointRadius to 0 to remove dot points
+            fill: true
+        }]
+    },
+    options: {
+        animation: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        responsive: true,
+        scales: {
+            x: {
+                type: 'time',
+                time: {
+                    unit: 'minute',
+                    max: 30
+                }
+            },
+            y: {
+                type: 'linear',
+                min: 0,
+                ticks: {
+                    callback: function(value, index, values) {
+                        return value;
+                    }
+                }
+            }
+        }
+    }
+});
+
+update_ws.addEventListener('message', event => {
+    getAPIData("{{ data_name }}", 'all')
+    .then(data => {
+        const new_{{ data_name }} = { x: new Date(), y: data["value"] };
+
+        // Add new data point to chart dataset
+        {{ data_name }}_chart.data.datasets[0].data.push(new_{{ data_name }});
+
+        // Remove older data points if number of data points exceeds 30
+        if ({{ data_name }}_chart.data.datasets[0].data.length > 30) {
+            {{ data_name }}_chart.data.datasets[0].data.splice(0, 1);
+        }
+        {{ data_name }}_chart.options.scales.y.ticks.callback = function(value, index, values) {
+            return value + ' ' + data.unit;
+        };
+
+        {{ data_name }}_chart.update();
+    });
+});
+</script>
+{%- endmacro %}
+
 {% macro create_update_ws(request) -%}
     <script>
         if (!window.WebSocket) alert("WebSocket not supported by this browser");

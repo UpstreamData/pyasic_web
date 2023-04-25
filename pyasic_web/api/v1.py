@@ -113,12 +113,9 @@ async def env_temp(selector: MinerSelector) -> MinerResponse:
 async def errors(selector: MinerSelector) -> dict:
     allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
     miner_data = MinerDataManager().data
-    if selector.miner_selector == "all":
-        data = {d: miner_data[d].get("errors") for d in miner_data}
-    else:
-        data = {
-            d: miner_data[d].get("errors") for d in miner_data if d in allowed_miners
-        }
+    data = {
+        d: miner_data[d].get("errors") for d in miner_data if d in allowed_miners
+    }
 
     data = {k: v for k, v in data.items() if v is not None}
     return data
@@ -133,6 +130,14 @@ async def fw_ver(selector: MinerSelector) -> dict:
 
 
 @router.post("/hashrate/")
+async def hashrate(selector: MinerSelector) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+    data = get_data_by_selector("hashrate", allowed_miners)
+    hr = sum(data)
+
+    return MinerResponse(value=round(hr, 2), unit="TH/s")
+
+@router.post("/hashrate_ths/")
 async def hashrate(selector: MinerSelector) -> MinerResponse:
     allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
     data = get_data_by_selector("hashrate", allowed_miners)

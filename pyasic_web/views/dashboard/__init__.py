@@ -16,7 +16,7 @@ from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
 )
 from pyasic_web.errors.miner import MinerDataError
 from pyasic_web.templates import templates
-from pyasic_web.func.auth import login_req, ws_login_req
+from pyasic_web.func.auth import login_req
 
 
 class MinerDataManager(metaclass=Singleton):
@@ -31,8 +31,8 @@ class MinerDataManager(metaclass=Singleton):
         return data_ret
 
 
+@login_req()
 async def page_dashboard(request: Request):
-    await login_req(request)
     return templates.TemplateResponse(
         "dashboard.html",
         {
@@ -50,8 +50,8 @@ def redirect_dashboard(request: Request):
     return RedirectResponse("/dashboard")
 
 
+@login_req()
 async def ws_dashboard(websocket):
-    await ws_login_req(websocket)
     await websocket.accept()
     # while True:
     #     await asyncio.sleep(5)

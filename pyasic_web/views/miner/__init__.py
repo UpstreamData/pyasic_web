@@ -15,13 +15,13 @@ from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 from pyasic_web.templates import templates, card_exists
-from pyasic_web.func.auth import login_req, ws_login_req
+from pyasic_web.func.auth import login_req
 from starlette.exceptions import HTTPException
 from pyasic_web.errors.miner import MinerDataError
 
 
+@login_req()
 async def page_miner(request: Request):
-    await login_req(request)
     miner_ip = request.path_params["miner_ip"]
     miners = await get_current_miner_list(await get_user_ip_range(request))
     if miner_ip not in miners:
@@ -39,8 +39,8 @@ async def page_miner(request: Request):
     )
 
 
+@login_req()
 async def page_remove_miner(request: Request):
-    await login_req(request)
     miner_ip = request.path_params["miner_ip"]
     miners = await get_current_miner_list("*")
     miners.remove(miner_ip)
@@ -51,8 +51,8 @@ async def page_remove_miner(request: Request):
     return RedirectResponse("/dashboard")
 
 
+@login_req()
 async def page_light_miner(request: Request):
-    await login_req(request)
     miner_ip = request.path_params["miner_ip"]
     miner = await pyasic.get_miner(miner_ip)
     if miner.light:
@@ -63,8 +63,8 @@ async def page_light_miner(request: Request):
     return RedirectResponse("/miner/" + miner_ip)
 
 
+@login_req()
 async def page_wattage_set_miner(request: Request):
-    await login_req(request)
     miner_ip = request.path_params["miner_ip"]
     d = await request.json()
     wattage = d["wattage"]
@@ -78,8 +78,8 @@ class SingleMinerDataManager(metaclass=Singleton):
         self.cached_data = None
 
 
+@login_req()
 async def ws_miner(websocket: WebSocket):
-    await ws_login_req(websocket)
     miner_ip = websocket.path_params["miner_ip"]
     await websocket.accept()
     settings = get_current_settings()

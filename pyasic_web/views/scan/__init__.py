@@ -8,13 +8,12 @@ from starlette.websockets import WebSocketDisconnect
 
 from pyasic_web import settings
 from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_current_user
-from pyasic_web.func.auth import login_req, ws_login_req
+from pyasic_web.func.auth import login_req
 from pyasic_web.func.scan import do_websocket_scan
 from pyasic_web.templates import templates
 
-
+@login_req(["admin"])
 async def page_scan(request: Request):
-    await login_req(request, ["admin"])
     return templates.TemplateResponse(
         "scan.html",
         {
@@ -27,8 +26,8 @@ async def page_scan(request: Request):
     )
 
 
+@login_req(["admin"])
 async def page_add_miners_scan(request: Request):
-    await login_req(request, ["admin"])
     miners = await request.json()
     with open(settings.MINER_LIST, "a+") as file:
         for miner_ip in miners["miners"]:
@@ -36,8 +35,8 @@ async def page_add_miners_scan(request: Request):
     return RedirectResponse("/scan")
 
 
+@login_req(["admin"])
 async def ws_scan(websocket):
-    await ws_login_req(websocket, ["admin"])
     await websocket.accept()
     cur_task = None
     try:
