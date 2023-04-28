@@ -207,7 +207,7 @@ async def page_update_miner_cards(request: Request):
     user = await get_current_user(request)
     user.miner_cards = cards
     user_provider.update_user_cards(user)
-    return RedirectResponse(request.url_for("page_manage_cards"), status_code=302)
+    return RedirectResponse("/manage/cards", status_code=302)
 
 @login_req()
 async def page_update_dashboard_cards(request: Request):
@@ -221,7 +221,7 @@ async def page_update_dashboard_cards(request: Request):
     user = await get_current_user(request)
     user.dashboard_cards = cards
     user_provider.update_user_cards(user)
-    return RedirectResponse(request.url_for("page_manage_cards"), status_code=302)
+    return RedirectResponse("/manage/cards", status_code=302)
 
 @login_req()
 async def page_reset_cards(request: Request):

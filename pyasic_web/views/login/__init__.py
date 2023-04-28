@@ -9,7 +9,7 @@ from pyasic_web.auth import login_manager, user_provider
 async def page_login(request: Request):
     if request.method == "GET":
         if await get_current_user(request):
-            return RedirectResponse("/dashboard")
+            return RedirectResponse("/dashboard", status_code=303)
         return templates.TemplateResponse("login.html", {"request": request})
     elif request.method == "POST":
         data = await request.form()
