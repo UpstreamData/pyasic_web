@@ -1,27 +1,22 @@
 import asyncio
+import json
+from typing import List, Literal, Union
 
-from fastapi import APIRouter, WebSocket
 import websockets
 import websockets.exceptions
+from fastapi import APIRouter, WebSocket
 from fastapi.websockets import WebSocketDisconnect
 from sse_starlette import EventSourceResponse
 
 import pyasic
 from pyasic.misc import Singleton
-from pyasic_web.func import get_current_miner_list
-from pyasic_web.func import get_user_ip_range
-from pyasic_web.func.auth import login_req
-from pyasic_web.func.web_settings import (
-    get_current_settings,
-)
-import json
 from pyasic_web.errors.miner import MinerDataError
+from pyasic_web.func import get_current_miner_list, get_user_ip_range
+from pyasic_web.func.auth import login_req
+from pyasic_web.func.web_settings import get_current_settings
 
-from .func import get_allowed_miners, convert_hashrate
+from .func import convert_hashrate, get_allowed_miners
 from .responses import MinerResponse, MinerSelector
-from typing import List, Literal, Union
-
-
 
 router = APIRouter(prefix="/realtime")
 

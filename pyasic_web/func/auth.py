@@ -1,6 +1,8 @@
-from pyasic_web.auth import user_provider
-from starlette.responses import RedirectResponse
 from starlette.exceptions import HTTPException
+from starlette.responses import RedirectResponse
+
+from pyasic_web.auth import user_provider
+
 
 def login_req(_scopes: list = None):
     def decorator(func):

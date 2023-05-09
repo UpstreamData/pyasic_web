@@ -1,5 +1,6 @@
-from pyasic_web.templates import templates
 from starlette.exceptions import HTTPException
+
+from pyasic_web.templates import templates
 
 
 async def handle_400(request, exc):

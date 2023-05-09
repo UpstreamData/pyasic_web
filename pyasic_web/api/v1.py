@@ -2,11 +2,12 @@ from typing import List
 
 from fastapi import APIRouter
 
-from .func import get_allowed_miners, convert_hashrate
+from .func import convert_hashrate, get_allowed_miners
 from .realtime import MinerDataManager, get_data_by_selector
 from .responses import MinerResponse, MinerSelector
 
 router = APIRouter(prefix="/v1", tags=["v1"])
+
 
 @router.post("/miners/")
 async def miners(selector: MinerSelector) -> List[str]:
@@ -17,12 +18,14 @@ async def miners(selector: MinerSelector) -> List[str]:
 async def count(selector: MinerSelector) -> MinerResponse:
     return MinerResponse(value=len(await get_allowed_miners(selector.api_key)))
 
+
 @router.post("/py_errors/")
 async def py_errors(selector: MinerSelector) -> dict:
     allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {d: miner_data[d].get("py_error") for d in miner_data if d in allowed_miners}
     return {k: v for k, v in data.items() if v is not None}
+
 
 @router.post("/api_ver/")
 async def api_ver(selector: MinerSelector) -> dict:
@@ -62,9 +65,7 @@ async def env_temp(selector: MinerSelector) -> MinerResponse:
 async def errors(selector: MinerSelector) -> dict:
     allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
     miner_data = MinerDataManager().data
-    data = {
-        d: miner_data[d].get("errors") for d in miner_data if d in allowed_miners
-    }
+    data = {d: miner_data[d].get("errors") for d in miner_data if d in allowed_miners}
 
     data = {k: v for k, v in data.items() if v is not None}
     return data
@@ -85,6 +86,7 @@ async def hashrate(selector: MinerSelector) -> MinerResponse:
     hr = sum(data)
 
     return MinerResponse(value=round(hr, 2), unit="TH/s")
+
 
 @router.post("/hashrate_ths/")
 async def hashrate(selector: MinerSelector) -> MinerResponse:

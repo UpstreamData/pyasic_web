@@ -2,17 +2,22 @@ import asyncio
 import os
 
 import websockets.exceptions
+from fastapi import APIRouter
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from starlette.websockets import WebSocketDisconnect
 
 from pyasic_web import settings
-from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_current_user
+from pyasic_web.func import get_current_miner_list, get_current_user, get_user_ip_range
 from pyasic_web.func.auth import login_req
 from pyasic_web.func.scan import do_websocket_scan
 from pyasic_web.templates import templates
 
+router = APIRouter(prefix="/scan")
+
+
 @login_req(["admin"])
+@router.route("/")
 async def page_scan(request: Request):
     return templates.TemplateResponse(
         "scan.html",
@@ -27,6 +32,7 @@ async def page_scan(request: Request):
 
 
 @login_req(["admin"])
+@router.route("/add_miner")
 async def page_add_miners_scan(request: Request):
     miners = await request.json()
     with open(settings.MINER_LIST, "a+") as file:
@@ -36,6 +42,7 @@ async def page_add_miners_scan(request: Request):
 
 
 @login_req(["admin"])
+@router.route("/ws")
 async def ws_scan(websocket):
     await websocket.accept()
     cur_task = None

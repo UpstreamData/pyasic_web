@@ -1,15 +1,13 @@
-from dataclasses import dataclass, field, asdict
-from starlette.middleware import Middleware, sessions
-
-from passlib.hash import pbkdf2_sha256
-
-import secrets
-import string
-
-from imia import LoginManager, UserProvider, authentication
 import json
 import os
+import secrets
+import string
 from copy import copy
+from dataclasses import asdict, dataclass, field
+
+from imia import LoginManager, UserProvider, authentication
+from passlib.hash import pbkdf2_sha256
+from starlette.middleware import Middleware, sessions
 
 key = "SECRET"
 

@@ -13,9 +13,9 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
-from typing import List, Literal, Union, Tuple
+from typing import List, Literal, Tuple, Union
 
-from pyasic_web.func import get_current_miner_list, get_api_ip_range
+from pyasic_web.func import get_api_ip_range, get_current_miner_list
 
 
 def convert_hashrate(ths_hr: float) -> Tuple[float, str]:

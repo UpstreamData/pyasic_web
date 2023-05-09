@@ -2,10 +2,10 @@ import asyncio
 import json
 
 from pyasic.miners.miner_factory import MinerFactory
+from pyasic_web.errors.miner import MinerDataError
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
-from pyasic_web.errors.miner import MinerDataError
 
 
 def get_pool_users_data(data: list):

@@ -1,9 +1,9 @@
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from pyasic_web.templates import templates
+from pyasic_web.auth import login_manager
 from pyasic_web.func import get_current_user
-from pyasic_web.auth import login_manager, user_provider
+from pyasic_web.templates import templates
 
 
 async def page_login(request: Request):

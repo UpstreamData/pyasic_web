@@ -5,14 +5,13 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 from pyasic_web import auth
+from pyasic_web.func import get_current_user
+from pyasic_web.func.auth import login_req
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
-from . import realtime
-from . import v1
-from pyasic_web.func.auth import login_req
-from pyasic_web.func import get_current_user
 
+from . import realtime, v1
 
 tags_metadata = [
     {
@@ -37,20 +36,26 @@ app = FastAPI(
     redoc_url=None,
     openapi_url=None,
     middleware=[*auth.middleware],
-    root_path="/api"
+    root_path="/api",
 )
+
 
 @login_req()
 async def docs(request: Request):
-    return get_swagger_ui_html(openapi_url="/api/openapi.json", title="docs", swagger_ui_parameters={"api_key": (await get_current_user(request)).api_key})
+    return get_swagger_ui_html(
+        openapi_url="/api/openapi.json",
+        title="docs",
+        swagger_ui_parameters={"api_key": (await get_current_user(request)).api_key},
+    )
+
 
 @login_req()
 async def get_openapi_schema(request: Request):
     return JSONResponse(get_openapi(title="FastAPI", version="1", routes=app.routes))
 
 
-# router = APIRouter(prefix="/api")
+# app = APIRouter(prefix="/api")
 app.include_router(v1.router)
 app.include_router(realtime.router)
 app.add_route("/openapi.json", get_openapi_schema, methods=["get"])
-app.add_route("/", docs,  methods=["get"])
+app.add_route("/", docs, methods=["get"])
