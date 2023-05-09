@@ -3,6 +3,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
+import asyncio
 
 from pyasic_web import auth
 from pyasic_web.func import get_current_user
@@ -34,7 +35,6 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     docs_url=None,
     redoc_url=None,
-    openapi_url=None,
     middleware=[*auth.middleware],
     root_path="/api",
 )
@@ -43,7 +43,7 @@ app = FastAPI(
 @login_req()
 async def docs(request: Request):
     return get_swagger_ui_html(
-        openapi_url="/api/openapi.json",
+        openapi_url="/openapi.json",
         title="docs",
         swagger_ui_parameters={"api_key": (await get_current_user(request)).api_key},
     )
@@ -53,8 +53,11 @@ async def docs(request: Request):
 async def get_openapi_schema(request: Request):
     return JSONResponse(get_openapi(title="FastAPI", version="1", routes=app.routes))
 
+@app.on_event("startup")
+async def app_startup():
+    asyncio.create_task(realtime.MinerDataManager().run())
 
-# app = APIRouter(prefix="/api")
+
 app.include_router(v1.router)
 app.include_router(realtime.router)
 app.add_route("/openapi.json", get_openapi_schema, methods=["get"])

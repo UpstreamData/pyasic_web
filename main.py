@@ -1,5 +1,5 @@
 import uvicorn
-from pyasic_web import app
+from pyasic_web.api import app
 
 APP = app
 

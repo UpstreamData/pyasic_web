@@ -8,11 +8,11 @@ packages = [{include = "pyasic_web"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-pyasic = "^0.33.6"
+pyasic = "^0.33.9"
 aiofiles = "^23.1.0"
 imia = "^0.5.3"
-fastapi = {version = "^0.95.1"}
-websockets = "^11.0.2"
+fastapi = "^0.95.1"
+websockets = "^11.0.3"
 uvicorn = "^0.21.1"
 itsdangerous = "^2.1.2"
 Jinja2 = "^3.1.2"
