@@ -4,6 +4,7 @@ from fastapi import APIRouter, WebSocket
 import websockets
 import websockets.exceptions
 from fastapi.websockets import WebSocketDisconnect
+from sse_starlette import EventSourceResponse
 
 import pyasic
 from pyasic.misc import Singleton
@@ -15,6 +16,11 @@ from pyasic_web.func.web_settings import (
 )
 import json
 from pyasic_web.errors.miner import MinerDataError
+
+from .func import get_allowed_miners, convert_hashrate
+from .responses import MinerResponse, MinerSelector
+from typing import List, Literal, Union
+
 
 
 router = APIRouter(prefix="/realtime")
@@ -57,6 +63,17 @@ class MinerDataManager(metaclass=Singleton):
             await asyncio.sleep(0)  # yield to event loop
 
 
+def get_data_by_selector(
+    data_key: str, selector: Union[List[str], str, Literal["all"]]
+):
+    miner_data = MinerDataManager().data
+    if selector == "all":
+        data = [miner_data[d].get(data_key) for d in miner_data]
+    else:
+        data = [miner_data[d].get(data_key) for d in miner_data if d in selector]
+    return list(filter(lambda x: x is not None, data))
+
+
 async def get_miner_data(miner_ip):
     try:
         settings = get_current_settings()
@@ -82,15 +99,6 @@ async def get_miner_data(miner_ip):
         }
 
 
-users = {}
-pool_data = [dp.get("pool_1_user") for dp in users]
-for user in pool_data:  # data
-    if user:
-        if not user in users:
-            users[user] = 0
-        users[user] += 1
-
-
 @login_req()
 @router.websocket("/all")
 async def all_data(websocket: WebSocket):
@@ -109,6 +117,7 @@ async def all_data(websocket: WebSocket):
             return
         except websockets.exceptions.ConnectionClosedOK:
             return
+
 
 @login_req()
 @router.websocket("/updates")

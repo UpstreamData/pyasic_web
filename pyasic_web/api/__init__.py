@@ -37,6 +37,7 @@ app = FastAPI(
     redoc_url=None,
     openapi_url=None,
     middleware=[*auth.middleware],
+    root_path="/api"
 )
 
 @login_req()

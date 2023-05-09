@@ -1,63 +1,12 @@
-from pydantic import BaseModel
-from typing import List, Literal, Union, Tuple
-from .realtime import MinerDataManager
+from typing import List
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
-from pyasic_web.func import get_current_miner_list, get_api_ip_range
+from .func import get_allowed_miners, convert_hashrate
+from .realtime import MinerDataManager, get_data_by_selector
+from .responses import MinerResponse, MinerSelector
 
 router = APIRouter(prefix="/v1", tags=["v1"])
-
-
-class MinerResponse(BaseModel):
-    value: Union[float, int, str]
-    unit: str = ""
-
-
-class MinerSelector(BaseModel):
-    api_key: str
-    miner_selector: Union[List[str], str, Literal["all"]] = "all"
-
-
-def convert_hashrate(ths_hr: float) -> Tuple[float, str]:
-    hr = ths_hr
-    if ths_hr == 0:
-        hr_unit = "TH/s"
-    elif ths_hr < 0.0001:
-        hr_unit = "MH/s"
-        hr = ths_hr * 1000000
-    elif ths_hr < 1:
-        hr_unit = "GH/s"
-        hr = ths_hr * 1000
-    elif ths_hr > 1000:
-        hr_unit = "PH/s"
-        hr = ths_hr / 1000
-    else:
-        hr_unit = "TH/s"
-    return hr, hr_unit
-
-
-def get_data_by_selector(
-    data_key: str, selector: Union[List[str], str, Literal["all"]]
-):
-    miner_data = MinerDataManager().data
-    if selector == "all":
-        data = [miner_data[d].get(data_key) for d in miner_data]
-    else:
-        data = [miner_data[d].get(data_key) for d in miner_data if d in selector]
-    return list(filter(lambda x: x is not None, data))
-
-
-async def get_allowed_miners(
-    api_key: str, selector: Union[List[str], str, Literal["all"]] = "all"
-) -> list:
-    allowed_range = await get_api_ip_range(api_key=api_key)
-    if selector == "all":
-        return await get_current_miner_list(allowed_range)
-    if allowed_range == "*":
-        return [ip for ip in await get_current_miner_list(selector)]
-    return [ip for ip in await get_current_miner_list(selector) if ip in allowed_range]
-
 
 @router.post("/miners/")
 async def miners(selector: MinerSelector) -> List[str]:
