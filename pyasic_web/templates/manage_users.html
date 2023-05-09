@@ -1,6 +1,22 @@
 {% extends 'navbar.html' %}
 {% block content %}
-    <nav class="navbar bg-dark" data-bs-theme="dark">
+    <!--
+  ~ Copyright 2022 Upstream Data Inc
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<nav class="navbar bg-dark" data-bs-theme="dark">
         <div class="row d-flex justify-content-between w-100 align-content-middle">
             {% import "macros/header.html" as header_macros %}
             {{ header_macros.create_header_item(text="Manage Users", icon="users") }}
@@ -13,7 +29,7 @@
                 <div class="card text-white bg-dark mb-3" style="max-width: 18rem;">
                     <div class="card-header">{{ u }}</div>
                     <div class="card-body">
-                        <form method="POST" action="/manage/update_user" id="form_{{ u }}">
+                        <form method="POST" action="{{ url_for('manage_users_update_page') }}" id="form_{{ u }}">
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Username</span>
                                 <input autocomplete="off"
@@ -95,7 +111,7 @@
 
 
     function deleteUser(user) {
-        post("/manage/delete_user", {user_id: user});
+        post("{{ url_for('manage_users_delete_page') }}", {user_id: user});
         card = document.getElementById("card_" + user);
         card.remove();
     }
@@ -108,11 +124,8 @@
         add_card = document.getElementById("card_add");
         add_card.remove();
         cards_div = document.getElementById("all_cards");
-        cards_div.innerHTML += '<div class="col d-flex justify-content-center" id="card_new_user" ><div class="card text-white bg-dark mb-3" style="max-width: 18rem;"><div class="card-header">New User</div><div class="card-body"><form method="POST" action="/manage/add_user" id="form_new_user"><div class="input-group mb-3"><span class="input-group-text">Username</span><input required autocomplete="off"name="username" id="username_new_user" class="form-control" type="text" placeholder="Username"></div><div class="input-group mb-3"><span class="input-group-text">Name</span><input required autocomplete="off" name="name" id="name_new_user" class="form-control" type="text" placeholder="Friendly Name"></div><div class="input-group mb-3"><span class="input-group-text">Password</span><input required autocomplete="off" name="password" id="password_new_user" class="form-control" type="text" placeholder="Password"></div><div class="input-group mb-3"><span class="input-group-text w-50">Admin</span><input type="checkbox" class="btn-check" id="admin_new_user" type="checkbox" class="select-item checkbox" name="admin"/><label class="btn btn-outline-success w-50" for="admin_new_user"></label></div><div class="input-group mb-3"><span class="input-group-text">IP Range</span><textarea id="iprange_new_user" name="ip_range" class="form-control" placeholder="IP Range"></textarea></div><div class="input-group mb-3"><button class="btn btn-success w-100" id="update_new_user">Add</button></div></form></div></div></div>'
-                                                                                                                            cards_div.innerHTML += '<div class="col d-flex justify-content-center" id="card_add"><div class="card text-white bg-dark mb-3"
-                                                                                                                     style="max-width: 18rem;
-                                                                                                                            width: 300px;
-                                                                                                                            height: 425px"><div class="card-header">Add User</div><div class="card-body"><button type="button" class="btn btn-dark w-100 h-100" onclick="addUser()"><svg class="bi me-2" width="100" height="100"><use xlink:href="#users_add"></use></svg></button></div></div></div>'
-                                                                                                                        }
+        cards_div.innerHTML += '<div class="col d-flex justify-content-center" id="card_new_user" ><div class="card text-white bg-dark mb-3" style="max-width: 18rem;"><div class="card-header">New User</div><div class="card-body"><form method="POST" action="{{ url_for('manage_users_add_page') }}" id="form_new_user"><div class="input-group mb-3"><span class="input-group-text">Username</span><input required autocomplete="off"name="username" id="username_new_user" class="form-control" type="text" placeholder="Username"></div><div class="input-group mb-3"><span class="input-group-text">Name</span><input required autocomplete="off" name="name" id="name_new_user" class="form-control" type="text" placeholder="Friendly Name"></div><div class="input-group mb-3"><span class="input-group-text">Password</span><input required autocomplete="off" name="password" id="password_new_user" class="form-control" type="text" placeholder="Password"></div><div class="input-group mb-3"><span class="input-group-text w-50">Admin</span><input type="checkbox" class="btn-check" id="admin_new_user" type="checkbox" class="select-item checkbox" name="admin"/><label class="btn btn-outline-success w-50" for="admin_new_user"></label></div><div class="input-group mb-3"><span class="input-group-text">IP Range</span><textarea id="iprange_new_user" name="ip_range" class="form-control" placeholder="IP Range"></textarea></div><div class="input-group mb-3"><button class="btn btn-success w-100" id="update_new_user">Add</button></div></form></div></div></div>'
+        cards_div.innerHTML += '<div class="col d-flex justify-content-center" id="card_add"><div class="card text-white bg-dark mb-3" style="max-width: 18rem; width: 300px; height: 425px"><div class="card-header">Add User</div><div class="card-body"><button type="button" class="btn btn-dark w-100 h-100" onclick="addUser()"><svg class="bi me-2" width="100" height="100"><use xlink:href="#users_add"></use></svg></button></div></div></div>'
+    }
     </script>
 {% endblock content %}

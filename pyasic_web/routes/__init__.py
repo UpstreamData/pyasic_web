@@ -13,11 +13,17 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
+from . import dashboard, login, miner, manage
+from fastapi import APIRouter
 
-from pathlib import Path
+router = APIRouter()
 
-BASE_DIR = Path(__file__).parent
+# manual routes
+router.add_route("/dashboard", dashboard.dashboard_page)
+router.add_route("/login", login.login_page, methods=["POST", "GET"])
+router.add_route("/", login.login_page, methods=["POST", "GET"])
+router.add_route("/logout", login.logout_page)
 
-TEMPLATES_DIR = BASE_DIR / "templates"
-STATIC_DIR = BASE_DIR / "static"
-MINER_LIST = BASE_DIR / "miner_list.txt"
+# routers
+router.include_router(miner.router, prefix="/miner")
+router.include_router(manage.router, prefix="/manage")

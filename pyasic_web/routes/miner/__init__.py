@@ -13,11 +13,11 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
+from fastapi import APIRouter
+from . import miner, scan
 
-from pathlib import Path
+router = APIRouter()
 
-BASE_DIR = Path(__file__).parent
-
-TEMPLATES_DIR = BASE_DIR / "templates"
-STATIC_DIR = BASE_DIR / "static"
-MINER_LIST = BASE_DIR / "miner_list.txt"
+# register scan first since miner router uses a wildcard
+router.include_router(scan.router, prefix="/scan")
+router.include_router(miner.router, prefix="/{miner_ip}")

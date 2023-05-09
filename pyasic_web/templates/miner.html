@@ -1,6 +1,22 @@
 {% extends 'navbar.html' %}
 {% block content %}
-    <script src="{{ url_for('static', path='/chart.js')}}"></script>
+    <!--
+  ~ Copyright 2022 Upstream Data Inc
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<script src="{{ url_for('static', path='/chart.js')}}"></script>
     <script src="{{ url_for('static', path='/luxon.min.js')}}"></script>
     <nav class="navbar bg-dark" data-bs-theme="dark">
         <div class="row d-flex justify-content-between w-100 align-content-middle">
@@ -132,7 +148,7 @@
                 <div class="modal-body">Do you really want to remove this miner?</div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a class="btn btn-danger" href="/miner/{{ miner }}/remove" role="button">Remove</a>
+                    <a class="btn btn-danger" href="{{ url_for('miner_remove_page', miner_ip=miner) }}" role="button">Remove</a>
                 </div>
             </div>
         </div>
@@ -188,7 +204,7 @@
         function updateWattage(event) {
             var wattage_input = document.getElementById("miner_input_wattage");
             set_wattage = wattage_input.value
-            post("/miner/{{miner}}/wattage", {wattage: set_wattage})
+            post("{{ url_for('miner_wattage_page', miner_ip=miner) }}", {wattage: set_wattage})
         };
     </script>
 {% endblock content %}

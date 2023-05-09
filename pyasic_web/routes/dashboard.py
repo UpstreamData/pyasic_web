@@ -13,11 +13,26 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
+from fastapi import APIRouter
+from fastapi.requests import Request
 
-from pathlib import Path
+from pyasic_web.func import get_current_miner_list, get_current_user, get_user_ip_range
+from pyasic_web.func.auth import login_req
+from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
+    get_current_settings,
+)
+from pyasic_web.templates import card_exists, templates
 
-BASE_DIR = Path(__file__).parent
-
-TEMPLATES_DIR = BASE_DIR / "templates"
-STATIC_DIR = BASE_DIR / "static"
-MINER_LIST = BASE_DIR / "miner_list.txt"
+@login_req()
+async def dashboard_page(request: Request):
+    return templates.TemplateResponse(
+        "dashboard.html",
+        {
+            "request": request,
+            "cur_miners": await get_current_miner_list(
+                await get_user_ip_range(request)
+            ),
+            "user": await get_current_user(request),
+            "card_exists": card_exists,
+        },
+    )

@@ -1,6 +1,22 @@
 {% extends 'navbar.html' %}
 {% block content %}
-    <nav class="navbar bg-dark" data-bs-theme="dark">
+    <!--
+  ~ Copyright 2022 Upstream Data Inc
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<nav class="navbar bg-dark" data-bs-theme="dark">
         <div class="row d-flex justify-content-between w-100 align-content-middle">
             {% import "macros/header.html" as header_macros %}
             {{ header_macros.create_header_item(text="Manage Miners", icon="edit") }}
@@ -101,7 +117,7 @@
         });
         </script>
         <script>
-        var ws = new WebSocket("ws://{{request.url.hostname}}:{% if request.url.port %}{{request.url.port}}{% else %}80{% endif %}/manage/manage_miners/ws");
+        var ws = new WebSocket("{{ url_for('manage_miners_ws') | replace('http', 'ws') }}");
         let all_data = []
         let all_labels = []
         ws.onmessage = function(event) {
@@ -130,7 +146,7 @@
                 for (i = 0; i< checkedBoxes.length; i++) {
                     minerList.push(checkedBoxes[i].defaultValue);
                 }
-                post("/remove_miners", {miners: minerList})
+                post("{{ url_for('manage_miners_remove_page') }}", {miners: minerList})
                 for (i = 0; i< minerList.length; i++) {
                     var tr_to_remove = document.getElementById(minerList[i])
                     tr_to_remove.remove()
@@ -147,7 +163,7 @@
                 for (i = 0; i< checkedBoxes.length; i++) {
                     minerList.push(checkedBoxes[i].defaultValue);
                 }
-                post("/manage/light_miners", {miners: minerList})
+                post("{{ url_for('manage_miners_light_page') }}", {miners: minerList})
             };
         };
 

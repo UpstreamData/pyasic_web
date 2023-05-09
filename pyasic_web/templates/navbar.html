@@ -1,3 +1,19 @@
+<!--
+  ~ Copyright 2022 Upstream Data Inc
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -66,7 +82,7 @@
                                 <h5 class="text-white p-3">Welcome {{ user.name }}</h5>
                             </li>
                             {% import "macros/navbar.html" as navbar_macros %}
-                            {{ navbar_macros.create_navbar_item("Home", "dashboard", "dashboard", request) }}
+                            {{ navbar_macros.create_navbar_item("Home", "dashboard_page", "dashboard", request) }}
                             <li class="nav-item mb-1 mx-2">
                                 <a href=""
                                    class="nav-link navbar-link {% if request.url.path.strip('/') == 'scan' or request.url.path.strip('/') == 'manage/miners' or request.url.path.split('/')[1] == 'miner' %}active{% else %}text-white{% endif %}"
@@ -83,8 +99,8 @@
                                         class="btn-toggle-nav fancy-scroll overflow-auto list-unstyled fw-normal pb-1 small">
                                         {% if "admin" in user.scopes %}
                                             <li>
-                                                <a href="/scan"
-                                                   class="nav-link navbar-link {% if request.url.path.strip('/') == 'scan' %}active{% else %}text-white{% endif %}">
+                                                <a href="{{ url_for('miner_scan_page') }}"
+                                                   class="nav-link navbar-link {% if request.url == url_for('miner_scan_page') %}active{% else %}text-white{% endif %}">
                                                     <svg class="bi me-2 mt-1" width="16" height="16">
                                                         <use xlink:href="#scan"></use>
                                                     </svg>
@@ -94,8 +110,8 @@
                                         {% endif %}
                                         {% if cur_miners|length > 0 %}
                                             <li>
-                                                <a href="/manage/miners"
-                                                   class="nav-link navbar-link {% if request.url.path.strip('/') == 'manage/miners' %}active{% else %}text-white{% endif %}">
+                                                <a href="{{ url_for('manage_miners_page') }}"
+                                                   class="nav-link navbar-link {% if request.url == url_for('manage_miners_page') %}active{% else %}text-white{% endif %}">
                                                     <svg class="bi me-2 mt-1" width="16" height="16">
                                                         <use xlink:href="#edit"></use>
                                                     </svg>
@@ -105,8 +121,8 @@
                                         {% endif %}
                                         {% for miner in cur_miners %}
                                             <li id="nav_{{ miner }}">
-                                                <a href="/miner/{{ miner }}"
-                                                   class="nav-link navbar-link {% if request.url.path.strip('/') == 'miner/' + miner %}active{% else %}text-white{% endif %}">
+                                                <a href="{{ url_for('miner_page', miner_ip=miner) }}"
+                                                   class="nav-link navbar-link {% if request.url == url_for('miner_page', miner_ip=miner) %}active{% else %}text-white{% endif %}">
                                                     <svg class="bi me-2 mt-1" width="16" height="16">
                                                         <use xlink:href="#miner"></use>
                                                     </svg>
@@ -118,24 +134,23 @@
                                 </div>
                             </li>
                             {% if "admin" in user.scopes %}
-                                {{ navbar_macros.create_navbar_item("Manage Users", "manage/users", "users", request) }}
+                                {{ navbar_macros.create_navbar_item("Manage Users", "manage_users_page", "users", request) }}
                             {% endif %}
-                            {{ navbar_macros.create_navbar_item("Manage Cards", "manage/cards", "cards", request) }}
+                            {{ navbar_macros.create_navbar_item("Manage Cards", "manage_cards_page", "cards", request) }}
                             <li class="border-top my-3"></li>
                             {% if "admin" in user.scopes %}
-                                {{ navbar_macros.create_navbar_item("Settings", "settings", "settings", request) }}
+                                {{ navbar_macros.create_navbar_item("Settings", "manage_settings_page", "settings", request) }}
                             {% endif %}
-                            {{ navbar_macros.create_navbar_item("Logout", "logout", "logout", request) }}
-                        </li>
-                    </ul>
+                            {{ navbar_macros.create_navbar_item("Logout", "logout_page", "logout", request) }}
+                        </ul>
+                    </div>
+                </nav>
+                <!--     <div class="col-lg-9 ms-md-auto col-xl-10 px-lg-4 ps-4"> -->
+                <div class="col-lg-9 ms-md-auto col-xl-10 px-0">
+                    {% block content %}
+                    {% endblock content %}
                 </div>
-            </nav>
-            <!--     <div class="col-lg-9 ms-md-auto col-xl-10 px-lg-4 ps-4"> -->
-            <div class="col-lg-9 ms-md-auto col-xl-10 px-0">
-                {% block content %}
-                {% endblock content %}
             </div>
         </div>
-    </div>
-</body>
+    </body>
 </html>

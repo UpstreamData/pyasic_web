@@ -14,10 +14,12 @@
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
 
-from pathlib import Path
+from fastapi import APIRouter
+from . import cards, miners, settings, users
 
-BASE_DIR = Path(__file__).parent
+router = APIRouter()
 
-TEMPLATES_DIR = BASE_DIR / "templates"
-STATIC_DIR = BASE_DIR / "static"
-MINER_LIST = BASE_DIR / "miner_list.txt"
+router.include_router(cards.router, prefix="/cards")
+router.include_router(miners.router, prefix="/miners")
+router.include_router(settings.router, prefix="/settings")
+router.include_router(users.router, prefix="/users")

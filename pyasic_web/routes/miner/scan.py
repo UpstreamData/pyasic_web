@@ -1,11 +1,26 @@
+# ------------------------------------------------------------------------------
+#  Copyright 2022 Upstream Data Inc                                            -
+#                                                                              -
+#  Licensed under the Apache License, Version 2.0 (the "License");             -
+#  you may not use this file except in compliance with the License.            -
+#  You may obtain a copy of the License at                                     -
+#                                                                              -
+#      http://www.apache.org/licenses/LICENSE-2.0                              -
+#                                                                              -
+#  Unless required by applicable law or agreed to in writing, software         -
+#  distributed under the License is distributed on an "AS IS" BASIS,           -
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    -
+#  See the License for the specific language governing permissions and         -
+#  limitations under the License.                                              -
+# ------------------------------------------------------------------------------
+
 import asyncio
-import os
 
 import websockets.exceptions
 from fastapi import APIRouter
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
-from fastapi.websockets import WebSocketDisconnect
+from fastapi.websockets import WebSocketDisconnect, WebSocket
 
 from pyasic_web import settings
 from pyasic_web.func import get_current_miner_list, get_current_user, get_user_ip_range
@@ -13,12 +28,11 @@ from pyasic_web.func.auth import login_req
 from pyasic_web.func.scan import do_websocket_scan
 from pyasic_web.templates import templates
 
-router = APIRouter(prefix="/scan")
+router = APIRouter()
 
-
-@login_req(["admin"])
 @router.route("/")
-async def page_scan(request: Request):
+@login_req(["admin"])
+async def miner_scan_page(request: Request):
     return templates.TemplateResponse(
         "scan.html",
         {
@@ -31,19 +45,19 @@ async def page_scan(request: Request):
     )
 
 
+@router.route("/add", methods=["POST"])
 @login_req(["admin"])
-@router.route("/add_miner")
-async def page_add_miners_scan(request: Request):
+async def miner_scan_add_page(request: Request):
     miners = await request.json()
     with open(settings.MINER_LIST, "a+") as file:
         for miner_ip in miners["miners"]:
             file.write(miner_ip + "\n")
-    return RedirectResponse("/scan")
+    return RedirectResponse(request.url_for("miner_scan_page", miner_ip=miner_ip), status_code=303)
 
 
+@router.websocket("/ws")
 @login_req(["admin"])
-@router.route("/ws")
-async def ws_scan(websocket):
+async def miner_scan_ws(websocket: WebSocket):
     await websocket.accept()
     cur_task = None
     try:

@@ -1,3 +1,19 @@
+# ------------------------------------------------------------------------------
+#  Copyright 2022 Upstream Data Inc                                            -
+#                                                                              -
+#  Licensed under the Apache License, Version 2.0 (the "License");             -
+#  you may not use this file except in compliance with the License.            -
+#  You may obtain a copy of the License at                                     -
+#                                                                              -
+#      http://www.apache.org/licenses/LICENSE-2.0                              -
+#                                                                              -
+#  Unless required by applicable law or agreed to in writing, software         -
+#  distributed under the License is distributed on an "AS IS" BASIS,           -
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.    -
+#  See the License for the specific language governing permissions and         -
+#  limitations under the License.                                              -
+# ------------------------------------------------------------------------------
+
 import asyncio
 
 from fastapi import APIRouter
@@ -17,9 +33,9 @@ from pyasic_web.templates import card_exists, templates
 router = APIRouter()
 
 
-@login_req()
 @router.route("/")
-async def page_miner(request: Request):
+@login_req()
+async def miner_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miners = await get_current_miner_list(await get_user_ip_range(request))
     if miner_ip not in miners:
@@ -37,9 +53,9 @@ async def page_miner(request: Request):
     )
 
 
-@login_req()
 @router.route("/remove")
-async def page_remove_miner(request: Request):
+@login_req(["admin"])
+async def miner_remove_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miners = await get_current_miner_list("*")
     miners.remove(miner_ip)
@@ -47,12 +63,12 @@ async def page_remove_miner(request: Request):
         for miner_ip in miners:
             file.write(miner_ip + "\n")
 
-    return RedirectResponse("/dashboard")
+    return RedirectResponse(request.url_for("dashboard_page"), status_code=303)
 
 
-@login_req()
 @router.route("/light")
-async def page_light_miner(request: Request):
+@login_req()
+async def miner_light_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miner = await pyasic.get_miner(miner_ip)
     if miner.light:
@@ -60,12 +76,12 @@ async def page_light_miner(request: Request):
     else:
         asyncio.create_task(miner.fault_light_on())
 
-    return RedirectResponse("/miner/" + miner_ip)
+    return RedirectResponse(request.url_for("miner_page", miner_ip=miner_ip), status_code=303)
 
 
-@login_req()
 @router.route("/wattage")
-async def page_wattage_set_miner(request: Request):
+@login_req()
+async def miner_wattage_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     d = await request.json()
     wattage = d["wattage"]
