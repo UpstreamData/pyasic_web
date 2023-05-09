@@ -1,4 +1,4 @@
-from starlette.exceptions import HTTPException
+from fastapi.exceptions import HTTPException
 
 from pyasic_web.templates import templates
 

@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from starlette.templating import Jinja2Templates
+from fastapi.templating import Jinja2Templates
 
 from pyasic_web import settings
 

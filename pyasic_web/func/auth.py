@@ -1,5 +1,5 @@
-from starlette.exceptions import HTTPException
-from starlette.responses import RedirectResponse
+from fastapi.exceptions import HTTPException
+from fastapi.responses import RedirectResponse
 
 from pyasic_web.auth import user_provider
 

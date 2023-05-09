@@ -2,9 +2,9 @@ import asyncio
 
 import websockets.exceptions
 from fastapi import APIRouter
-from starlette.requests import Request
-from starlette.responses import RedirectResponse
-from starlette.websockets import WebSocket, WebSocketDisconnect
+from fastapi.requests import Request
+from fastapi.responses import RedirectResponse
+from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from pyasic import get_miner
 from pyasic_web import settings

@@ -1,7 +1,7 @@
 import asyncio
 import ipaddress
 
-from starlette.websockets import WebSocket
+from fastapi.websockets import WebSocket
 
 from pyasic.network import MinerNetwork
 from pyasic_web.func import get_current_miner_list, get_user_ip_range

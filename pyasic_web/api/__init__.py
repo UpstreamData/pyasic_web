@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
-from starlette.requests import Request
-from starlette.responses import JSONResponse
+from fastapi.requests import Request
+from fastapi.responses import JSONResponse
 
 from pyasic_web import auth
 from pyasic_web.func import get_current_user

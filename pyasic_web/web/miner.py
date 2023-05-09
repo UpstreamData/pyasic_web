@@ -1,9 +1,9 @@
 import asyncio
 
 from fastapi import APIRouter
-from starlette.exceptions import HTTPException
-from starlette.requests import Request
-from starlette.responses import RedirectResponse
+from fastapi.exceptions import HTTPException
+from fastapi.requests import Request
+from fastapi.responses import RedirectResponse
 
 import pyasic
 from pyasic_web import settings
