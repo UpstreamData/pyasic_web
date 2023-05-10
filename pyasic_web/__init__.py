@@ -14,18 +14,20 @@
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Security
 from pyasic_web import api
 from pyasic_web.api.realtime import MinerDataManager
 from pyasic_web import auth, errors, routes, settings
 from fastapi.staticfiles import StaticFiles
 import asyncio
 
+from pyasic_web.auth import AUTH_SCHEME
 
 app = FastAPI(
-    middleware=[*auth.middleware],
     exception_handlers=errors.exception_handlers,
-    debug=True
+    debug=True,
+    docs_url=None,
+    redoc_url=None
 )
 app.include_router(routes.router)
 

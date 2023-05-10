@@ -15,49 +15,47 @@
 # ------------------------------------------------------------------------------
 
 import asyncio
+from typing import Annotated
 
 import websockets.exceptions
-from fastapi import APIRouter
+from fastapi import APIRouter, Security
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 from fastapi.websockets import WebSocketDisconnect, WebSocket
 
 from pyasic_web import settings
+from pyasic_web.auth import AUTH_SCHEME, User
 from pyasic_web.func import get_current_miner_list, get_current_user, get_user_ip_range
-from pyasic_web.func.auth import login_req
 from pyasic_web.func.scan import do_websocket_scan
 from pyasic_web.templates import templates
 
-router = APIRouter()
+router = APIRouter(dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 
-@router.route("/")
-@login_req(["admin"])
-async def miner_scan_page(request: Request):
+@router.get("/")
+async def miner_scan_page(request: Request, current_user: Annotated[User, Security(get_current_user)]):
     return templates.TemplateResponse(
         "scan.html",
         {
             "request": request,
             "cur_miners": await get_current_miner_list(
-                await get_user_ip_range(request)
+                await get_user_ip_range(current_user)
             ),
-            "user": await get_current_user(request),
+            "user": current_user,
         },
     )
 
 
-@router.route("/add", methods=["POST"])
-@login_req(["admin"])
+@router.post("/add")
 async def miner_scan_add_page(request: Request):
     miners = await request.json()
     with open(settings.MINER_LIST, "a+") as file:
         for miner_ip in miners["miners"]:
             file.write(miner_ip + "\n")
-    return RedirectResponse(request.url_for("miner_scan_page", miner_ip=miner_ip), status_code=303)
+    return RedirectResponse(request.url_for("miner_scan_page"), status_code=303)
 
 
 @router.websocket("/ws")
-@login_req(["admin"])
-async def miner_scan_ws(websocket: WebSocket):
+async def miner_scan_ws(websocket: WebSocket, current_user: Annotated[User, Security(get_current_user)]):
     await websocket.accept()
     cur_task = None
     try:
@@ -73,7 +71,7 @@ async def miner_scan_ws(websocket: WebSocket):
                         cur_task = None
                 await websocket.send_text("Cancelled")
             else:
-                cur_task = asyncio.create_task(do_websocket_scan(websocket, ws_data))
+                cur_task = asyncio.create_task(do_websocket_scan(websocket, current_user, ws_data))
             if cur_task and cur_task.done():
                 cur_task = None
     except WebSocketDisconnect:

@@ -15,7 +15,8 @@
 # ------------------------------------------------------------------------------
 from typing import List, Literal, Tuple, Union
 
-from pyasic_web.func import get_api_ip_range, get_current_miner_list
+from pyasic_web.auth import User
+from pyasic_web.func import get_user_ip_range, get_current_miner_list
 
 
 def convert_hashrate(ths_hr: float) -> Tuple[float, str]:
@@ -37,9 +38,9 @@ def convert_hashrate(ths_hr: float) -> Tuple[float, str]:
 
 
 async def get_allowed_miners(
-    api_key: str, selector: Union[List[str], str, Literal["all"]] = "all"
+    user: User, selector: Union[List[str], str, Literal["all"]] = "all"
 ) -> list:
-    allowed_range = await get_api_ip_range(api_key=api_key)
+    allowed_range = await get_user_ip_range(user)
     if selector == "all":
         return await get_current_miner_list(allowed_range)
     if allowed_range == "*":

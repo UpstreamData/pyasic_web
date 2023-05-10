@@ -22,17 +22,12 @@ import websockets
 import websockets.exceptions
 from fastapi import APIRouter, WebSocket
 from fastapi.websockets import WebSocketDisconnect
-from sse_starlette import EventSourceResponse
 
 import pyasic
 from pyasic.misc import Singleton
 from pyasic_web.errors.miner import MinerDataError
-from pyasic_web.func import get_current_miner_list, get_user_ip_range
-from pyasic_web.func.auth import login_req
+from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_current_user
 from pyasic_web.func.web_settings import get_current_settings
-
-from .func import convert_hashrate, get_allowed_miners
-from .responses import MinerResponse, MinerSelector
 
 router = APIRouter(prefix="/realtime")
 
@@ -110,7 +105,6 @@ async def get_miner_data(miner_ip):
         }
 
 @router.websocket("/all")
-@login_req()
 async def all_data(websocket: WebSocket):
     await websocket.accept()
     data_manager = MinerDataManager()
@@ -129,8 +123,7 @@ async def all_data(websocket: WebSocket):
             return
 
 @router.websocket("/updates")
-@login_req()
-async def all_data(websocket: WebSocket):
+async def updates(websocket: WebSocket):
     await websocket.accept()
     data_manager = MinerDataManager()
     async for update in data_manager.subscribe_to_updates():

@@ -24,5 +24,4 @@ class MinerResponse(BaseModel):
 
 
 class MinerSelector(BaseModel):
-    api_key: str
     miner_selector: Union[List[str], str, Literal["all"]] = "all"

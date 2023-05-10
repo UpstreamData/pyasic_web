@@ -16,16 +16,20 @@
 
 import json
 import os
-import secrets
 import string
 from copy import copy
-from dataclasses import asdict, dataclass, field
+from typing import Optional
 
-from imia import LoginManager, UserProvider, authentication
-from passlib.hash import pbkdf2_sha256
-from starlette.middleware import Middleware, sessions
+from fastapi import HTTPException
+from fastapi.security import OAuth2
+from fastapi.security.utils import get_authorization_scheme_param
+from passlib.hash import bcrypt
+from pydantic import BaseModel, Field
+from fastapi.openapi.models import OAuthFlows
+from starlette.requests import Request
+from fastapi.websockets import WebSocket
 
-key = "SECRET"
+SECRET = "SECRET"
 
 DEFAULT_DASHBOARD_CARDS = [
     "count",
@@ -52,16 +56,14 @@ DEFAULT_MINER_CARDS = [
 ALPHABET = string.ascii_letters + string.digits
 
 
-@dataclass
-class User:
+class User(BaseModel):
     username: str
     name: str = "Anon"
     password: str = "password"
-    scopes: list[str] = field(default_factory=list)
+    scopes: list[str] = Field(default_factory=list)
     ip_range: str = "*"
-    dashboard_cards: list = field(default_factory=list)
-    miner_cards: list = field(default_factory=list)
-    api_key: str = "".join(secrets.choice(ALPHABET) for _ in range(32))
+    dashboard_cards: list = Field(default_factory=list)
+    miner_cards: list = Field(default_factory=list)
 
     def get_display_name(self) -> str:
         return self.name
@@ -75,23 +77,20 @@ class User:
     def get_scopes(self) -> list:
         return self.scopes
 
-    def get_api_key(self) -> str:
-        return self.api_key
 
-
-class JsonProvider(UserProvider):
+class JsonProvider:
     def __init__(self, file):
         self.user_map = {}
         self.file = file
         self.load_users()
 
-    async def find_by_id(self, connection, identifier: str):
+    async def find_by_id(self, identifier: str):
         return self.user_map.get(identifier)
 
-    async def find_by_username(self, connection, username_or_email: str):
+    async def find_by_username(self, username_or_email: str):
         return self.user_map.get(username_or_email)
 
-    async def find_by_token(self, connection, token: str):
+    async def find_by_token(self, token: str):
         return self.user_map.get(token)
 
     async def find_by_api_key(self, api_key: str):
@@ -101,8 +100,20 @@ class JsonProvider(UserProvider):
             ]
 
     def load_users(self):
+        if not os.path.exists(self.file):
+            open(self.file, "w").close()
         with open(self.file, "r") as f:
-            users_data = json.loads(f.read())
+            try:
+                users_data = json.loads(f.read())
+            except json.decoder.JSONDecodeError:
+                self.add_user(
+                    "admin",
+                    "Admin",
+                    "pass",
+                    ["admin"],
+                    "*"
+                )
+                return
 
         for u in users_data:
             dashboard_cards = users_data[u].get("dashboard_cards")
@@ -119,7 +130,6 @@ class JsonProvider(UserProvider):
                 ip_range=users_data[u]["ip_range"],
                 dashboard_cards=dashboard_cards,
                 miner_cards=miner_cards,
-                api_key=users_data[u]["api_key"],
             )
 
     def add_user(
@@ -128,12 +138,11 @@ class JsonProvider(UserProvider):
         self.user_map[username] = User(
             username=username,
             name=name,
-            password=pbkdf2_sha256.hash(password),
+            password=bcrypt.hash(password),
             scopes=scopes,
             ip_range=ip_range,
             dashboard_cards=DEFAULT_DASHBOARD_CARDS,
             miner_cards=DEFAULT_MINER_CARDS,
-            api_key="".join(secrets.choice(ALPHABET) for _ in range(32)),
         )
         self.dump_users()
 
@@ -161,7 +170,7 @@ class JsonProvider(UserProvider):
         if not password:
             password = old_user.get_hashed_password()
         else:
-            password = pbkdf2_sha256.hash(password)
+            password = bcrypt.hash(password)
         new_user = User(
             username=username,
             name=name,
@@ -170,7 +179,6 @@ class JsonProvider(UserProvider):
             ip_range=ip_range,
             dashboard_cards=old_user.dashboard_cards,
             miner_cards=old_user.miner_cards,
-            api_key=old_user.api_key,
         )
         self.user_map[username] = new_user  # noqa
         self.dump_users()
@@ -178,25 +186,67 @@ class JsonProvider(UserProvider):
     def dump_users(self):
         user_data = copy(self.user_map)
         for u in user_data:
-            user_data[u] = asdict(user_data[u])
+            user_data[u] = user_data[u].dict()
         with open(self.file, "w") as f:
             f.write(json.dumps(user_data))
+
+    async def verify(self, username: str, password: str) -> Optional[User]:
+        user = await self.find_by_username(username_or_email=username)
+        if user:
+            if bcrypt.verify(password, user.password):
+                return user
+
+
+class OAuth2PasswordBearerCookie(OAuth2):
+    def __init__(
+        self,
+        tokenUrl: str,
+        scheme_name: str = None,
+        scopes: dict = None,
+        auto_error: bool = True,
+    ):
+        if not scopes:
+            scopes = {}
+        flows = OAuthFlows(password={"tokenUrl": tokenUrl, "scopes": scopes})
+        super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
+
+    async def __call__(self, request: Request = None, websocket: WebSocket = None) -> Optional[str]:
+        if websocket and not request:
+            request = websocket
+        header_authorization: str = request.headers.get("Authorization")
+        cookie_authorization: str = request.cookies.get("Authorization")
+
+        header_scheme, header_param = get_authorization_scheme_param(
+            header_authorization
+        )
+        cookie_scheme, cookie_param = get_authorization_scheme_param(
+            cookie_authorization
+        )
+
+        if header_scheme.lower() == "bearer":
+            authorization = True
+            scheme = header_scheme
+            param = header_param
+
+        elif cookie_scheme.lower() == "bearer":
+            authorization = True
+            scheme = cookie_scheme
+            param = cookie_param
+
+        else:
+            authorization = False
+
+        if not authorization or scheme.lower() != "bearer":
+            raise HTTPException(
+                status_code=307,
+                headers={'Location': '/'})
+        return param
 
 
 user_provider = JsonProvider(os.path.join(os.path.dirname(__file__), "users.json"))
 user_provider.dump_users()
 
-login_manager = LoginManager(
-    user_provider=user_provider, password_verifier=pbkdf2_sha256, secret_key=key
+AUTH_SCHEME = OAuth2PasswordBearerCookie(
+    tokenUrl="login",
+    scopes={"admin": "Site administrator."},
 )
-
-middleware = [
-    Middleware(sessions.SessionMiddleware, secret_key=key),
-    Middleware(
-        authentication.AuthenticationMiddleware,
-        authenticators=[authentication.SessionAuthenticator(user_provider)],
-        on_failure="redirect",
-        redirect_to="/login",
-        include_patterns=["\/lpage"],
-    ),
-]

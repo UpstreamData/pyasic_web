@@ -15,16 +15,17 @@
 # ------------------------------------------------------------------------------
 
 import asyncio
+from typing import Annotated
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Security
 from fastapi.exceptions import HTTPException
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 
 import pyasic
 from pyasic_web import settings
+from pyasic_web.auth import AUTH_SCHEME, User
 from pyasic_web.func import get_current_miner_list, get_current_user, get_user_ip_range
-from pyasic_web.func.auth import login_req
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
@@ -33,11 +34,10 @@ from pyasic_web.templates import card_exists, templates
 router = APIRouter()
 
 
-@router.route("/")
-@login_req()
-async def miner_page(request: Request):
+@router.get("/")
+async def miner_page(request: Request, current_user: Annotated[User, Security(get_current_user)]):
     miner_ip = request.path_params["miner_ip"]
-    miners = await get_current_miner_list(await get_user_ip_range(request))
+    miners = await get_current_miner_list(await get_user_ip_range(current_user))
     if miner_ip not in miners:
         raise HTTPException(403)
 
@@ -47,14 +47,13 @@ async def miner_page(request: Request):
             "request": request,
             "cur_miners": miners,
             "miner": miner_ip,
-            "user": await get_current_user(request),
+            "user": current_user,
             "card_exists": card_exists,
         },
     )
 
 
-@router.route("/remove")
-@login_req(["admin"])
+@router.post("/remove", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def miner_remove_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miners = await get_current_miner_list("*")
@@ -66,8 +65,7 @@ async def miner_remove_page(request: Request):
     return RedirectResponse(request.url_for("dashboard_page"), status_code=303)
 
 
-@router.route("/light")
-@login_req()
+@router.post("/light", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def miner_light_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miner = await pyasic.get_miner(miner_ip)
@@ -79,8 +77,7 @@ async def miner_light_page(request: Request):
     return RedirectResponse(request.url_for("miner_page", miner_ip=miner_ip), status_code=303)
 
 
-@router.route("/wattage")
-@login_req()
+@router.post("/wattage", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def miner_wattage_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     d = await request.json()

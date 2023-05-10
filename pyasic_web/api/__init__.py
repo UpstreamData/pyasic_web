@@ -13,22 +13,21 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
+import asyncio
+from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Security, Depends, HTTPException
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
-from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-import asyncio
+from fastapi.security import OAuth2PasswordRequestForm
 
-from pyasic_web import auth
-from pyasic_web.func import get_current_user
-from pyasic_web.func.auth import login_req
+from pyasic_web.auth import User, user_provider
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
-
 from . import realtime, v1
+from .auth import get_current_user, Token, create_access_token
 
 tags_metadata = [
     {
@@ -51,22 +50,37 @@ app = FastAPI(
     openapi_tags=tags_metadata,
     docs_url=None,
     redoc_url=None,
-    middleware=[*auth.middleware],
     root_path="/api",
 )
 
+@app.post("/login/", response_model=Token)
+async def api_login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+):
+    user = await user_provider.verify(form_data.username, form_data.password)
+    if user is None:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    access_token = create_access_token(
+        data={"sub": user.username, "scopes": [s for s in form_data.scopes if s in user.scopes]},
+    )
+    resp = JSONResponse({"access_token": access_token, "token_type": "bearer"})
+    resp.set_cookie(
+        "Authorization",
+        value=f"Bearer {access_token}",
+        max_age=1800,
+        expires=1800,
+    )
+    return resp
 
-@login_req()
-async def docs(request: Request):
+
+async def docs(current_user: Annotated[User, Security(get_current_user)]):
     return get_swagger_ui_html(
-        openapi_url="/openapi.json",
+        openapi_url="/api/openapi.json",
         title="docs",
-        swagger_ui_parameters={"api_key": (await get_current_user(request)).api_key},
     )
 
 
-@login_req()
-async def get_openapi_schema(request: Request):
+async def get_openapi_schema(current_user: Annotated[User, Security(get_current_user)]):
     return JSONResponse(get_openapi(title="FastAPI", version="1", routes=app.routes))
 
 @app.on_event("startup")

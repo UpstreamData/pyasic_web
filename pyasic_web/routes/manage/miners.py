@@ -16,9 +16,10 @@
 
 import asyncio
 import json
+from typing import Annotated
 
 import websockets.exceptions
-from fastapi import APIRouter
+from fastapi import APIRouter, Security
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 from fastapi.websockets import WebSocket, WebSocketDisconnect
@@ -26,37 +27,35 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 from pyasic import get_miner
 from pyasic_web import settings
 from pyasic_web.api.realtime import MinerDataManager
+from pyasic_web.auth import AUTH_SCHEME, User
 from pyasic_web.func import (
     get_current_miner_list,
     get_current_user,
     get_user_ip_range,
 )
-from pyasic_web.func.auth import login_req
 from pyasic_web.templates import templates
 
 router = APIRouter()
 
 
-@router.route("/")
-@login_req()
-async def manage_miners_page(request: Request):
+@router.get("/")
+async def manage_miners_page(request: Request, current_user: Annotated[User, Security(get_current_user)]):
     return templates.TemplateResponse(
         "manage_miners.html",
         {
             "request": request,
             "cur_miners": await get_current_miner_list(
-                await get_user_ip_range(request)
+                await get_user_ip_range(current_user)
             ),
-            "user": await get_current_user(request),
+            "user": current_user,
         },
     )
 
 
 @router.websocket("/ws")
-@login_req()
-async def manage_miners_ws(websocket: WebSocket):
+async def manage_miners_ws(websocket: WebSocket, current_user: Annotated[User, Security(get_current_user)]):
     await websocket.accept()
-    miners = await get_current_miner_list(await get_user_ip_range(websocket))
+    miners = await get_current_miner_list(await get_user_ip_range(current_user))
     try:
         async for data in MinerDataManager().subscribe():
             for miner in miners:
@@ -68,8 +67,7 @@ async def manage_miners_ws(websocket: WebSocket):
         pass
 
 
-@router.route("/light", methods=["POST"])
-@login_req()
+@router.post("/light")
 async def manage_miners_light_page(request: Request):
     miners_light = (await request.json())["miners"]
     if not miners_light:
@@ -86,8 +84,7 @@ async def manage_miners_light_page(request: Request):
     return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
 
 
-@router.route("/reboot", methods=["POST"])
-@login_req()
+@router.post("/reboot")
 async def manage_miners_reboot_page(request: Request):
     miners_light = (await request.json())["miners"]
     if not miners_light:
@@ -97,8 +94,7 @@ async def manage_miners_reboot_page(request: Request):
     return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
 
 
-@router.route("/restart_backend", methods=["POST"])
-@login_req()
+@router.post("/restart_backend")
 async def manage_miners_restart_backend_page(request: Request):
     miners_restart = (await request.json())["miners"]
     if not miners_restart:
@@ -108,8 +104,7 @@ async def manage_miners_restart_backend_page(request: Request):
     return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
 
 
-@router.route("/remove", methods=["POST"])
-@login_req(["admin"])
+@router.post("/remove", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def manage_miners_remove_page(request: Request):
     miners_remove = (await request.json())["miners"]
     if not miners_remove:
@@ -123,8 +118,7 @@ async def manage_miners_remove_page(request: Request):
     return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
 
 
-@router.route("/remove_all")
-@login_req(["admin"])
+@router.post("/remove_all", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def manage_miners_remove_all_page(request: Request):
     file = open(settings.MINER_LIST, "w")
     file.close()

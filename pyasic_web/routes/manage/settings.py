@@ -13,38 +13,36 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
+from typing import Annotated
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Security
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 
-from pyasic_web import settings
 from pyasic_web.func import get_current_miner_list, get_current_user, get_user_ip_range
-from pyasic_web.func.auth import login_req
 from pyasic_web.func.web_settings import get_current_settings, update_settings
 from pyasic_web.templates import templates
+from pyasic_web.auth import AUTH_SCHEME, User
 
-router = APIRouter()
+router = APIRouter(dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 
 
-@router.route("/")
-@login_req(["admin"])
-async def manage_settings_page(request: Request):
+@router.get("/")
+async def manage_settings_page(request: Request, current_user: Annotated[User, Security(get_current_user)]):
     return templates.TemplateResponse(
         "settings.html",
         {
             "request": request,
             "cur_miners": await get_current_miner_list(
-                await get_user_ip_range(request)
+                await get_user_ip_range(current_user)
             ),
             "settings": get_current_settings(),
-            "user": await get_current_user(request),
+            "user": current_user,
         },
     )
 
 
-@router.route("/update", methods=["POST"])
-@login_req(["admin"])
+@router.post("/update")
 async def manage_settings_update_page(request: Request):
     data = await request.form()
     data_sleep_time = data.get("data_sleep_time")

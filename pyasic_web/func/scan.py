@@ -20,11 +20,12 @@ import ipaddress
 from fastapi.websockets import WebSocket
 
 from pyasic.network import MinerNetwork
+from pyasic_web.auth import AUTH_SCHEME, User
 from pyasic_web.func import get_current_miner_list, get_user_ip_range
 
 
-async def do_websocket_scan(websocket: WebSocket, network_ip: str):
-    cur_miners = await get_current_miner_list(await get_user_ip_range(websocket))
+async def do_websocket_scan(websocket: WebSocket, user: User, network_ip: str):
+    cur_miners = await get_current_miner_list(await get_user_ip_range(user))
     try:
         if "/" in network_ip:
             network_ip, network_subnet = network_ip.split("/")

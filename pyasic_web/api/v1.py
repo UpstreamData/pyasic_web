@@ -14,46 +14,51 @@
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
 
-from typing import List
+from typing import List, Annotated
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Security
+
 
 from .func import convert_hashrate, get_allowed_miners
 from .realtime import MinerDataManager, get_data_by_selector
 from .responses import MinerResponse, MinerSelector
+from pyasic_web.auth import User
+from pyasic_web.func import get_current_user
 
 router = APIRouter(prefix="/v1", tags=["v1"])
 
 
 @router.post("/miners/")
-async def miners(selector: MinerSelector) -> List[str]:
-    return await get_allowed_miners(selector.api_key)
+@router.get("/miners/")
+async def miners(current_user: Annotated[User, Security(get_current_user)]) -> List[str]:
+    return await get_allowed_miners(current_user)
 
 
 @router.post("/count/")
-async def count(selector: MinerSelector) -> MinerResponse:
-    return MinerResponse(value=len(await get_allowed_miners(selector.api_key)))
+@router.get("/count/")
+async def count(current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    return MinerResponse(value=len(await get_allowed_miners(current_user)))
 
 
 @router.post("/py_errors/")
-async def py_errors(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def py_errors(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> dict:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {d: miner_data[d].get("py_error") for d in miner_data if d in allowed_miners}
     return {k: v for k, v in data.items() if v is not None}
 
 
 @router.post("/api_ver/")
-async def api_ver(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def api_ver(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> dict:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {d: miner_data[d].get("api_ver") for d in miner_data if d in allowed_miners}
     return {k: v for k, v in data.items() if v is not None}
 
 
 @router.post("/efficiency/")
-async def efficiency(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def efficiency(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("efficiency", allowed_miners)
 
     if len(data) > 0:
@@ -64,8 +69,8 @@ async def efficiency(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/env_temp/")
-async def env_temp(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def env_temp(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("env_temp", allowed_miners)
 
     data = list(filter(lambda x: x != -1, data))
@@ -78,8 +83,8 @@ async def env_temp(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/errors/")
-async def errors(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def errors(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> dict:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {d: miner_data[d].get("errors") for d in miner_data if d in allowed_miners}
 
@@ -88,16 +93,16 @@ async def errors(selector: MinerSelector) -> dict:
 
 
 @router.post("/fw_ver/")
-async def fw_ver(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def fw_ver(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> dict:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {d: miner_data[d].get("fw_ver") for d in miner_data if d in allowed_miners}
     return {k: v for k, v in data.items() if v is not None}
 
 
 @router.post("/hashrate/")
-async def hashrate(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def hashrate(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("hashrate", allowed_miners)
     hr = sum(data)
 
@@ -105,8 +110,8 @@ async def hashrate(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/hashrate_ths/")
-async def hashrate(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def hashrate(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("hashrate", allowed_miners)
     hr, unit = convert_hashrate(sum(data))
 
@@ -114,16 +119,16 @@ async def hashrate(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/hostname/")
-async def hostname(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def hostname(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> dict:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {d: miner_data[d].get("hostname") for d in miner_data if d in allowed_miners}
     return {k: v for k, v in data.items() if v is not None}
 
 
 @router.post("/ideal_chips/")
-async def ideal_chips(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def ideal_chips(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("ideal_chips", allowed_miners)
 
     return MinerResponse(
@@ -132,8 +137,8 @@ async def ideal_chips(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/ideal_hashrate/")
-async def ideal_hashrate(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def ideal_hashrate(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("nominal_hashrate", allowed_miners)
     hr, unit = convert_hashrate(sum(data))
 
@@ -141,8 +146,8 @@ async def ideal_hashrate(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/lights/")
-async def lights(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def lights(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> dict:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {
         d: miner_data[d].get("fault_light") for d in miner_data if d in allowed_miners
@@ -153,32 +158,32 @@ async def lights(selector: MinerSelector) -> dict:
 
 
 @router.post("/make/")
-async def make(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def make(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> dict:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {d: miner_data[d].get("make") for d in miner_data if d in allowed_miners}
     return {k: v for k, v in data.items() if v is not None}
 
 
 @router.post("/max_wattage/")
-async def ideal_hashrate(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def ideal_hashrate(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("wattage_limit", allowed_miners)
 
     return MinerResponse(value=sum(data), unit="W")
 
 
 @router.post("/model/")
-async def model(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def model(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> dict:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {d: miner_data[d].get("model") for d in miner_data if d in allowed_miners}
     return {k: v for k, v in data.items() if v is not None}
 
 
 @router.post("/pct_ideal_chips/")
-async def pct_ideal_chips(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def pct_ideal_chips(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("percent_ideal_chips", allowed_miners)
 
     if len(data) > 0:
@@ -190,8 +195,8 @@ async def pct_ideal_chips(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/pct_ideal_hashrate/")
-async def pct_ideal_hashrate(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def pct_ideal_hashrate(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("percent_ideal_hashrate", allowed_miners)
 
     if len(data) > 0:
@@ -203,8 +208,8 @@ async def pct_ideal_hashrate(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/pct_ideal_wattage/")
-async def pct_ideal_wattage(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def pct_ideal_wattage(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("percent_ideal_wattage", allowed_miners)
 
     if len(data) > 0:
@@ -216,8 +221,8 @@ async def pct_ideal_wattage(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/pools/")
-async def pools(selector: MinerSelector) -> dict:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def pools(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> dict:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     miner_data = MinerDataManager().data
     data = {
         d: miner_data[d].get("pool_1_user") for d in miner_data if d in allowed_miners
@@ -228,8 +233,8 @@ async def pools(selector: MinerSelector) -> dict:
 
 
 @router.post("/avg_temperature/")
-async def avg_temperature(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def avg_temperature(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("temperature_avg", allowed_miners)
 
     if len(data) > 0:
@@ -241,16 +246,16 @@ async def avg_temperature(selector: MinerSelector) -> MinerResponse:
 
 
 @router.post("/total_chips/")
-async def total_chips(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def total_chips(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("total_chips", allowed_miners)
 
     return MinerResponse(value=sum(data))
 
 
 @router.post("/total_wattage/")
-async def total_wattage(selector: MinerSelector) -> MinerResponse:
-    allowed_miners = await get_allowed_miners(selector.api_key, selector.miner_selector)
+async def total_wattage(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerResponse:
+    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = get_data_by_selector("wattage", allowed_miners)
 
     return MinerResponse(value=sum(data), unit="W")

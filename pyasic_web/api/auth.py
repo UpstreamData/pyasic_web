@@ -13,48 +13,39 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
+from datetime import datetime, timedelta
+from typing import Annotated
+from typing import List
 
-import ipaddress
-import os
-from typing import Annotated, Union
-
-import aiofiles
 from fastapi import Depends, HTTPException
-from fastapi.security import SecurityScopes
+from fastapi.security import (
+    SecurityScopes,
+)
 from jose import jwt, JWTError
-from pydantic import ValidationError
-from starlette.requests import Request
-from fastapi.websockets import WebSocket
+from pydantic import BaseModel, ValidationError
+from pydantic import Field
 
-from pyasic import MinerNetwork
-from pyasic_web import settings
-from pyasic_web.api.auth import ALGORITHM, TokenData
-from pyasic_web.auth import user_provider, AUTH_SCHEME, SECRET, User
+from pyasic_web.auth import SECRET, AUTH_SCHEME
+from pyasic_web.auth import user_provider
 
+ALGORITHM = "HS256"
 
-async def get_current_miner_list(allowed_ips: str = "*"):
-    if not allowed_ips:
-        return []
-    cur_miners = []
-    if os.path.exists(settings.MINER_LIST):
-        async with aiofiles.open(settings.MINER_LIST) as file:
-            async for line in file:
-                cur_miners.append(line.strip())
-    if not allowed_ips == "*":
-        network = MinerNetwork(allowed_ips)
-        cur_miners = [
-            ip for ip in cur_miners if ipaddress.ip_address(ip) in network.hosts()
-        ]
-    cur_miners = sorted(cur_miners, key=lambda x: ipaddress.ip_address(x))
-    return cur_miners
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: str
+    scopes: List[str] = Field(default_factory=list)
 
 
-async def get_user_ip_range(user: User) -> str:
-    return user.ip_range
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=30)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET, algorithm=ALGORITHM)
+    return encoded_jwt
 
-
-async def get_api_ip_range(user: User) -> str:
-    return user.ip_range
 
 async def get_current_user(security_scopes: SecurityScopes, token: Annotated[str, Depends(AUTH_SCHEME)]):
     if security_scopes.scopes:
@@ -86,18 +77,3 @@ async def get_current_user(security_scopes: SecurityScopes, token: Annotated[str
                 headers={"WWW-Authenticate": authenticate_value},
             )
     return user
-
-
-
-async def get_all_users():
-    return user_provider.user_map
-
-
-def get_available_cards(page):
-    directory = os.path.join(settings.TEMPLATES_DIR, "cards", page)
-    card_names = [
-        str(f).replace(".html", "")
-        for f in os.listdir(directory)
-        if os.path.isfile(os.path.join(directory, f))
-    ]
-    return sorted(card_names)

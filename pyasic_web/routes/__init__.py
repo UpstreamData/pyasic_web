@@ -13,17 +13,13 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
-from . import dashboard, login, miner, manage
+from . import miner, manage, dashboard, login
 from fastapi import APIRouter
 
 router = APIRouter()
 
-# manual routes
-router.add_route("/dashboard", dashboard.dashboard_page)
-router.add_route("/login", login.login_page, methods=["POST", "GET"])
-router.add_route("/", login.login_page, methods=["POST", "GET"])
-router.add_route("/logout", login.logout_page)
-
 # routers
 router.include_router(miner.router, prefix="/miner")
 router.include_router(manage.router, prefix="/manage")
+router.include_router(dashboard.router)
+router.include_router(login.router)
