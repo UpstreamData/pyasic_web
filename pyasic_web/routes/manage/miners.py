@@ -59,7 +59,16 @@ async def manage_miners_ws(websocket: WebSocket, current_user: Annotated[User, S
         async for data in MinerDataManager().subscribe():
             for miner in miners:
                 if miner in data:
-                    await websocket.send_text(json.dumps(data[miner]))
+                    await websocket.send_json(
+                            {
+                                "ip": miner,
+                                "model": data[miner].get("model", "Unknown"),
+                                "hashrate": data[miner].get("hashrate", 0),
+                                "percent_ideal_chips": data[miner].get("percent_ideal_chips", 0),
+                                "errors": data[miner].get("errors", []),
+                                "fault_light": data[miner].get("fault_light", False),
+                            }
+                        )
     except WebSocketDisconnect:
         print("Websocket disconnected.")
     except websockets.exceptions.ConnectionClosedOK:
