@@ -15,14 +15,12 @@
 # ------------------------------------------------------------------------------
 from typing import Annotated
 
-from fastapi import APIRouter, Security, Depends
+from fastapi import APIRouter, Depends
 from fastapi.requests import Request
 
-from pyasic_web.auth import User
-from pyasic_web.func import get_current_miner_list, get_current_user, get_user_ip_range
-from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
-    get_current_settings,
-)
+from pyasic_web.auth.users import get_current_user, User
+from pyasic_web.func.users import get_user_ip_range
+from pyasic_web.func.miners import get_current_miner_list
 from pyasic_web.templates import card_exists, templates
 
 router = APIRouter()

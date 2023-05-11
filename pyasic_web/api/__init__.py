@@ -22,12 +22,13 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from pyasic_web.auth import User, user_provider
+from pyasic_web.auth.users import User, user_provider
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 from . import realtime, v1
-from .auth import get_current_user, Token, create_access_token
+from pyasic_web.auth.users import get_current_user
+from pyasic_web.auth.token import Token, create_access_token
 
 tags_metadata = [
     {

@@ -20,8 +20,9 @@ import ipaddress
 from fastapi.websockets import WebSocket
 
 from pyasic.network import MinerNetwork
-from pyasic_web.auth import AUTH_SCHEME, User
-from pyasic_web.func import get_current_miner_list, get_user_ip_range
+from pyasic_web.auth.users import User
+from .miners import get_current_miner_list
+from .users import get_user_ip_range
 
 
 async def do_websocket_scan(websocket: WebSocket, user: User, network_ip: str):

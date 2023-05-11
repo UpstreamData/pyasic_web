@@ -13,9 +13,16 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
-from .oauth2 import OAuth2PasswordBearerCookie
+import os
 
-AUTH_SCHEME = OAuth2PasswordBearerCookie(
-    tokenUrl="login",
-    scopes={"admin": "Site administrator."},
-)
+from pyasic_web import settings
+
+
+def get_available_cards(page):
+    directory = os.path.join(settings.TEMPLATES_DIR, "cards", page)
+    card_names = [
+        str(f).replace(".html", "")
+        for f in os.listdir(directory)
+        if os.path.isfile(os.path.join(directory, f))
+    ]
+    return sorted(card_names)

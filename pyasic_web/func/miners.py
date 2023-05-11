@@ -13,9 +13,29 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
-from .oauth2 import OAuth2PasswordBearerCookie
 
-AUTH_SCHEME = OAuth2PasswordBearerCookie(
-    tokenUrl="login",
-    scopes={"admin": "Site administrator."},
-)
+import ipaddress
+import os
+
+import aiofiles
+
+from pyasic import MinerNetwork
+from pyasic_web import settings
+
+
+async def get_current_miner_list(allowed_ips: str = "*"):
+    if not allowed_ips:
+        return []
+    cur_miners = []
+    if os.path.exists(settings.MINER_LIST):
+        async with aiofiles.open(settings.MINER_LIST) as file:
+            async for line in file:
+                # noinspection PyUnresolvedReferences - type hinted as coroutine
+                cur_miners.append(line.strip())
+    if not allowed_ips == "*":
+        network = MinerNetwork(allowed_ips)
+        cur_miners = [
+            ip for ip in cur_miners if ipaddress.ip_address(ip) in network.hosts()
+        ]
+    cur_miners = sorted(cur_miners, key=lambda x: ipaddress.ip_address(x))
+    return cur_miners

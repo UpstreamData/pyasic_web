@@ -14,7 +14,7 @@
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
 
-from fastapi import FastAPI, Security
+from fastapi import FastAPI
 from pyasic_web import api
 from pyasic_web.api.realtime import MinerDataManager
 from pyasic_web import auth, errors, routes, settings

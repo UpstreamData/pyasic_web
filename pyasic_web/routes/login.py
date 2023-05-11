@@ -19,7 +19,8 @@ from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 
 from pyasic_web.api import create_access_token
-from pyasic_web.auth import user_provider, AUTH_SCHEME
+from pyasic_web.auth import AUTH_SCHEME
+from pyasic_web.auth.users import user_provider
 from pyasic_web.templates import templates
 
 router = APIRouter()

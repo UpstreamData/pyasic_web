@@ -19,13 +19,11 @@ from fastapi import APIRouter, Security
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 
-from pyasic_web.auth import DEFAULT_DASHBOARD_CARDS, DEFAULT_MINER_CARDS, user_provider, User
-from pyasic_web.func import (
-    get_available_cards,
-    get_current_miner_list,
-    get_current_user,
-    get_user_ip_range,
-)
+from pyasic_web.auth.users import User, get_current_user, user_provider
+from pyasic_web.settings import DEFAULT_DASHBOARD_CARDS, DEFAULT_MINER_CARDS
+from pyasic_web.func.cards import get_available_cards
+from pyasic_web.func.miners import get_current_miner_list
+from pyasic_web.func.users import get_user_ip_range
 from pyasic_web.templates import templates
 
 router = APIRouter()
@@ -54,9 +52,8 @@ async def manage_cards_update_miner_page(request: Request, current_user: Annotat
     for idx, card in enumerate(cards):
         card = card.replace("[]=card", "").replace("miner_", "")
         cards[idx] = card
-    user = await get_current_user(current_user)
-    user.miner_cards = cards
-    user_provider.update_user_cards(user)
+    current_user.miner_cards = cards
+    user_provider.update_user_cards(current_user)
     return RedirectResponse(request.url_for("manage_cards_page"), status_code=303)
 
 

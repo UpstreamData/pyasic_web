@@ -14,21 +14,13 @@
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
 from datetime import datetime, timedelta
-from typing import Annotated
 from typing import List
 
-from fastapi import Depends, HTTPException
-from fastapi.security import (
-    SecurityScopes,
-)
-from jose import jwt, JWTError
-from pydantic import BaseModel, ValidationError
+from jose import jwt
+from pydantic import BaseModel
 from pydantic import Field
 
-from pyasic_web.auth import SECRET, AUTH_SCHEME
-from pyasic_web.auth import user_provider
-
-ALGORITHM = "HS256"
+from pyasic_web.settings import SECRET, ALGORITHM
 
 class Token(BaseModel):
     access_token: str
@@ -45,35 +37,3 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET, algorithm=ALGORITHM)
     return encoded_jwt
-
-
-async def get_current_user(security_scopes: SecurityScopes, token: Annotated[str, Depends(AUTH_SCHEME)]):
-    if security_scopes.scopes:
-        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
-    else:
-        authenticate_value = "Bearer"
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": authenticate_value},
-    )
-    try:
-        payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_scopes = payload.get("scopes", [])
-        token_data = TokenData(scopes=token_scopes, username=username)
-    except (JWTError, ValidationError):
-        raise credentials_exception
-    user = await user_provider.find_by_username(token_data.username)
-    if user is None:
-        raise credentials_exception
-    for scope in security_scopes.scopes:
-        if scope not in token_data.scopes:
-            raise HTTPException(
-                status_code=401,
-                detail="Not enough permissions",
-                headers={"WWW-Authenticate": authenticate_value},
-            )
-    return user

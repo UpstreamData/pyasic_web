@@ -19,7 +19,7 @@ import json
 
 from pyasic.miners.miner_factory import MinerFactory
 from pyasic_web.errors.miner import MinerDataError
-from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
+from pyasic_web.func.web_settings import (
     get_current_settings,
 )
 

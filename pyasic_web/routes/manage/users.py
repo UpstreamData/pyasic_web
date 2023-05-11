@@ -19,13 +19,11 @@ from fastapi import APIRouter, Security
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 
-from pyasic_web.auth import user_provider, AUTH_SCHEME, User
-from pyasic_web.func import (
-    get_all_users,
-    get_current_miner_list,
-    get_current_user,
-    get_user_ip_range,
-)
+from pyasic_web.auth import AUTH_SCHEME
+from pyasic_web.auth.users import get_current_user, User, user_provider
+from pyasic_web.func.miners import get_current_miner_list
+from pyasic_web.func.users import get_user_ip_range, get_all_users
+
 from pyasic_web.templates import templates
 
 router = APIRouter(dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])

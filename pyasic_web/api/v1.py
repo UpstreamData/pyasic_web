@@ -22,8 +22,7 @@ from fastapi import APIRouter, Security
 from .func import convert_hashrate, get_allowed_miners
 from .realtime import MinerDataManager, get_data_by_selector
 from .responses import MinerResponse, MinerSelector
-from pyasic_web.auth import User
-from pyasic_web.func import get_current_user
+from pyasic_web.auth.users import User, get_current_user
 
 router = APIRouter(prefix="/v1", tags=["v1"])
 

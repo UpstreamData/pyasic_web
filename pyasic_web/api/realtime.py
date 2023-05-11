@@ -20,16 +20,17 @@ from typing import List, Literal, Union
 
 import websockets
 import websockets.exceptions
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, Security
 from fastapi.websockets import WebSocketDisconnect
 
 import pyasic
 from pyasic.misc import Singleton
+from pyasic_web.auth import AUTH_SCHEME
 from pyasic_web.errors.miner import MinerDataError
-from pyasic_web.func import get_current_miner_list, get_user_ip_range, get_current_user
+from pyasic_web.func.miners import get_current_miner_list
 from pyasic_web.func.web_settings import get_current_settings
 
-router = APIRouter(prefix="/realtime")
+router = APIRouter(prefix="/realtime", dependencies=[Security(AUTH_SCHEME)])
 
 
 class MinerDataManager(metaclass=Singleton):
@@ -103,24 +104,6 @@ async def get_miner_data(miner_ip):
             "ip": miner_ip,
             "py_error": MinerDataError.BAD_DATA.value,
         }
-
-@router.websocket("/all")
-async def all_data(websocket: WebSocket):
-    await websocket.accept()
-    data_manager = MinerDataManager()
-    irange = await get_user_ip_range(websocket)
-    allowed_miners = await get_current_miner_list(irange)
-    async for data in data_manager.subscribe():
-        try:
-            await websocket.send_json({d: data[d] for d in data if d in allowed_miners})
-        except WebSocketDisconnect:
-            print("Websocket disconnected.")
-            return
-        except websockets.exceptions.ConnectionClosedError:
-            print("Websocket disconnected.")
-            return
-        except websockets.exceptions.ConnectionClosedOK:
-            return
 
 @router.websocket("/updates")
 async def updates(websocket: WebSocket):

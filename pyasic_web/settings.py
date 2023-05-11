@@ -21,3 +21,28 @@ BASE_DIR = Path(__file__).parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 MINER_LIST = BASE_DIR / "miner_list.txt"
+
+SECRET = "SECRET"
+ALGORITHM = "HS256"
+
+DEFAULT_DASHBOARD_CARDS = [
+    "count",
+    "hashrate",
+    "pct_ideal_chips",
+    "temperature_avg",
+    "wattage",
+    "pct_max_wattage",
+    "efficiency",
+    "errors",
+]
+DEFAULT_MINER_CARDS = [
+    "model",
+    "hashrate",
+    "pct_ideal_chips",
+    "temperature_avg",
+    "wattage",
+    "pct_max_wattage",
+    "efficiency",
+    "errors",
+    "pools",
+]

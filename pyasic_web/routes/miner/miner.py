@@ -24,8 +24,10 @@ from fastapi.responses import RedirectResponse
 
 import pyasic
 from pyasic_web import settings
-from pyasic_web.auth import AUTH_SCHEME, User
-from pyasic_web.func import get_current_miner_list, get_current_user, get_user_ip_range
+from pyasic_web.auth import AUTH_SCHEME
+from pyasic_web.auth.users import get_current_user, User
+from pyasic_web.func.miners import get_current_miner_list
+from pyasic_web.func.users import get_user_ip_range
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )

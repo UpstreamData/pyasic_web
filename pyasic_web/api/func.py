@@ -15,8 +15,9 @@
 # ------------------------------------------------------------------------------
 from typing import List, Literal, Tuple, Union
 
-from pyasic_web.auth import User
-from pyasic_web.func import get_user_ip_range, get_current_miner_list
+from pyasic_web.auth.users import User
+from pyasic_web.func.users import get_user_ip_range
+from pyasic_web.func.miners import get_current_miner_list
 
 
 def convert_hashrate(ths_hr: float) -> Tuple[float, str]:
