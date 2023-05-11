@@ -21,20 +21,25 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from starlette.requests import Request
 
 from pyasic_web.auth.users import User, user_provider
 from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 from . import realtime, v1
-from pyasic_web.auth.users import get_current_user
 from pyasic_web.auth.token import Token, create_access_token
+from pyasic_web.auth import AUTH_SCHEME
 
 tags_metadata = [
     {
+        "name": "Auth",
+        "description": "Login and authorization.",
+    },
+    {
         "name": "v1",
         "description": "API V1",
-    }
+    },
 ]
 
 app = FastAPI(
@@ -54,7 +59,7 @@ app = FastAPI(
     root_path="/api",
 )
 
-@app.post("/login/", response_model=Token)
+@app.post("/login/", response_model=Token, tags=["Auth"])
 async def api_login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
@@ -73,15 +78,17 @@ async def api_login(
     )
     return resp
 
-
-async def docs(current_user: Annotated[User, Security(get_current_user)]):
+@app.get("/", dependencies=[Security(AUTH_SCHEME)], name="api_docs", include_in_schema=False)
+async def api_docs(request: Request):
     return get_swagger_ui_html(
         openapi_url="/api/openapi.json",
         title="docs",
+        swagger_favicon_url=str(request.url_for("static", path="favicon.ico"))
     )
 
 
-async def get_openapi_schema(current_user: Annotated[User, Security(get_current_user)]):
+@app.get("/openapi.json", dependencies=[Security(AUTH_SCHEME)], name="openapi_schema", include_in_schema=False)
+async def get_openapi_schema():
     return JSONResponse(get_openapi(title="FastAPI", version="1", routes=app.routes))
 
 @app.on_event("startup")
@@ -91,5 +98,3 @@ async def app_startup():
 
 app.include_router(v1.router)
 app.include_router(realtime.router)
-app.add_route("/openapi.json", get_openapi_schema, methods=["get"])
-app.add_route("/", docs, methods=["get"])

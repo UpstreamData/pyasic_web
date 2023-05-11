@@ -141,6 +141,7 @@
                             {% if "admin" in user.scopes %}
                                 {{ navbar_macros.create_navbar_item("Settings", "manage_settings_page", "settings", request) }}
                             {% endif %}
+                            {{ navbar_macros.create_navbar_item("API (Advanced)", "api_docs", "api", request) }}
                             {{ navbar_macros.create_navbar_item("Logout", "logout_page", "logout", request) }}
                         </ul>
                     </div>
