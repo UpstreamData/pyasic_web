@@ -44,8 +44,8 @@ update_ws.addEventListener('message', (event) => {
         .then(data => {
             lights_on_card.innerHTML = ""
             lights_off_card.innerHTML = ""
-            for (const ip of Object.keys(data)) {
-                    if (data[ip]) {
+            for (const ip of Object.keys(data["data"])) {
+                    if (data["data"][ip]) {
                         lights_on_card.innerHTML += '<div class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + ip + '</div>'
                     } else {
                         lights_off_card.innerHTML += '<div class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + ip + '</div>'

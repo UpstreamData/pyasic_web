@@ -16,21 +16,27 @@
 
 import asyncio
 import json
-from typing import List, Literal, Union
+from typing import List, Literal, Union, Callable, Type, Dict
 
 import websockets
 import websockets.exceptions
 from fastapi import APIRouter, WebSocket, Security
 from fastapi.websockets import WebSocketDisconnect
+from sse_starlette import EventSourceResponse
+from starlette.requests import Request
 
 import pyasic
 from pyasic.misc import Singleton
+from pyasic_web.api.responses import MinerSelector, MinerResponse
 from pyasic_web.auth import AUTH_SCHEME
+from pyasic_web.auth.users import get_current_user
 from pyasic_web.errors.miner import MinerDataError
 from pyasic_web.func.miners import get_current_miner_list
 from pyasic_web.func.web_settings import get_current_settings
 
 router = APIRouter(prefix="/realtime", dependencies=[Security(AUTH_SCHEME)])
+
+MESSAGE_STREAM_RETRY_TIMEOUT = 15000  # MS
 
 
 class MinerDataManager(metaclass=Singleton):
@@ -72,14 +78,23 @@ class MinerDataManager(metaclass=Singleton):
 
 def get_data_by_selector(
     data_key: str, selector: Union[List[str], str, Literal["all"]]
-):
+) -> dict:
     miner_data = MinerDataManager().data
     if selector == "all":
-        data = [miner_data[d].get(data_key) for d in miner_data]
+        data = {d: miner_data[d][data_key] for d in miner_data if miner_data[d].get(data_key) is not None}
     else:
-        data = [miner_data[d].get(data_key) for d in miner_data if d in selector]
-    return list(filter(lambda x: x is not None, data))
+        data = {d: miner_data[d][data_key] for d in miner_data if miner_data[d].get(data_key) is not None and d in selector}
+    return data
 
+def create_return_by_selector(
+    data_key: str, selector: Union[List[str], str, Literal["all"]], ret_type: type(MinerResponse)
+) -> Dict[str, type(MinerResponse)]:
+    miner_data = MinerDataManager().data
+    if selector == "all":
+        data = {d: ret_type(value=miner_data[d][data_key]) for d in miner_data if miner_data[d].get(data_key) is not None}
+    else:
+        data = {d: ret_type(value=miner_data[d][data_key]) for d in miner_data if miner_data[d].get(data_key) is not None and d in selector}
+    return data
 
 async def get_miner_data(miner_ip):
     try:
@@ -105,6 +120,7 @@ async def get_miner_data(miner_ip):
             "py_error": MinerDataError.BAD_DATA.value,
         }
 
+
 @router.websocket("/updates")
 async def updates(websocket: WebSocket):
     await websocket.accept()
@@ -120,3 +136,51 @@ async def updates(websocket: WebSocket):
             return
         except websockets.exceptions.ConnectionClosedOK:
             return
+
+
+async def event_generator(
+    request: Request,
+    miner_selector: MinerSelector,
+    data: str,
+    unit: str,
+    parse_func: Callable,
+):
+    msg_id = 0
+    data_manager = MinerDataManager()
+    yield {
+        "event": "new_message",
+        "id": msg_id,
+        "retry": MESSAGE_STREAM_RETRY_TIMEOUT,
+        "data": MinerResponse(
+            value=parse_func(get_data_by_selector(data, miner_selector.miner_selector)),
+            unit=unit,
+        ),
+    }
+    async for _ in data_manager.subscribe_to_updates():
+        msg_id += 1
+        if await request.is_disconnected():
+            break
+        yield {
+            "event": "new_message",
+            "id": msg_id,
+            "retry": MESSAGE_STREAM_RETRY_TIMEOUT,
+            "data": MinerResponse(
+                value=parse_func(
+                    get_data_by_selector(data, miner_selector.miner_selector)
+                ),
+                unit=unit,
+            ),
+        }
+
+
+@router.post("/hashrate", dependencies=[Security(get_current_user)])
+async def hashrate_stream(request: Request, selector: MinerSelector):
+    return EventSourceResponse(
+        event_generator(
+            request,
+            selector,
+            "hashrate",
+            "TH/s",
+            lambda x: round(sum(x), 2),
+        )
+    )

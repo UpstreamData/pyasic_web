@@ -28,11 +28,36 @@
             {{data_name}}_card = document.getElementById("card_{{data_name}}")
             getAPIData("{{data_name}}", 'all')
                 .then(data => {
-                    if (!!{{data_name}}_card) {
-                        if (data["unit"] == "") {
-                            {{data_name}}_card.innerHTML = data["value"]
-                        } else {
-                            {{data_name}}_card.innerHTML = data["value"] + " " + data["unit"]
+                    if (data.hasOwnProperty("data")) {
+                        var unit = data["data"][Object.keys(data["data"])[0]]["unit"]
+                        if (!!{{data_name}}_card) {
+                            if (Object.keys(data).length > 0) {
+                                const miner_data = data["data"]
+                                if (data["combine_method"] == "sum") {
+                                    var sum = Object.values(miner_data).reduce((acc, curr) => acc + curr.value, 0);
+                                    var total = +sum.toFixed(2)
+                                } else if (data["combine_method"] == "avg") {
+                                    var sum = Object.values(miner_data).reduce((acc, curr) => acc + curr.value, 0);
+                                    var avg = sum / Object.keys(miner_data).length
+                                    var total = +avg.toFixed(2)
+                                }
+
+                                if (unit == "") {
+                                    {{data_name}}_card.innerHTML = total
+                                } else {
+                                    {{data_name}}_card.innerHTML = total + " " + unit
+                                }
+                            }
+                        }
+                    } else {
+                        var unit = data["unit"]
+                        var val = data["value"]
+                        if (!!{{data_name}}_card) {
+                            if (unit == "") {
+                                {{data_name}}_card.innerHTML = val
+                            } else {
+                                {{data_name}}_card.innerHTML = val + " " + unit
+                            }
                         }
                     }
                 })
@@ -106,18 +131,36 @@ const {{ data_name }}_chart = new Chart(graph_{{ data_name }}_ctx, {
 update_ws.addEventListener('message', event => {
     getAPIData("{{ data_name }}", 'all')
     .then(data => {
-        const new_{{ data_name }} = { x: new Date(), y: data["value"] };
-
-        // Add new data point to chart dataset
-        {{ data_name }}_chart.data.datasets[0].data.push(new_{{ data_name }});
+        if (data.hasOwnProperty("data")) {
+            const unit = data["data"][Object.keys(data["data"])[0]]["unit"]
+            if (Object.keys(data).length > 0) {
+                const miner_data = data["data"]
+                if (data["combine_method"] == "sum") {
+                    var sum = Object.values(miner_data).reduce((acc, curr) => acc + curr.value, 0);
+                    var total = +sum.toFixed(2)
+                } else if (data["combine_method"] == "avg") {
+                    var sum = Object.values(miner_data).reduce((acc, curr) => acc + curr.value, 0);
+                    var avg = sum / Object.keys(miner_data).length
+                    var total = +avg.toFixed(2)
+                }
+                {{ data_name }}_chart.data.datasets[0].data.push({ x: new Date(), y: total });
+                {{ data_name }}_chart.options.scales.y.ticks.callback = function(value, index, values) {
+                    return value + ' ' + unit;
+                };
+            }
+        } else {
+            const unit = data["unit"]
+            const val = data["value"]
+            {{ data_name }}_chart.data.datasets[0].data.push({ x: new Date(), y: val });
+            {{ data_name }}_chart.options.scales.y.ticks.callback = function(value, index, values) {
+                return value + ' ' + unit;
+            };
+        }
 
         // Remove older data points if number of data points exceeds 30
         if ({{ data_name }}_chart.data.datasets[0].data.length > 30) {
             {{ data_name }}_chart.data.datasets[0].data.splice(0, 1);
         }
-        {{ data_name }}_chart.options.scales.y.ticks.callback = function(value, index, values) {
-            return value + ' ' + data.unit;
-        };
 
         {{ data_name }}_chart.update();
     });

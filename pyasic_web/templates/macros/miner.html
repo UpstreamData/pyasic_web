@@ -27,20 +27,21 @@
         update_ws.addEventListener('message', (event) => {
             {{data_name}}_card = document.getElementById("card_{{data_name}}")
             getAPIData("{{data_name}}", [minerIP])
-                .then(data => {
-                    if (!!{{data_name}}_card) {
-                        if (data.hasOwnProperty("value")) {
-                            if (data["unit"] == "") {
-                                {{data_name}}_card.innerHTML = data["value"]
-                            } else {
-                                {{data_name}}_card.innerHTML = data["value"] + " " + data["unit"]
-                            }
-                        } else if (data.hasOwnProperty(minerIP)) {
-                            {{data_name}}_card.innerHTML = data[minerIP]
+            .then(data => {
+                if (data.hasOwnProperty("data")) {
+                    if (Object.keys(data).length > 0) {
+                        const total = data["data"][Object.keys(data["data"])[0]]["value"]
+                        const unit = data["data"][Object.keys(data["data"])[0]]["unit"]
+
+                        if (unit == "") {
+                            {{data_name}}_card.innerHTML = total
+                        } else {
+                            {{data_name}}_card.innerHTML = total + " " + unit
                         }
                     }
-                })
-                .catch(error => console.error(error));
+                }
+            })
+            .catch(error => console.error(error));
         });
     </script>
 {%- endmacro %}

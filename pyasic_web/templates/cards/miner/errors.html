@@ -31,8 +31,8 @@
         .then((data) => {
             const errors_card = document.getElementById("card_errors");
             let errorsHtml = "";
-            for (const ip of Object.keys(data)) {
-                const errors = data[ip];
+            for (const res of Object.values(data["data"])) {
+                const errors = res["value"];
                 for (i = 0; i < errors.length; i++) {
                     errorsHtml += '<div class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + errors[i]["error_message"] + '</div>'
                 };

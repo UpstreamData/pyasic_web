@@ -13,15 +13,64 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
-from typing import List, Literal, Union
+from enum import Enum
+from typing import List, Literal, Union, Dict, Type, Optional
 
 from pydantic import BaseModel
 
-
-class MinerResponse(BaseModel):
-    value: Union[float, int, str]
-    unit: str = ""
+from pyasic_web.errors.miner import MinerDataError
 
 
 class MinerSelector(BaseModel):
     miner_selector: Union[List[str], str, Literal["all"]] = "all"
+
+class MinerResponse(BaseModel):
+    value: Union[float, int, str, list, bool, MinerDataError]
+    unit: str = ""
+
+class MinerStringResponse(MinerResponse):
+    value: str
+
+class MinerIntegerResponse(MinerResponse):
+    value: int
+
+class MinerFloatResponse(MinerResponse):
+    value: float
+
+class MinerListResponse(MinerResponse):
+    value: list
+
+class MinerBooleanResponse(MinerResponse):
+    value: bool
+
+class MinerErrorResponse(MinerResponse):
+    value: MinerDataError
+
+class MinerEfficiencyResponse(MinerResponse):
+    value: float
+    unit: str = "J/TH"
+
+class MinerWattageResponse(MinerResponse):
+    value: int
+    unit: str = "W"
+
+class MinerTempResponse(MinerResponse):
+    value: float
+    unit: str = "°C"
+
+class MinerHashrateResponse(MinerResponse):
+    value: float
+    unit: Literal["MH/s", "GH/s", "TH/s", "PH/s"] = "TH/s"
+
+class MinerPercentageResponse(MinerResponse):
+    value: float
+    unit: str = "%"
+
+class MinerCombineMethod(Enum):
+    NONE = "none"
+    AVG = "avg"
+    SUM = "sum"
+
+class MinerGroupResponse(BaseModel):
+    data: Optional[Dict[str, MinerResponse]]
+    combine_method: MinerCombineMethod = MinerCombineMethod.NONE

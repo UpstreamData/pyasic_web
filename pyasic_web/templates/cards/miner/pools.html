@@ -31,8 +31,8 @@
         .then((data) => {
             pools_card = document.getElementById("card_pools")
             poolsHTML = ""
-            for (const item of Object.values(data)) {
-                poolsHTML += '<div class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + item + '</div>'
+            for (const item of Object.values(data["data"])) {
+                poolsHTML += '<div class="list-group-item no-transition d-flex justify-content-between list-group-item-action miner-error">' + item["value"] + '</div>'
             }
             if (!!pools_card) {
                 pools_card.innerHTML = poolsHTML

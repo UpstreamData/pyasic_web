@@ -32,8 +32,8 @@
             const errorsCard = document.getElementById("card_errors");
             let errorsHtml = "";
 
-            for (const ip of Object.keys(data)) {
-                const errors = data[ip];
+            for (const ip of Object.keys(data["data"])) {
+                const errors = data["data"][ip]["value"];
                 if (errors.length > 0) {
                     const minerId = ip.replaceAll(".", "-");
                     const errorsElem = document.getElementById(`errors_${minerId}`);

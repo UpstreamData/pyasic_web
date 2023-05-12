@@ -23,13 +23,10 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.requests import Request
 
-from pyasic_web.auth.users import User, user_provider
-from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
-    get_current_settings,
-)
-from . import realtime, v1
-from pyasic_web.auth.token import Token, create_access_token
 from pyasic_web.auth import AUTH_SCHEME
+from pyasic_web.auth.token import Token, create_access_token
+from pyasic_web.auth.users import user_provider
+from . import realtime, v1
 
 tags_metadata = [
     {
@@ -83,7 +80,9 @@ async def api_docs(request: Request):
     return get_swagger_ui_html(
         openapi_url="/api/openapi.json",
         title="docs",
-        swagger_favicon_url=str(request.url_for("static", path="favicon.ico"))
+        swagger_favicon_url=str(request.url_for("static", path="favicon.ico")),
+        swagger_js_url=str(request.url_for("static", path="docs/swagger.js")),
+        swagger_css_url=str(request.url_for("static", path="docs/swagger.css"))
     )
 
 
