@@ -13,13 +13,11 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
-
 from fastapi import FastAPI
 from pyasic_web import api
 from pyasic_web.api.realtime import MinerDataManager
 from pyasic_web import auth, errors, routes, settings
 from fastapi.staticfiles import StaticFiles
-import asyncio
 
 from pyasic_web.auth import AUTH_SCHEME
 
@@ -27,7 +25,8 @@ app = FastAPI(
     exception_handlers=errors.exception_handlers,
     debug=True,
     docs_url=None,
-    redoc_url=None
+    redoc_url=None,
+    on_startup=[*api.app.router.on_startup]
 )
 app.include_router(routes.router)
 
@@ -36,7 +35,3 @@ app.mount("/static", static, name="static")
 
 # add API
 app.mount("/api", api.app)
-
-@app.on_event("startup")
-async def app_startup():
-    asyncio.create_task(api.realtime.MinerDataManager().run())

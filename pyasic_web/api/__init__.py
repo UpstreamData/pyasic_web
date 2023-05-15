@@ -39,6 +39,10 @@ tags_metadata = [
     },
 ]
 
+
+async def start_gathering_data():
+    asyncio.create_task(realtime.MinerDataManager().run())
+
 app = FastAPI(
     title="pyasic Web API",
     version="1.0.0",
@@ -54,6 +58,7 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     root_path="/api",
+    on_startup=[start_gathering_data]
 )
 
 @app.post("/login/", response_model=Token, tags=["Auth"])
@@ -89,10 +94,6 @@ async def api_docs(request: Request):
 @app.get("/openapi.json", dependencies=[Security(AUTH_SCHEME)], name="openapi_schema", include_in_schema=False)
 async def get_openapi_schema():
     return JSONResponse(get_openapi(title="FastAPI", version="1", routes=app.routes))
-
-@app.on_event("startup")
-async def app_startup():
-    asyncio.create_task(realtime.MinerDataManager().run())
 
 
 app.include_router(v1.router)
