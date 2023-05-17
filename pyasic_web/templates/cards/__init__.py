@@ -171,7 +171,8 @@ class GraphCard(HTMLCard):
         }});
 
         function update_{self.name}_{self.modifier.name}_card(data) {{
-            if (!(data.hasOwnProperty("data") && Object.keys(data["data"]).length > 0 && !!{self.name}_card)) {{
+            {self.name}_{self.modifier.name}_card = document.getElementById("{self.name}-{self.modifier.name}_card");
+            if (!(data.hasOwnProperty("data") && Object.keys(data["data"]).length > 0 && !!{self.name}_{self.modifier.name}_card)) {{
                 return;
             }}
             var unit = data["data"][Object.keys(data["data"])[0]]["unit"]

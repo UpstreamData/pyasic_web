@@ -287,7 +287,7 @@ async def pct_ideal_wattage(
 ) -> MinerGroupResponse:
     allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = create_return_by_selector(
-        "percent_ideal_wattage", allowed_miners, MinerWattageResponse
+        "percent_ideal_wattage", allowed_miners, MinerPercentageResponse
     )
     return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
 
