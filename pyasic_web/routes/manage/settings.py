@@ -30,7 +30,9 @@ router = APIRouter(dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 
 
 @router.get("/")
-async def manage_settings_page(request: Request, current_user: Annotated[User, Security(get_current_user)]):
+async def manage_settings_page(
+    request: Request, current_user: Annotated[User, Security(get_current_user)]
+):
     return templates.TemplateResponse(
         "settings.html",
         {

@@ -37,7 +37,9 @@ class OAuth2PasswordBearerCookie(OAuth2):
         flows = OAuthFlows(password={"tokenUrl": tokenUrl, "scopes": scopes})
         super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
 
-    async def __call__(self, request: Request = None, websocket: WebSocket = None) -> Optional[str]:
+    async def __call__(
+        self, request: Request = None, websocket: WebSocket = None
+    ) -> Optional[str]:
         if websocket and not request:
             request = websocket
         header_authorization: str = request.headers.get("Authorization")
@@ -56,6 +58,4 @@ class OAuth2PasswordBearerCookie(OAuth2):
             return cookie_param
 
         # redirect /
-        raise HTTPException(
-            status_code=307,
-            headers={'Location': '/'})
+        raise HTTPException(status_code=307, headers={"Location": "/"})

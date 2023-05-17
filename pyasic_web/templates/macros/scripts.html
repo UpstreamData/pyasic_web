@@ -14,22 +14,33 @@
   ~ limitations under the License.
   -->
 
-{% macro create_get_api_data(api_key) -%}
+{% macro create_get_api_data(selector) -%}
 <script>
-        function getAPIData(path, selector) {
-          const url = `/api/v1/${path}/`;
-
-          const options = {
+    const cookies = document.cookie.split('; ');
+    let authorizationCookie = null;
+    cookies.forEach(cookie => {
+        const [name, value] = cookie.split('=');
+        if (name === 'Authorization') {
+            authorizationCookie = value;
+        }
+    });
+    function getAPIData(url) {
+        const options = {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-              'accept': 'application/json'
+               'Content-Type': 'application/json',
+               'accept': 'application/json',
+               'Authorization': authorizationCookie
             },
-            body: JSON.stringify({"api_key": "{{api_key}}", "miner_selector": selector})
-          };
+            {% if selector == "all" %}
+                body: JSON.stringify({"miner_selector": "all"})
+            {% else %}
+                body: JSON.stringify({"miner_selector": ["{{selector}}"]})
+            {% endif %}
+        };
 
-          return fetch(url, options)
-            .then(response => response.json());
-        }
-    </script>
+      return fetch(url, options)
+          .then(response => response.json());
+    }
+</script>
 {%- endmacro %}

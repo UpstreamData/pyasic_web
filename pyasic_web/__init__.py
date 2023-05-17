@@ -15,7 +15,6 @@
 # ------------------------------------------------------------------------------
 from fastapi import FastAPI
 from pyasic_web import api
-from pyasic_web.api.realtime import MinerDataManager
 from pyasic_web import auth, errors, routes, settings
 from fastapi.staticfiles import StaticFiles
 
@@ -26,7 +25,7 @@ app = FastAPI(
     debug=True,
     docs_url=None,
     redoc_url=None,
-    on_startup=[*api.app.router.on_startup]
+    on_startup=[*api.app.router.on_startup],
 )
 app.include_router(routes.router)
 

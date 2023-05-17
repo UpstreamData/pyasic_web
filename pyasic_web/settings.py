@@ -31,7 +31,7 @@ DEFAULT_DASHBOARD_CARDS = [
     "pct_ideal_chips",
     "temperature_avg",
     "wattage",
-    "pct_max_wattage",
+    "pct_ideal_wattage",
     "efficiency",
     "errors",
 ]
@@ -41,7 +41,7 @@ DEFAULT_MINER_CARDS = [
     "pct_ideal_chips",
     "temperature_avg",
     "wattage",
-    "pct_max_wattage",
+    "pct_ideal_wattage",
     "efficiency",
     "errors",
     "pools",

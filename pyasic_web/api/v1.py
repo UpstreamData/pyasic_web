@@ -14,179 +14,189 @@
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
 
-from typing import Annotated, Dict
+from typing import Annotated
 
 from fastapi import APIRouter, Security
 
 from pyasic_web.auth.users import User, get_current_user
-from .func import get_allowed_miners
-from .realtime import create_return_by_selector
+from . import data
 from .responses import *
 
 router = APIRouter(prefix="/v1", tags=["v1"])
 
 
+
 @router.post("/miners/")
 @router.get("/miners/")
-async def miners(current_user: Annotated[User, Security(get_current_user)]) -> List[str]:
-    return await get_allowed_miners(current_user)
+async def miners(
+    current_user: Annotated[User, Security(get_current_user)]
+) -> List[str]:
+    return await data.miners(current_user)
 
 
 @router.post("/count/")
 @router.get("/count/")
-async def count(current_user: Annotated[User, Security(get_current_user)]) -> MinerIntegerResponse:
-    return MinerIntegerResponse(value=len(await get_allowed_miners(current_user)))
+async def count(
+    current_user: Annotated[User, Security(get_current_user)]
+) -> MinerIntegerResponse:
+    return await data.count(current_user)
 
 
 @router.post("/py_errors/")
-async def py_errors(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("py_error", allowed_miners, MinerErrorResponse)
-    return MinerGroupResponse(data=data)
+async def py_errors(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.py_errors(selector, current_user)
 
 
 @router.post("/api_ver/")
-async def api_ver(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("api_ver", allowed_miners, MinerStringResponse)
-    return MinerGroupResponse(data=data)
+async def api_ver(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.api_ver(selector, current_user)
 
 
 @router.post("/efficiency/")
-async def efficiency(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("efficiency", allowed_miners, MinerEfficiencyResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
+async def efficiency(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.efficiency(selector, current_user)
 
 
 @router.post("/env_temp/")
-async def env_temp(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("env_temp", allowed_miners, MinerTempResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
+async def env_temp(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.env_temp(selector, current_user)
 
 
 @router.post("/errors/")
-async def errors(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("errors", allowed_miners, MinerListResponse)
-    return MinerGroupResponse(data=data)
+async def errors(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.errors(selector, current_user)
 
 
 @router.post("/fw_ver/")
-async def fw_ver(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("fw_ver", allowed_miners, MinerStringResponse)
-    return MinerGroupResponse(data=data)
+async def fw_ver(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.fw_ver(selector, current_user)
 
 
 @router.post("/hashrate_ths/")
-async def hashrate_ths(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("hashrate", allowed_miners, MinerHashrateResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
+async def hashrate_ths(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.hashrate_ths(selector, current_user)
 
 
 @router.post("/hashrate/")
-async def hashrate(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("hashrate", allowed_miners, MinerHashrateResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
+async def hashrate(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.hashrate(selector, current_user)
 
 
 @router.post("/hostname/")
-async def hostname(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("hostname", allowed_miners, MinerStringResponse)
-    return MinerGroupResponse(data=data)
+async def hostname(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.hostname(selector, current_user)
 
 
 @router.post("/ideal_chips/")
-async def ideal_chips(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("ideal_chips", allowed_miners, MinerIntegerResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
+async def ideal_chips(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.ideal_chips(selector, current_user)
 
 
 @router.post("/ideal_hashrate/")
-async def ideal_hashrate(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("nominal_hashrate", allowed_miners, MinerHashrateResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
+async def ideal_hashrate(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.ideal_hashrate(selector, current_user)
 
 
 @router.post("/lights/")
-async def lights(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("fault_light", allowed_miners, MinerBooleanResponse)
-    return MinerGroupResponse(data=data)
+async def lights(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.lights(selector, current_user)
 
 
 @router.post("/make/")
-async def make(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("make", allowed_miners, MinerStringResponse)
-    return MinerGroupResponse(data=data)
+async def make(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.make(selector, current_user)
 
 
 @router.post("/max_wattage/")
-async def max_wattage(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("wattage_limit", allowed_miners, MinerWattageResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
+async def max_wattage(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.max_wattage(selector, current_user)
 
 
 @router.post("/model/")
-async def model(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("model", allowed_miners, MinerStringResponse)
-    return MinerGroupResponse(data=data)
+async def model(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.model(selector, current_user)
 
 
 @router.post("/pct_ideal_chips/")
-async def pct_ideal_chips(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("percent_ideal_chips", allowed_miners, MinerPercentageResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
+async def pct_ideal_chips(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.pct_ideal_chips(selector, current_user)
 
 
 @router.post("/pct_ideal_hashrate/")
-async def pct_ideal_hashrate(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("percent_ideal_hashrate", allowed_miners, MinerPercentageResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
+async def pct_ideal_hashrate(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.pct_ideal_hashrate(selector, current_user)
 
 
 @router.post("/pct_ideal_wattage/")
-async def pct_ideal_wattage(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("percent_ideal_wattage", allowed_miners, MinerWattageResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
+async def pct_ideal_wattage(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.pct_ideal_wattage(selector, current_user)
 
 
 @router.post("/pools/")
-async def pools(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("pool_1_user", allowed_miners, MinerStringResponse)
-    return MinerGroupResponse(data=data)
+async def pools(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.pools(selector, current_user)
 
 
 @router.post("/avg_temperature/")
-async def avg_temperature(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("temperature_avg", allowed_miners, MinerTempResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
+async def avg_temperature(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.avg_temperature(selector, current_user)
 
 
 @router.post("/total_chips/")
-async def total_chips(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("total_chips", allowed_miners, MinerIntegerResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
+async def total_chips(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.total_chips(selector, current_user)
 
 
 @router.post("/total_wattage/")
-async def total_wattage(selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]) -> MinerGroupResponse:
-    allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
-    data = create_return_by_selector("wattage", allowed_miners, MinerWattageResponse)
-    return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
+async def total_wattage(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.total_wattage(selector, current_user)
+
+@router.post("/nominal/")
+async def nominal(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
+) -> MinerGroupResponse:
+    return await data.nominal(selector, current_user)

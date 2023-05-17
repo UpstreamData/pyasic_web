@@ -28,8 +28,11 @@ from pyasic_web.templates import templates
 
 router = APIRouter(dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 
+
 @router.get("/")
-async def manage_users_page(request: Request, current_user: Annotated[User, Security(get_current_user)]):
+async def manage_users_page(
+    request: Request, current_user: Annotated[User, Security(get_current_user)]
+):
     return templates.TemplateResponse(
         "manage_users.html",
         {

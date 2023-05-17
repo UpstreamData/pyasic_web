@@ -15,8 +15,10 @@
 # ------------------------------------------------------------------------------
 from pyasic_web.auth.users import User, user_provider
 
+
 async def get_user_ip_range(user: User) -> str:
     return user.ip_range
+
 
 async def get_all_users():
     return user_provider.user_map

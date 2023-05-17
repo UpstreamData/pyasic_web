@@ -31,7 +31,13 @@ from pydantic import Field
 
 from pyasic_web.auth import AUTH_SCHEME
 from .token import TokenData
-from pyasic_web.settings import SECRET, ALGORITHM, DEFAULT_DASHBOARD_CARDS, DEFAULT_MINER_CARDS
+from pyasic_web.settings import (
+    SECRET,
+    ALGORITHM,
+    DEFAULT_DASHBOARD_CARDS,
+    DEFAULT_MINER_CARDS,
+)
+
 
 class User(BaseModel):
     username: str
@@ -83,13 +89,7 @@ class JsonProvider:
             try:
                 users_data = json.loads(f.read())
             except json.decoder.JSONDecodeError:
-                self.add_user(
-                    "admin",
-                    "Admin",
-                    "pass",
-                    ["admin"],
-                    "*"
-                )
+                self.add_user("admin", "Admin", "pass", ["admin"], "*")
                 return
 
         for u in users_data:
@@ -174,8 +174,9 @@ class JsonProvider:
                 return user
 
 
-
-async def get_current_user(security_scopes: SecurityScopes, token: Annotated[str, Depends(AUTH_SCHEME)]):
+async def get_current_user(
+    security_scopes: SecurityScopes, token: Annotated[str, Depends(AUTH_SCHEME)]
+):
     if security_scopes.scopes:
         authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
     else:

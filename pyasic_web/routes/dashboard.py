@@ -22,11 +22,163 @@ from pyasic_web.auth.users import get_current_user, User
 from pyasic_web.func.users import get_user_ip_range
 from pyasic_web.func.miners import get_current_miner_list
 from pyasic_web.templates import card_exists, templates
+from pyasic_web.templates.cards import BasicCard, CountCard, GraphCard, PoolsCard, ErrorsCard, LightsCard, GRAPH_MODIFIER, AvailableCards
+from pyasic_web.api import v1
 
 router = APIRouter()
 
+
+CARDS = AvailableCards(
+    cards=[
+        CountCard(
+            title="Count",
+            name="count",
+            data_endpoint=v1.count.__name__,
+        ),
+        BasicCard(
+            title="Efficiency",
+            name="efficiency",
+            data_endpoint=v1.efficiency.__name__,
+        ),
+        GraphCard(
+            title="Efficiency",
+            name="efficiency",
+            data_endpoint=v1.efficiency.__name__,
+        ),
+        BasicCard(
+            title="Env Temperature",
+            name="env_temp",
+            data_endpoint=v1.env_temp.__name__,
+        ),
+        GraphCard(
+            title="Env Temperature",
+            name="env_temp",
+            data_endpoint=v1.env_temp.__name__,
+        ),
+        ErrorsCard(
+            title="Errors",
+            name="errors",
+            data_endpoint=v1.errors.__name__,
+        ),
+        BasicCard(
+            title="Hashrate",
+            name="hashrate",
+            data_endpoint=v1.hashrate.__name__,
+        ),
+        GraphCard(
+            title="Hashrate",
+            name="hashrate",
+            data_endpoint=v1.hashrate.__name__,
+        ),
+        BasicCard(
+            title="Ideal Chips",
+            name="ideal_chips",
+            data_endpoint=v1.ideal_chips.__name__,
+        ),
+        GraphCard(
+            title="Ideal Chips",
+            name="ideal_chips",
+            data_endpoint=v1.ideal_chips.__name__,
+        ),
+        BasicCard(
+            title="Ideal Hashrate",
+            name="ideal_hashrate",
+            data_endpoint=v1.ideal_hashrate.__name__,
+        ),
+        GraphCard(
+            title="Ideal Hashrate",
+            name="ideal_hashrate",
+            data_endpoint=v1.ideal_hashrate.__name__,
+        ),
+        LightsCard(
+            title="Lights",
+            name="lights",
+            data_endpoint=v1.lights.__name__,
+        ),
+        BasicCard(
+            title="Max Wattage",
+            name="max_wattage",
+            data_endpoint=v1.max_wattage.__name__,
+        ),
+        GraphCard(
+            title="Max Wattage",
+            name="max_wattage",
+            data_endpoint=v1.max_wattage.__name__,
+        ),
+        BasicCard(
+            title="% Ideal Chips",
+            name="pct_ideal_chips",
+            data_endpoint=v1.pct_ideal_chips.__name__,
+        ),
+        GraphCard(
+            title="% Ideal Chips",
+            name="pct_ideal_chips",
+            data_endpoint=v1.pct_ideal_chips.__name__,
+        ),
+        BasicCard(
+            title="% Ideal Hashrate",
+            name="pct_ideal_hashrate",
+            data_endpoint=v1.pct_ideal_hashrate.__name__,
+        ),
+        GraphCard(
+            title="% Ideal Hashrate",
+            name="pct_ideal_hashrate",
+            data_endpoint=v1.pct_ideal_hashrate.__name__,
+        ),
+        BasicCard(
+            title="% Ideal Wattage",
+            name="pct_ideal_wattage",
+            data_endpoint=v1.pct_ideal_wattage.__name__,
+        ),
+        GraphCard(
+            title="% Ideal Wattage",
+            name="pct_ideal_wattage",
+            data_endpoint=v1.pct_ideal_wattage.__name__,
+        ),
+        PoolsCard(
+            title="Pools",
+            name="pools",
+            data_endpoint=v1.pools.__name__,
+        ),
+        BasicCard(
+            title="Avg Temperature",
+            name="temperature_avg",
+            data_endpoint=v1.avg_temperature.__name__,
+        ),
+        GraphCard(
+            title="Avg Temperature",
+            name="temperature_avg",
+            data_endpoint=v1.avg_temperature.__name__,
+        ),
+        BasicCard(
+            title="Total Chips",
+            name="total_chips",
+            data_endpoint=v1.total_chips.__name__,
+        ),
+        GraphCard(
+            title="Total Chips",
+            name="total_chips",
+            data_endpoint=v1.total_chips.__name__,
+        ),
+        BasicCard(
+            title="Wattage",
+            name="wattage",
+            data_endpoint=v1.total_wattage.__name__,
+        ),
+        GraphCard(
+            title="Wattage",
+            name="wattage",
+            data_endpoint=v1.total_wattage.__name__,
+        ),
+    ],
+    modifiers=[GRAPH_MODIFIER],
+)
+
+
 @router.get("/dashboard")
-async def dashboard_page(request: Request, current_user: Annotated[User, Depends(get_current_user)]):
+async def dashboard_page(
+    request: Request, current_user: Annotated[User, Depends(get_current_user)]
+):
     return templates.TemplateResponse(
         "dashboard.html",
         {
@@ -35,6 +187,7 @@ async def dashboard_page(request: Request, current_user: Annotated[User, Depends
                 await get_user_ip_range(current_user)
             ),
             "user": current_user,
-            "card_exists": card_exists,
+            "cards": CARDS,
+            "data_endpoints": set(request.url_for(CARDS.get_card(c).data_endpoint).path for c in current_user.dashboard_cards)
         },
     )

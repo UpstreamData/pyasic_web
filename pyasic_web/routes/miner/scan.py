@@ -34,8 +34,11 @@ from pyasic_web.templates import templates
 
 router = APIRouter(dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 
+
 @router.get("/")
-async def miner_scan_page(request: Request, current_user: Annotated[User, Security(get_current_user)]):
+async def miner_scan_page(
+    request: Request, current_user: Annotated[User, Security(get_current_user)]
+):
     return templates.TemplateResponse(
         "scan.html",
         {
@@ -54,11 +57,13 @@ async def miner_scan_add_page(request: Request):
     with open(settings.MINER_LIST, "a+") as file:
         for miner_ip in miners["miners"]:
             file.write(miner_ip + "\n")
-    return RedirectResponse(request.url_for("miner_scan_page"), status_code=303)
+    return RedirectResponse(request.url_for("dashboard_page"), status_code=303)
 
 
 @router.websocket("/ws")
-async def miner_scan_ws(websocket: WebSocket, current_user: Annotated[User, Security(get_current_user)]):
+async def miner_scan_ws(
+    websocket: WebSocket, current_user: Annotated[User, Security(get_current_user)]
+):
     await websocket.accept()
     cur_task = None
     try:
@@ -74,7 +79,9 @@ async def miner_scan_ws(websocket: WebSocket, current_user: Annotated[User, Secu
                         cur_task = None
                 await websocket.send_text("Cancelled")
             else:
-                cur_task = asyncio.create_task(do_websocket_scan(websocket, current_user, ws_data))
+                cur_task = asyncio.create_task(
+                    do_websocket_scan(websocket, current_user, ws_data)
+                )
             if cur_task and cur_task.done():
                 cur_task = None
     except WebSocketDisconnect:

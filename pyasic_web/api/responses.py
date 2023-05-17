@@ -14,7 +14,7 @@
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
 from enum import Enum
-from typing import List, Literal, Union, Dict, Type, Optional
+from typing import List, Literal, Union, Dict, Optional
 
 from pydantic import BaseModel
 
@@ -24,52 +24,93 @@ from pyasic_web.errors.miner import MinerDataError
 class MinerSelector(BaseModel):
     miner_selector: Union[List[str], str, Literal["all"]] = "all"
 
+
+class DataSelector(MinerSelector):
+    data_selector: List[
+        Literal[
+            "api_ver",
+            "efficiency",
+            "env_temp",
+            "errors",
+            "fw_ver",
+            "hashrate",
+            "hostname",
+            "ideal_chips",
+            "ideal_hashrate",
+            "lights",
+            "make",
+            "max_wattage",
+            "model",
+            "pct_ideal_chips",
+            "pct_ideal_hashrate",
+            "pct_ideal_wattage",
+            "pools",
+            "avg_temperature",
+            "total_chips",
+            "total_wattage",
+        ]
+    ] = []
+
+
 class MinerResponse(BaseModel):
     value: Union[float, int, str, list, bool, MinerDataError]
     unit: str = ""
 
+
 class MinerStringResponse(MinerResponse):
     value: str
+
 
 class MinerIntegerResponse(MinerResponse):
     value: int
 
+
 class MinerFloatResponse(MinerResponse):
     value: float
+
 
 class MinerListResponse(MinerResponse):
     value: list
 
+
 class MinerBooleanResponse(MinerResponse):
     value: bool
 
+
 class MinerErrorResponse(MinerResponse):
     value: MinerDataError
+
 
 class MinerEfficiencyResponse(MinerResponse):
     value: float
     unit: str = "J/TH"
 
+
 class MinerWattageResponse(MinerResponse):
     value: int
     unit: str = "W"
+
 
 class MinerTempResponse(MinerResponse):
     value: float
     unit: str = "°C"
 
+
 class MinerHashrateResponse(MinerResponse):
     value: float
     unit: Literal["MH/s", "GH/s", "TH/s", "PH/s"] = "TH/s"
+
 
 class MinerPercentageResponse(MinerResponse):
     value: float
     unit: str = "%"
 
+
 class MinerCombineMethod(Enum):
     NONE = "none"
     AVG = "avg"
     SUM = "sum"
+
 
 class MinerGroupResponse(BaseModel):
     data: Optional[Dict[str, MinerResponse]]

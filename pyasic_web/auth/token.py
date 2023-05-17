@@ -22,9 +22,11 @@ from pydantic import Field
 
 from pyasic_web.settings import SECRET, ALGORITHM
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
+
 
 class TokenData(BaseModel):
     username: str

@@ -25,6 +25,7 @@ from pyasic_web.templates import templates
 
 router = APIRouter()
 
+
 @router.get("/login")
 @router.get("/")
 async def login_page_get(request: Request):
@@ -35,10 +36,13 @@ async def login_page_get(request: Request):
     else:
         return RedirectResponse(request.url_for("dashboard_page"), status_code=303)
 
+
 @router.post("/login")
 @router.post("/")
 async def login_page(request: Request):
     data = await request.form()
+    if not data.get("username"):
+        return RedirectResponse(request.url_for("login_page_get"), status_code=303)
     user = data["username"]
     pwd = data["password"]
     if not user:
@@ -52,8 +56,7 @@ async def login_page(request: Request):
     if await user_provider.verify(user, pwd):
         current_user = await user_provider.find_by_username(user)
         access_token = create_access_token(
-            data={"sub": current_user.username,
-                  "scopes": current_user.scopes},
+            data={"sub": current_user.username, "scopes": current_user.scopes},
         )
         resp = RedirectResponse(request.url_for("dashboard_page"), status_code=303)
         resp.set_cookie(

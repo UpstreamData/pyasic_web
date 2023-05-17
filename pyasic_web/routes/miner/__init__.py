@@ -15,6 +15,7 @@
 # ------------------------------------------------------------------------------
 from fastapi import APIRouter
 from . import miner, scan
+from .miner import CARDS
 
 router = APIRouter()
 

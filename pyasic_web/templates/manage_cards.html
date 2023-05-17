@@ -34,8 +34,14 @@
                 <div class="card-body">
                     <div class="container mb-2 ms-0 ps-0">
                         <div class="input-group">
+                            <span class="input-group-text">Modifier</span>
+                            <select class="form-select" id="dashboard_card_modifier">
+                                <option value="">No Modifier</option>
+                                {% for modifier in dashboard_available_cards.modifiers %}<option value="{{ modifier.name }}">{{ modifier.title }}</option>{% endfor %}
+                            </select>
+                            <span class="input-group-text">Card</span>
                             <select class="form-select" id="dashboard_card_add">
-                                {% for card in dashboard_available_cards %}<option value="{{ card }}">{{ card }}</option>{% endfor %}
+                                {% for card in dashboard_available_cards.cards %}{% if not card.modifier %}<option value="{{ card.name }}">{{ card.title }}</option>{% endif %}{% endfor %}
                             </select>
                             <button class="btn btn-outline-secondary"
                                     type="button"
@@ -51,14 +57,26 @@
                              class="p-0 thick-fancy-scroll list-group pe-3">
                             <ul id="sortable_dashboard_cards" style="padding: 0px!important;">
                                 {% for card in user.dashboard_cards %}
-                                    <li class="form-control user-select-none d-flex justify-content-between"
-                                        id="dashboard_{{ card }}_card"
-                                        type="text">
-                                        {{ card }}
-                                        <button type="button"
-                                                class="btn-close"
-                                                onclick="removeItem('dashboard_{{ card }}_card')"></button>
-                                    </li>
+                                {% set card_split = card.split("-") %}
+                                    {% if card_split | length > 1 %}
+                                        <li class="form-control user-select-none d-flex justify-content-between"
+                                            id="dashboard_{{ dashboard_available_cards.get_card(card_split[0]).name }}-{{dashboard_available_cards.get_modifier(card_split[1]).name}}_card"
+                                            type="text">
+                                            {{ dashboard_available_cards.get_card(card_split[0]).title }} - {{dashboard_available_cards.get_modifier(card_split[1]).title}}
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    onclick="removeItem('dashboard_{{ dashboard_available_cards.get_card(card_split[0]).name }}-{{dashboard_available_cards.get_modifier(card_split[1]).name}}_card')"></button>
+                                        </li>
+                                    {% else %}
+                                        <li class="form-control user-select-none d-flex justify-content-between"
+                                            id="dashboard_{{ dashboard_available_cards.get_card(card_split[0]).name }}_card"
+                                            type="text">
+                                            {{ dashboard_available_cards.get_card(card_split[0]).title }}
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    onclick="removeItem('dashboard_{{ dashboard_available_cards.get_card(card_split[0]).name }}_card')"></button>
+                                        </li>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>
@@ -80,8 +98,14 @@
                 <div class="card-body">
                     <div class="container mb-2 ms-0 ps-0">
                         <div class="input-group">
+                            <span class="input-group-text">Modifier</span>
+                            <select class="form-select" id="miner_card_modifier">
+                                <option value="">No Modifier</option>
+                                {% for modifier in miner_available_cards.modifiers %}<option value="{{ modifier.name }}">{{ modifier.title }}</option>{% endfor %}
+                            </select>
+                            <span class="input-group-text">Card</span>
                             <select class="form-select" id="miner_card_add">
-                                {% for card in miner_available_cards %}<option value="{{ card }}">{{ card }}</option>{% endfor %}
+                                {% for card in miner_available_cards.cards %}{% if not card.modifier %}<option value="{{ card.name }}">{{ card.title }}</option>{% endif %}{% endfor %}
                             </select>
                             <button class="btn btn-outline-secondary"
                                     type="button"
@@ -97,14 +121,26 @@
                              class="p-0 thick-fancy-scroll list-group pe-3">
                             <ul id="sortable_miner_cards" style="padding: 0px!important;">
                                 {% for card in user.miner_cards %}
-                                    <li class="form-control user-select-none d-flex justify-content-between"
-                                        id="miner_{{ card }}_card"
-                                        type="text">
-                                        {{ card }}
-                                        <button type="button"
-                                                class="btn-close"
-                                                onclick="removeItem('miner_{{ card }}_card')"></button>
-                                    </li>
+                                {% set card_split = card.split("-") %}
+                                    {% if card_split | length > 1 %}
+                                        <li class="form-control user-select-none d-flex justify-content-between"
+                                            id="miner_{{ miner_available_cards.get_card(card_split[0]).name }}-{{miner_available_cards.get_modifier(card_split[1]).name}}_card"
+                                            type="text">
+                                            {{ miner_available_cards.get_card(card_split[0]).title }} - {{miner_available_cards.get_modifier(card_split[1]).title}}
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    onclick="removeItem('miner_{{ miner_available_cards.get_card(card_split[0]).name }}-{{miner_available_cards.get_modifier(card_split[1]).name}}_card')"></button>
+                                        </li>
+                                    {% else %}
+                                        <li class="form-control user-select-none d-flex justify-content-between"
+                                            id="miner_{{ miner_available_cards.get_card(card_split[0]).name }}_card"
+                                            type="text">
+                                            {{ miner_available_cards.get_card(card_split[0]).title }}
+                                            <button type="button"
+                                                    class="btn-close"
+                                                    onclick="removeItem('miner_{{ miner_available_cards.get_card(card_split[0]).name }}_card')"></button>
+                                        </li>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>
@@ -122,6 +158,96 @@
         </div>
     </div>
     <script>
+    const db_cards = {
+    "": {
+        "title": "No Modifier",
+        "cards": [
+            {% for card in dashboard_available_cards.cards %}
+                {% if not card.modifier %}
+                    {"name": "{{card.name}}", "title": "{{card.title}}"},
+                {% endif %}
+            {% endfor %}
+        ]
+    },
+    {% for modifier in dashboard_available_cards.modifiers %}
+        "{{ modifier.name }}": {
+            "title": "{{ modifier.title }}",
+            "cards": [
+                {% for card in dashboard_available_cards.cards %}
+                    {% if card.modifier == modifier %}
+                        {"name": "{{card.name}}", "title": "{{card.title}}"},
+                    {% endif %}
+                {% endfor %}
+            ]
+        },
+    {% endfor %}
+    }
+
+    const modifierDropdownDashboard = document.getElementById('dashboard_card_modifier');
+    const cardDropdownDashboard = document.getElementById('dashboard_card_add');
+
+    modifierDropdownDashboard.addEventListener('change', function() {
+      const selectedModifier = modifierDropdownDashboard.value;
+
+      cardDropdownDashboard.innerHTML = '';
+
+      const selectedData = db_cards[selectedModifier];
+
+      if (selectedData) {
+        for (const card of selectedData.cards) {
+          const option = document.createElement('option');
+          option.value = card.name;
+          option.textContent = card.title;
+          cardDropdownDashboard.appendChild(option);
+        }
+      }
+    });
+
+    const miner_cards = {
+    "": {
+        "title": "No Modifier",
+        "cards": [
+            {% for card in miner_available_cards.cards %}
+                {% if not card.modifier %}
+                    {"name": "{{card.name}}", "title": "{{card.title}}"},
+                {% endif %}
+            {% endfor %}
+        ]
+    },
+    {% for modifier in miner_available_cards.modifiers %}
+        "{{ modifier.name }}": {
+            "title": "{{ modifier.title }}",
+            "cards": [
+                {% for card in miner_available_cards.cards %}
+                    {% if card.modifier == modifier %}
+                        {"name": "{{card.name}}", "title": "{{card.title}}"},
+                    {% endif %}
+                {% endfor %}
+            ]
+        },
+    {% endfor %}
+    }
+
+    const modifierDropdownMiner = document.getElementById('miner_card_modifier');
+    const cardDropdownMiner = document.getElementById('miner_card_add');
+
+    modifierDropdownMiner.addEventListener('change', function() {
+      const selectedModifier = modifierDropdownMiner.value;
+
+      cardDropdownMiner.innerHTML = '';
+
+      const selectedData = miner_cards[selectedModifier];
+
+      if (selectedData) {
+        for (const card of selectedData.cards) {
+          const option = document.createElement('option');
+          option.value = card.name;
+          option.textContent = card.title;
+          cardDropdownMiner.appendChild(option);
+        }
+      }
+    });
+
     window.post = function(url, data) {
       return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
     }
@@ -132,19 +258,34 @@
 
     function addMinerCard() {
         list = document.getElementById("sortable_miner_cards");
-        card_name = document.getElementById("miner_card_add").value;
+        miner_data_name = document.getElementById("miner_card_add").value;
+        miner_modifier = document.getElementById("miner_card_modifier").value;
+        card_name = miner_data_name;
+        card_text = miner_cards[miner_modifier]["cards"].find(obj => obj["name"] == miner_data_name)["title"];
+        if (miner_modifier != "") {
+            card_text += " - " + db_cards[miner_modifier]["title"];
+            card_name += "-" + miner_modifier;
+        }
+        console.log(card_text);
         if (document.getElementById("miner_" + card_name + "_card") == null) {
             if (card_name != "" ) {
-                list.innerHTML += `<li class="form-control user-select-none d-flex justify-content-between" id="miner_${card_name}_card" type="text">${card_name}<button type="button"class="btn-close"onclick="removeItem('miner_${card_name}_card')"></button></li>`
+                list.innerHTML += `<li class="form-control user-select-none d-flex justify-content-between" id="miner_${card_name}_card" type="text">${card_text}<button type="button"class="btn-close"onclick="removeItem('miner_${card_name}_card')"></button></li>`
             }
         }
     }
     function addDashboardCard() {
         list = document.getElementById("sortable_dashboard_cards");
-        card_name = document.getElementById("dashboard_card_add").value;
+        data_name = document.getElementById("dashboard_card_add").value;
+        modifier_name = document.getElementById("dashboard_card_modifier").value;
+        card_name = data_name;
+        card_text = db_cards[modifier_name]["cards"].find(obj => obj["name"] == data_name)["title"];
+        if (modifier_name != "") {
+            card_text += " - " + db_cards[modifier_name]["title"];
+            card_name += "-" + modifier_name
+        }
         if (document.getElementById("dashboard_" + card_name + "_card") == null) {
             if (card_name != "" ) {
-                list.innerHTML += `<li class="form-control user-select-none d-flex justify-content-between" id="dashboard_${card_name}_card" type="text">${card_name}<button type="button"class="btn-close"onclick="removeItem('dashboard_${card_name}_card')"></button></li>`
+                list.innerHTML += `<li class="form-control user-select-none d-flex justify-content-between" id="dashboard_${card_name}_card" type="text">${card_text}<button type="button"class="btn-close"onclick="removeItem('dashboard_${card_name}_card')"></button></li>`
             }
         }
     }

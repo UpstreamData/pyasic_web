@@ -26,7 +26,7 @@ from fastapi.websockets import WebSocket, WebSocketDisconnect
 
 from pyasic import get_miner
 from pyasic_web import settings
-from pyasic_web.api.realtime import MinerDataManager
+from pyasic_web.api.data import data_manager
 from pyasic_web.auth import AUTH_SCHEME
 from pyasic_web.auth.users import User, get_current_user
 from pyasic_web.func.miners import get_current_miner_list
@@ -38,7 +38,9 @@ router = APIRouter()
 
 
 @router.get("/")
-async def manage_miners_page(request: Request, current_user: Annotated[User, Security(get_current_user)]):
+async def manage_miners_page(
+    request: Request, current_user: Annotated[User, Security(get_current_user)]
+):
     return templates.TemplateResponse(
         "manage_miners.html",
         {
@@ -52,23 +54,27 @@ async def manage_miners_page(request: Request, current_user: Annotated[User, Sec
 
 
 @router.websocket("/ws")
-async def manage_miners_ws(websocket: WebSocket, current_user: Annotated[User, Security(get_current_user)]):
+async def manage_miners_ws(
+    websocket: WebSocket, current_user: Annotated[User, Security(get_current_user)]
+):
     await websocket.accept()
     miners = await get_current_miner_list(await get_user_ip_range(current_user))
     try:
-        async for data in MinerDataManager().subscribe():
+        async for data in data_manager.subscribe():
             for miner in miners:
                 if miner in data:
                     await websocket.send_json(
-                            {
-                                "ip": miner,
-                                "model": data[miner].get("model", "Unknown"),
-                                "hashrate": data[miner].get("hashrate", 0),
-                                "percent_ideal_chips": data[miner].get("percent_ideal_chips", 0),
-                                "errors": data[miner].get("errors", []),
-                                "fault_light": data[miner].get("fault_light", False),
-                            }
-                        )
+                        {
+                            "ip": miner,
+                            "model": data[miner].get("model", "Unknown"),
+                            "hashrate": data[miner].get("hashrate", 0),
+                            "percent_ideal_chips": data[miner].get(
+                                "percent_ideal_chips", 0
+                            ),
+                            "errors": data[miner].get("errors", []),
+                            "fault_light": data[miner].get("fault_light", False),
+                        }
+                    )
     except WebSocketDisconnect:
         print("Websocket disconnected.")
     except websockets.exceptions.ConnectionClosedOK:

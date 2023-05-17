@@ -1,5 +1,3 @@
-{% extends 'navbar.html' %}
-{% block content %}
     <!--
   ~ Copyright 2022 Upstream Data Inc
   ~
@@ -15,196 +13,211 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<script src="{{ url_for('static', path='/chart.js')}}"></script>
-    <script src="{{ url_for('static', path='/luxon.min.js')}}"></script>
-    <nav class="navbar bg-dark" data-bs-theme="dark">
-        <div class="row d-flex justify-content-between w-100 align-content-middle">
-            {% import "macros/header.html" as header_macros %}
-            {{ header_macros.create_header_item(text=miner, icon="miner") }}
-            <div class="col d-flex justify-content-end">
-                <div class="btn-group dropstart">
-                    <button type="button"
-                            class="btn btn-secondary dropdown-toggle"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                        <svg class="m-0 p-0"
-                             style="fill: currentColor;
-                                    vertical-align: -.25em"
-                             width="20"
-                             height="22">
-                            <use xlink:href="#action"></use>
-                        </svg>
-                        Actions
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item"
-                               target="_blank"
-                               href="http://{{ miner }}"
-                               role="button">
-                                <svg class="m-0 p-0"
-                                     style="vertical-align: -.25em"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round"
-                                     stroke-width="2"
-                                     version="1.1"
-                                     viewBox="0 0 24 24"
-                                     xmlns="http://www.w3.org/2000/svg"
-                                     width="20"
-                                     height="22">
-                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                    <polyline points="15 3 21 3 21 9"/>
-                                    <line x1="10" x2="21" y1="14" y2="3"/>
-                                </svg>
-                                Web Interface
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item"
-                               href="http://{{ request.url.hostname }}:{% if request.url.port %}{{ request.url.port }}{% else %}80{% endif %}/miner/{{ miner }}/light"
-                               role="button">
-                                <svg class="m-0 p-0"
-                                     style="fill: currentColor;
-                                            vertical-align: -.25em"
-                                     width="20"
-                                     height="22"
-                                     id="svg_fault_light">
-                                    <use xlink:href="#light-off"></use>
-                                </svg>
-                                Fault Light
-                            </a>
-                        </li>
-                        <li>
-                            <button onclick="updateWattage()"
-                                    id="update_wattage"
-                                    class="dropdown-item"
-                                    role="button"
-                                    value="Update Wattage">
-                                <svg width="20"
-                                     height="22"
-                                     viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round">
-                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                                    <polyline points="17 6 23 6 23 12"></polyline>
-                                </svg>
-                                Update Wattage
-                            </button>
-                            <input type="number"
-                                   class="form-control border p-1 my-2 w-75 rounded ms-4 me-0"
-                                   id="miner_input_wattage">
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li>
-                            <button type="button"
-                                    class="dropdown-item text-danger"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#removeModal">
-                                <svg class="m-0 p-0"
-                                     style="vertical-align: -.325em"
-                                     width="20"
-                                     height="22"
-                                     viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2"
-                                     stroke-linecap="round"
-                                     stroke-linejoin="round">
-                                    <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
-                                    <line x1="18" y1="9" x2="12" y2="15"></line>
-                                    <line x1="12" y1="9" x2="18" y2="15"></line>
-                                </svg>
-                                Remove Miner
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <!-- Modal -->
-    <div class="modal fade"
-         id="removeModal"
-         tabindex="-1"
-         aria-labelledby="removeModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="removeModalLabel">Remove Miner</h5>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                </div>
-                <div class="modal-body">Do you really want to remove this miner?</div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <a class="btn btn-danger" href="{{ url_for('miner_remove_page', miner_ip=miner) }}" role="button">Remove</a>
-                </div>
+{% extends 'navbar.html' %}
+{% block content %}
+<nav class="navbar bg-dark" data-bs-theme="dark">
+    <div class="row d-flex justify-content-between w-100 align-content-middle">
+        {% import "macros/header.html" as header_macros %}
+        {{ header_macros.create_header_item(text=miner, icon="miner") }}
+        <div class="col d-flex justify-content-end">
+            <div class="btn-group dropstart">
+                <button type="button"
+                        class="btn btn-secondary dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    <svg class="m-0 p-0"
+                         style="fill: currentColor;
+                                vertical-align: -.25em"
+                         width="20"
+                         height="22">
+                        <use xlink:href="#action"></use>
+                    </svg>
+                    Actions
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item"
+                           target="_blank"
+                           href="http://{{ miner }}"
+                           role="button">
+                            <svg class="m-0 p-0"
+                                 style="vertical-align: -.25em"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round"
+                                 stroke-width="2"
+                                 version="1.1"
+                                 viewBox="0 0 24 24"
+                                 xmlns="http://www.w3.org/2000/svg"
+                                 width="20"
+                                 height="22">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                <polyline points="15 3 21 3 21 9"/>
+                                <line x1="10" x2="21" y1="14" y2="3"/>
+                            </svg>
+                            Web Interface
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item"
+                           href="http://{{ request.url.hostname }}:{% if request.url.port %}{{ request.url.port }}{% else %}80{% endif %}/miner/{{ miner }}/light"
+                           role="button">
+                            <svg class="m-0 p-0"
+                                 style="fill: currentColor;
+                                        vertical-align: -.25em"
+                                 width="20"
+                                 height="22"
+                                 id="svg_fault_light">
+                                <use xlink:href="#light-off"></use>
+                            </svg>
+                            Fault Light
+                        </a>
+                    </li>
+                    <li>
+                        <button onclick="updateWattage()"
+                                id="update_wattage"
+                                class="dropdown-item"
+                                role="button"
+                                value="Update Wattage">
+                            <svg width="20"
+                                 height="22"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                <polyline points="17 6 23 6 23 12"></polyline>
+                            </svg>
+                            Update Wattage
+                        </button>
+                        <input type="number"
+                               class="form-control border p-1 my-2 w-75 rounded ms-4 me-0"
+                               id="miner_input_wattage">
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <button type="button"
+                                class="dropdown-item text-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#removeModal">
+                            <svg class="m-0 p-0"
+                                 style="vertical-align: -.325em"
+                                 width="20"
+                                 height="22"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                                <line x1="18" y1="9" x2="12" y2="15"></line>
+                                <line x1="12" y1="9" x2="18" y2="15"></line>
+                            </svg>
+                            Remove Miner
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
-    <div id="err-cover"
-         class="d-flex flex-column justify-content-center align-items-center d-none"
-         style="height:80vh">
-        <h2 id="err-status">Loading...</h2>
-        <div class="animate-flicker">
-            {% import "macros/logo.html" as logo_macros %}
-            {{ logo_macros.create_logo() }}
-        </div>
-    </div>
-    {% import '/macros/scripts.html' as scripts %}
-    {{ scripts.create_get_api_data(user.api_key) }}
-    {% import '/macros/miner.html' as miner_macro %}
-    {{ miner_macro.create_update_ws(request, miner) }}
-    <div id="content">
-        <div class="px-lg-4 my-2 mx-4 mx-lg-0">
-            <div class="row row-cols-1 row-cols-xl-5 row-cols-md-3 my-3 g-3"
-                 id="all_cards">
-                {% for card_name in user.miner_cards %}
-                    {% if card_exists('cards/miner/' + card_name + '.html') %}
-                        {% include 'cards/miner/' + card_name + '.html' %}
-                    {% endif %}
-                {% endfor %}
+</nav>
+<!-- Modal -->
+<div class="modal fade"
+     id="removeModal"
+     tabindex="-1"
+     aria-labelledby="removeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeModalLabel">Remove Miner</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Do you really want to remove this miner?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a class="btn btn-danger" href="{{ url_for('miner_remove_page', miner_ip=miner) }}" role="button">Remove</a>
             </div>
         </div>
     </div>
-    <script>
-    update_ws.addEventListener('message', (event) => {
-        getAPIData("py_errors", [minerIP])
+</div>
+<div id="err-cover"
+     class="d-flex flex-column justify-content-center align-items-center d-none"
+     style="height:80vh">
+    <h2 id="err-status">Loading...</h2>
+    <div class="animate-flicker">
+        {% import "macros/logo.html" as logo_macros %}
+        {{ logo_macros.create_logo() }}
+    </div>
+</div>
+{% import '/macros/scripts.html' as scripts %}
+{{ scripts.create_get_api_data(miner) }}
+{% import '/macros/miner.html' as miner_macro %}
+{{ miner_macro.create_update_ws(request, miner) }}
+<div id="content">
+    <div class="px-lg-4 my-2 mx-4 mx-lg-0">
+        <div class="row" data-masonry='{"percentPosition": true }' id="all_cards">
+        {% for card_name in user.miner_cards %}
+            {% set current_card = cards.get_card(card_name) %}{% if current_card %}{% include current_card.generate_html() %}{% endif %}
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% for card_name in user.miner_cards %}
+    <script>{% set current_card = cards.get_card(card_name) %}{% if current_card %}{% include current_card.generate_js() %}{% endif %}</script>
+{% endfor %}
+<script>
+    function update_data() {
+        getAPIData("/api/v1/py_errors/")
         .then(data => {
             const py_errors = document.getElementById("err-cover")
             const content = document.getElementById("content");
-            if (data.hasOwnProperty(minerIP)) {
-                var err_container = document.getElementById("err-status")
-                err_container.innerHTML = data[minerIP]["msg"]
-                py_errors.classList.remove("d-none");
-                content.classList.add("d-none");
-            } else {
-                py_errors.classList.add("d-none");
-                content.classList.remove("d-none");
+            if (data.hasOwnProperty("data")) {
+                if (data["data"].hasOwnProperty(minerIP)) {
+                    var err_container = document.getElementById("err-status")
+                    err_container.innerHTML = data["data"][minerIP]["value"]["msg"]
+                    py_errors.classList.remove("d-none");
+                    content.classList.add("d-none");
+                } else {
+                    py_errors.classList.add("d-none");
+                    content.classList.remove("d-none");
+                    {% for loc in data_endpoints %}
+                        getAPIData("{{loc}}", 'all')
+                        .then(data => { {% for card_name in user.miner_cards %}{% set current_card = cards.get_card(card_name) %}{% if url_for(current_card.data_endpoint).path == loc %}
+                            update_{{card_name.replace("-", "_")}}_card(data);{% endif %}{% endfor %}
+                        });
+                    {% endfor %}
+                }
             }
         })
         .catch(error => console.log(error));
+
+    }
+
+    update_ws.addEventListener('message', (event) => {
+        update_data();
     });
+    window.onload = (event) => {
+        update_data();
+    }
 
-        window.post = function(url, data) {
-          return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
-        }
+    window.post = function(url, data) {
+      return fetch(url, {method: "POST", headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
+    }
 
-        function updateWattage(event) {
-            var wattage_input = document.getElementById("miner_input_wattage");
-            set_wattage = wattage_input.value
-            post("{{ url_for('miner_wattage_page', miner_ip=miner) }}", {wattage: set_wattage})
-        };
-    </script>
+    function updateWattage(event) {
+        var wattage_input = document.getElementById("miner_input_wattage");
+        set_wattage = wattage_input.value
+        post("{{ url_for('miner_wattage_page', miner_ip=miner) }}", {wattage: set_wattage})
+    };
+</script>
 {% endblock content %}

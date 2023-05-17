@@ -16,6 +16,7 @@
 import asyncio
 from typing import Annotated
 
+import uvicorn
 from fastapi import FastAPI, Security, Depends, HTTPException
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
@@ -26,7 +27,8 @@ from starlette.requests import Request
 from pyasic_web.auth import AUTH_SCHEME
 from pyasic_web.auth.token import Token, create_access_token
 from pyasic_web.auth.users import user_provider
-from . import realtime, v1
+from pyasic_web.api import realtime, v1
+from pyasic_web.api.data import data_manager
 
 tags_metadata = [
     {
@@ -41,7 +43,8 @@ tags_metadata = [
 
 
 async def start_gathering_data():
-    asyncio.create_task(realtime.MinerDataManager().run())
+    asyncio.create_task(data_manager.run())
+
 
 app = FastAPI(
     title="pyasic Web API",
@@ -58,18 +61,20 @@ app = FastAPI(
     docs_url=None,
     redoc_url=None,
     root_path="/api",
-    on_startup=[start_gathering_data]
+    on_startup=[start_gathering_data],
 )
 
+
 @app.post("/login/", response_model=Token, tags=["Auth"])
-async def api_login(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
-):
+async def api_login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = await user_provider.verify(form_data.username, form_data.password)
     if user is None:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(
-        data={"sub": user.username, "scopes": [s for s in form_data.scopes if s in user.scopes]},
+        data={
+            "sub": user.username,
+            "scopes": [s for s in form_data.scopes if s in user.scopes],
+        },
     )
     resp = JSONResponse({"access_token": access_token, "token_type": "bearer"})
     resp.set_cookie(
@@ -80,21 +85,33 @@ async def api_login(
     )
     return resp
 
-@app.get("/", dependencies=[Security(AUTH_SCHEME)], name="api_docs", include_in_schema=False)
+
+@app.get(
+    "/", dependencies=[Security(AUTH_SCHEME)], name="api_docs", include_in_schema=False
+)
 async def api_docs(request: Request):
     return get_swagger_ui_html(
         openapi_url="/api/openapi.json",
         title="docs",
         swagger_favicon_url=str(request.url_for("static", path="favicon.ico")),
         swagger_js_url=str(request.url_for("static", path="docs/swagger.js")),
-        swagger_css_url=str(request.url_for("static", path="docs/swagger.css"))
+        swagger_css_url=str(request.url_for("static", path="docs/swagger.css")),
     )
 
 
-@app.get("/openapi.json", dependencies=[Security(AUTH_SCHEME)], name="openapi_schema", include_in_schema=False)
+@app.get(
+    "/openapi.json",
+    dependencies=[Security(AUTH_SCHEME)],
+    name="openapi_schema",
+    include_in_schema=False,
+)
 async def get_openapi_schema():
     return JSONResponse(get_openapi(title="FastAPI", version="1", routes=app.routes))
 
 
 app.include_router(v1.router)
 app.include_router(realtime.router)
+
+
+if __name__ == "__main__":
+    uvicorn.run("__init__:app", host="0.0.0.0", port=8080)

@@ -24,6 +24,7 @@ from fastapi.responses import RedirectResponse
 
 import pyasic
 from pyasic_web import settings
+from pyasic_web.api import v1
 from pyasic_web.auth import AUTH_SCHEME
 from pyasic_web.auth.users import get_current_user, User
 from pyasic_web.func.miners import get_current_miner_list
@@ -32,12 +33,182 @@ from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
     get_current_settings,
 )
 from pyasic_web.templates import card_exists, templates
+from pyasic_web.templates.cards import BasicCard, CountCard, GraphCard, PoolsCard, ErrorsCard, \
+    LightsCard, GRAPH_MODIFIER, AvailableCards, BooleanCard
 
 router = APIRouter()
 
+CARDS = AvailableCards(
+    cards=[
+        BasicCard(
+            title="API Version",
+            name="api_ver",
+            data_endpoint=v1.api_ver.__name__,
+        ),
+        BasicCard(
+            title="Efficiency",
+            name="efficiency",
+            data_endpoint=v1.efficiency.__name__,
+        ),
+        GraphCard(
+            title="Efficiency",
+            name="efficiency",
+            data_endpoint=v1.efficiency.__name__,
+        ),
+        BasicCard(
+            title="Env Temperature",
+            name="env_temp",
+            data_endpoint=v1.env_temp.__name__,
+        ),
+        GraphCard(
+            title="Env Temperature",
+            name="env_temp",
+            data_endpoint=v1.env_temp.__name__,
+        ),
+        ErrorsCard(
+            title="Errors",
+            name="errors",
+            data_endpoint=v1.errors.__name__,
+        ),
+        BasicCard(
+            title="FW Version",
+            name="fw_ver",
+            data_endpoint=v1.fw_ver.__name__,
+        ),
+        BasicCard(
+            title="Hashrate",
+            name="hashrate",
+            data_endpoint=v1.hashrate.__name__,
+        ),
+        GraphCard(
+            title="Hashrate",
+            name="hashrate",
+            data_endpoint=v1.hashrate.__name__,
+        ),
+        BasicCard(
+            title="Hostname",
+            name="hostname",
+            data_endpoint=v1.hostname.__name__,
+        ),
+        BasicCard(
+            title="Ideal Chips",
+            name="ideal_chips",
+            data_endpoint=v1.ideal_chips.__name__,
+        ),
+        GraphCard(
+            title="Ideal Chips",
+            name="ideal_chips",
+            data_endpoint=v1.ideal_chips.__name__,
+        ),
+        BasicCard(
+            title="Ideal Hashrate",
+            name="ideal_hashrate",
+            data_endpoint=v1.ideal_hashrate.__name__,
+        ),
+        GraphCard(
+            title="Ideal Hashrate",
+            name="ideal_hashrate",
+            data_endpoint=v1.ideal_hashrate.__name__,
+        ),
+        BasicCard(
+            title="Make",
+            name="make",
+            data_endpoint=v1.make.__name__,
+        ),
+        BasicCard(
+            title="Max Wattage",
+            name="max_wattage",
+            data_endpoint=v1.max_wattage.__name__,
+        ),
+        GraphCard(
+            title="Max Wattage",
+            name="max_wattage",
+            data_endpoint=v1.max_wattage.__name__,
+        ),
+        BasicCard(
+            title="Model",
+            name="model",
+            data_endpoint=v1.model.__name__,
+        ),
+        BasicCard(
+            title="% Ideal Chips",
+            name="pct_ideal_chips",
+            data_endpoint=v1.pct_ideal_chips.__name__,
+        ),
+        GraphCard(
+            title="% Ideal Chips",
+            name="pct_ideal_chips",
+            data_endpoint=v1.pct_ideal_chips.__name__,
+        ),
+        BasicCard(
+            title="% Ideal Hashrate",
+            name="pct_ideal_hashrate",
+            data_endpoint=v1.pct_ideal_hashrate.__name__,
+        ),
+        GraphCard(
+            title="% Ideal Hashrate",
+            name="pct_ideal_hashrate",
+            data_endpoint=v1.pct_ideal_hashrate.__name__,
+        ),
+        BasicCard(
+            title="% Ideal Wattage",
+            name="pct_ideal_wattage",
+            data_endpoint=v1.pct_ideal_wattage.__name__,
+        ),
+        GraphCard(
+            title="% Ideal Wattage",
+            name="pct_ideal_wattage",
+            data_endpoint=v1.pct_ideal_wattage.__name__,
+        ),
+        BasicCard(
+            title="Pools",
+            name="pools",
+            data_endpoint=v1.pools.__name__,
+        ),
+        BasicCard(
+            title="Avg Temperature",
+            name="temperature_avg",
+            data_endpoint=v1.avg_temperature.__name__,
+        ),
+        GraphCard(
+            title="Avg Temperature",
+            name="temperature_avg",
+            data_endpoint=v1.avg_temperature.__name__,
+        ),
+        BasicCard(
+            title="Total Chips",
+            name="total_chips",
+            data_endpoint=v1.total_chips.__name__,
+        ),
+        GraphCard(
+            title="Total Chips",
+            name="total_chips",
+            data_endpoint=v1.total_chips.__name__,
+        ),
+        BasicCard(
+            title="Wattage",
+            name="wattage",
+            data_endpoint=v1.total_wattage.__name__,
+        ),
+        GraphCard(
+            title="Wattage",
+            name="wattage",
+            data_endpoint=v1.total_wattage.__name__,
+        ),
+        BooleanCard(
+            title="Nominal",
+            name="nominal",
+            data_endpoint=v1.nominal.__name__
+        )
+    ],
+    modifiers=[GRAPH_MODIFIER],
+)
+
 
 @router.get("/")
-async def miner_page(request: Request, current_user: Annotated[User, Security(get_current_user)]):
+async def miner_page(
+    request: Request, current_user: Annotated[User, Security(get_current_user)]
+):
     miner_ip = request.path_params["miner_ip"]
     miners = await get_current_miner_list(await get_user_ip_range(current_user))
     if miner_ip not in miners:
@@ -50,7 +221,8 @@ async def miner_page(request: Request, current_user: Annotated[User, Security(ge
             "cur_miners": miners,
             "miner": miner_ip,
             "user": current_user,
-            "card_exists": card_exists,
+            "cards": CARDS,
+            "data_endpoints": set(request.url_for(CARDS.get_card(c).data_endpoint).path for c in current_user.miner_cards)
         },
     )
 
@@ -76,7 +248,9 @@ async def miner_light_page(request: Request):
     else:
         asyncio.create_task(miner.fault_light_on())
 
-    return RedirectResponse(request.url_for("miner_page", miner_ip=miner_ip), status_code=303)
+    return RedirectResponse(
+        request.url_for("miner_page", miner_ip=miner_ip), status_code=303
+    )
 
 
 @router.post("/wattage", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
