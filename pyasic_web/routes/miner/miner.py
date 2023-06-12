@@ -29,7 +29,7 @@ from pyasic_web.auth import AUTH_SCHEME
 from pyasic_web.auth.users import get_current_user, User
 from pyasic_web.func.miners import get_current_miner_list
 from pyasic_web.func.users import get_user_ip_range
-from pyasic_web.func.web_settings import (  # noqa - Ignore access to _module
+from pyasic_web.func.web_settings import (
     get_current_settings,
 )
 from pyasic_web.templates import card_exists, templates

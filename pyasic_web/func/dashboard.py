@@ -17,7 +17,7 @@
 import asyncio
 import json
 
-from pyasic.miners.miner_factory import MinerFactory
+from pyasic.miners.miner_factory import miner_factory
 from pyasic_web.errors.miner import MinerDataError
 from pyasic_web.func.web_settings import (
     get_current_settings,
@@ -42,7 +42,7 @@ async def get_miner_data_dashboard(miner_ip):
         miner_data_timeout = settings["miner_data_timeout"]
 
         miner = await asyncio.wait_for(
-            MinerFactory().get_miner(miner_ip), miner_identify_timeout
+            miner_factory.get_miner(miner_ip), miner_identify_timeout
         )
 
         data = await asyncio.wait_for(miner.get_data(), miner_data_timeout)
