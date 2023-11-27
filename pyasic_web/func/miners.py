@@ -33,9 +33,9 @@ async def get_current_miner_list(allowed_ips: str = "*"):
                 # noinspection PyUnresolvedReferences - type hinted as coroutine
                 cur_miners.append(line.strip())
     if not allowed_ips == "*":
-        network = MinerNetwork(allowed_ips)
+        network = MinerNetwork.from_address(allowed_ips)
         cur_miners = [
-            ip for ip in cur_miners if ipaddress.ip_address(ip) in network.hosts()
+            ip for ip in cur_miners if ipaddress.ip_address(ip) in network.hosts
         ]
     cur_miners = sorted(cur_miners, key=lambda x: ipaddress.ip_address(x))
     return cur_miners

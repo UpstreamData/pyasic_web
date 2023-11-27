@@ -29,10 +29,9 @@ async def do_websocket_scan(websocket: WebSocket, user: User, network_ip: str):
     cur_miners = await get_current_miner_list(await get_user_ip_range(user))
     try:
         if "/" in network_ip:
-            network_ip, network_subnet = network_ip.split("/")
-            network = MinerNetwork(network_ip, mask=network_subnet)
+            network = MinerNetwork.from_subnet(network_ip)
         else:
-            network = MinerNetwork(network_ip)
+            network = MinerNetwork.from_subnet(network_ip + "/24")
         miner_generator = network.scan_network_generator()
         all_miners = []
         async for found_miner in miner_generator:

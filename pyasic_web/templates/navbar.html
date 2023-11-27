@@ -3,7 +3,7 @@
     <head>
         <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
         <title>pyasic Web</title>
-        <script src="{{ url_for('static', path='/jquery.min.js') }}"></script>
+        <script src="'"></script>
         <script src="{{ url_for('static', path='/jquery-ui.min.js') }}"></script>
         <script src="{{ url_for('static', path='/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ url_for('static', path='/masonry.min.js') }}"></script>
@@ -68,8 +68,7 @@
                             {% import "macros/navbar.html" as navbar_macros %}
                             {{ navbar_macros.create_navbar_item("Home", "dashboard_page", "dashboard", request) }}
                             <li class="nav-item mb-1 mx-2">
-                                <a href=""
-                                   class="nav-link navbar-link {% if request.url.path.strip('/') == 'scan' or request.url.path.strip('/') == 'manage/miners' or request.url.path.split('/')[1] == 'miner' %}active{% else %}text-white{% endif %}"
+                                <a class="nav-link navbar-link {% if request.url.path.strip('/') == 'scan' or request.url.path.strip('/') == 'manage/miners' or request.url.path.split('/')[1] == 'miner' %}active{% else %}text-white{% endif %}"
                                    data-bs-toggle="collapse"
                                    data-bs-target="#miners-collapse"
                                    aria-expanded="false">
@@ -101,7 +100,8 @@
                                                     </svg>
                                                     Manage Miners
                                                 </a>
-                                            </li>
+                                            </li>    <symbol id="edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
                                         {% endif %}
                                         {% for miner in cur_miners %}
                                             <li id="nav_{{ miner }}">

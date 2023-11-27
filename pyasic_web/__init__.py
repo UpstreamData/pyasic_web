@@ -30,6 +30,7 @@ app = FastAPI(
 app.include_router(routes.router)
 
 static = StaticFiles(directory=settings.STATIC_DIR)
+
 app.mount("/static", static, name="static")
 
 # add API
