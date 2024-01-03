@@ -25,5 +25,34 @@ MINER_LIST = BASE_DIR / "miner_list.txt"
 SECRET = "SECRET"
 ALGORITHM = "HS256"
 
-DEFAULT_DASHBOARD_CARDS = ["count", "hashrate", "hashrate-graph", "ideal_hashrate", "pct_ideal_hashrate", "wattage-graph", "wattage", "max_wattage", "pct_ideal_wattage", "efficiency", "temperature_avg", "env_temp", "temperature_avg-graph", "ideal_chips", "total_chips", "efficiency-graph", "errors"]
-DEFAULT_MINER_CARDS = ["model", "api_ver", "make", "fw_ver", "hashrate-graph", "temperature_avg-graph", "hashrate", "efficiency", "wattage", "pct_ideal_hashrate"]
+DEFAULT_DASHBOARD_CARDS = [
+    "count",
+    "hashrate",
+    "hashrate-graph",
+    "expected_hashrate",
+    "pct_expected_hashrate",
+    "wattage-graph",
+    "wattage",
+    "max_wattage",
+    "pct_expected_wattage",
+    "efficiency",
+    "temperature_avg",
+    "env_temp",
+    "temperature_avg-graph",
+    "expected_chips",
+    "total_chips",
+    "efficiency-graph",
+    "errors",
+]
+DEFAULT_MINER_CARDS = [
+    "model",
+    "api_ver",
+    "make",
+    "fw_ver",
+    "hashrate-graph",
+    "temperature_avg-graph",
+    "hashrate",
+    "efficiency",
+    "wattage",
+    "pct_expected_hashrate",
+]

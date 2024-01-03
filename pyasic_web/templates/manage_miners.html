@@ -123,7 +123,7 @@
             var data = JSON.parse(event.data)
             document.getElementById(data["ip"] + "_model").innerHTML = data["model"]
             document.getElementById(data["ip"] + "_hashrate").innerHTML = data["hashrate"] + " TH/s"
-            document.getElementById(data["ip"] + "_chip_pct").innerHTML = data["percent_ideal_chips"] + " %"
+            document.getElementById(data["ip"] + "_chip_pct").innerHTML = data["percent_expected_chips"] + " %"
             document.getElementById(data["ip"] + "_errors").innerHTML = data["errors"].length
             if (data["fault_light"]) {
                 var fault_light_ico = 'On <svg class="ms-2 m-0 p-0" style="fill: currentColor; vertical-align: -.25em;" width="20" height="22" id="svg_fault_light"><use xlink:href="#light-on"></use></svg>'

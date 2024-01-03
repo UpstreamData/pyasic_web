@@ -34,12 +34,13 @@ from pyasic_web.api.responses import (
     MinerBooleanResponse,
     MinerWattageResponse,
     MinerPercentageResponse,
-    MinerResponse
+    MinerResponse,
 )
 from pyasic_web.auth.users import User
 from pyasic_web.errors.miner import MinerDataError
 from pyasic_web.func.miners import get_current_miner_list
 from pyasic_web.func.web_settings import get_current_settings
+
 
 class MinerDataManager(metaclass=Singleton):
     def __init__(self):
@@ -124,6 +125,7 @@ async def get_miner_data(miner_ip: str):
             "py_error": MinerDataError.BAD_DATA.value,
         }
 
+
 def create_return_by_selector(
     data_key: str,
     selector: Union[List[str], str, Literal["all"]],
@@ -143,7 +145,6 @@ def create_return_by_selector(
             if miner_data[d].get(data_key) is not None and d in selector
         }
     return d
-
 
 
 async def miners(current_user: User) -> List[str]:
@@ -212,22 +213,22 @@ async def hostname(selector: MinerSelector, current_user: User) -> MinerGroupRes
     return MinerGroupResponse(data=data)
 
 
-async def ideal_chips(
+async def expected_chips(
     selector: MinerSelector, current_user: User
 ) -> MinerGroupResponse:
     allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = create_return_by_selector(
-        "ideal_chips", allowed_miners, MinerIntegerResponse
+        "expected_chips", allowed_miners, MinerIntegerResponse
     )
     return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
 
 
-async def ideal_hashrate(
+async def expected_hashrate(
     selector: MinerSelector, current_user: User
 ) -> MinerGroupResponse:
     allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = create_return_by_selector(
-        "nominal_hashrate", allowed_miners, MinerHashrateResponse
+        "expected_hashrate", allowed_miners, MinerHashrateResponse
     )
     return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
 
@@ -262,32 +263,32 @@ async def model(selector: MinerSelector, current_user: User) -> MinerGroupRespon
     return MinerGroupResponse(data=data)
 
 
-async def pct_ideal_chips(
+async def pct_expected_chips(
     selector: MinerSelector, current_user: User
 ) -> MinerGroupResponse:
     allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = create_return_by_selector(
-        "percent_ideal_chips", allowed_miners, MinerPercentageResponse
+        "percent_expected_chips", allowed_miners, MinerPercentageResponse
     )
     return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
 
 
-async def pct_ideal_hashrate(
+async def pct_expected_hashrate(
     selector: MinerSelector, current_user: User
 ) -> MinerGroupResponse:
     allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = create_return_by_selector(
-        "percent_ideal_hashrate", allowed_miners, MinerPercentageResponse
+        "percent_expected_hashrate", allowed_miners, MinerPercentageResponse
     )
     return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
 
 
-async def pct_ideal_wattage(
+async def pct_expected_wattage(
     selector: MinerSelector, current_user: User
 ) -> MinerGroupResponse:
     allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = create_return_by_selector(
-        "percent_ideal_wattage", allowed_miners, MinerPercentageResponse
+        "percent_expected_wattage", allowed_miners, MinerPercentageResponse
     )
     return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.AVG)
 
@@ -325,9 +326,8 @@ async def total_wattage(
     data = create_return_by_selector("wattage", allowed_miners, MinerWattageResponse)
     return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.SUM)
 
-async def nominal(
-    selector: MinerSelector, current_user: User
-) -> MinerGroupResponse:
+
+async def nominal(selector: MinerSelector, current_user: User) -> MinerGroupResponse:
     allowed_miners = await get_allowed_miners(current_user, selector.miner_selector)
     data = create_return_by_selector("nominal", allowed_miners, MinerBooleanResponse)
     return MinerGroupResponse(data=data, combine_method=MinerCombineMethod.NONE)

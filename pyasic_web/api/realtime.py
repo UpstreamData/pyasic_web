@@ -33,7 +33,6 @@ router = APIRouter(prefix="/realtime", dependencies=[Security(AUTH_SCHEME)])
 MESSAGE_STREAM_RETRY_TIMEOUT = 15000  # MS
 
 
-
 @router.websocket("/updates")
 async def updates(websocket: WebSocket):
     await websocket.accept()
@@ -48,6 +47,7 @@ async def updates(websocket: WebSocket):
             return
         except websockets.exceptions.ConnectionClosedOK:
             return
+
 
 @router.get("/updates")
 async def updates():

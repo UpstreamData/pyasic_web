@@ -86,6 +86,7 @@ class BasicCard(HTMLCard):
         """
         return jinja2.Template(data)
 
+
 class BooleanCard(HTMLCard):
     def generate_js(self):
         data = f"""
@@ -202,7 +203,7 @@ class GraphCard(HTMLCard):
 
 class CountCard(BasicCard):
     def generate_js(self) -> jinja2.Template:
-        data = f'''
+        data = f"""
         function update_{self.name}_card(data) {{
             {self.name}_card = document.getElementById("{self.name}_card");
             if (!(data.hasOwnProperty("value") && data.hasOwnProperty("unit") || !!{self.name}_card)) {{
@@ -216,13 +217,13 @@ class CountCard(BasicCard):
                 {self.name}_card.innerHTML = val + " " + unit
             }}
         }}
-        '''
+        """
         return jinja2.Template(data)
 
 
 class PoolsCard(HTMLCard):
     def generate_html(self) -> jinja2.Template:
-        data = f'''
+        data = f"""
         <div class="col col-12 col-sm-6 my-2">
             <div class="card">
                 <div class="card-header fw-bold text-center">{self.title}</div>
@@ -234,11 +235,11 @@ class PoolsCard(HTMLCard):
                 </div>
             </div>
         </div>
-        '''
+        """
         return jinja2.Template(data)
 
     def generate_js(self) -> jinja2.Template:
-        data = f'''
+        data = f"""
         function update_{self.name}_card(data) {{
             {self.name}_card = document.getElementById("{self.name}_card");
             if (!(data.hasOwnProperty("data") && Object.keys(data["data"]).length > 0 && !!{self.name}_card)) {{
@@ -253,13 +254,13 @@ class PoolsCard(HTMLCard):
                 pools_card.innerHTML += `<div class ="list-group-item d-flex justify-content-between">${{item}}<span class="badge bg-fancy-gradient rounded-pill align-items-middle p-2 m-0" style="width:50px;">${{poolUsers[item]}}</span></div>`
             }}
         }}
-        '''
+        """
         return jinja2.Template(data)
 
 
 class ErrorsCard(HTMLCard):
     def generate_html(self) -> jinja2.Template:
-        data = f'''
+        data = f"""
         <div class="col col-12 col-sm-6 my-2">
             <div class="card">
                 <div class="card-header fw-bold text-center">{self.title}</div>
@@ -271,7 +272,7 @@ class ErrorsCard(HTMLCard):
                 </div>
             </div>
         </div>
-        '''
+        """
         return jinja2.Template(data)
 
     def generate_js(self) -> jinja2.Template:
@@ -324,7 +325,7 @@ class ErrorsCard(HTMLCard):
 
 class LightsCard(HTMLCard):
     def generate_html(self) -> jinja2.Template:
-        data = '''
+        data = """
         <div class="col col-12 col-sm-6 my-2">
             <div class="card-group">
                 <div class="card">
@@ -347,11 +348,11 @@ class LightsCard(HTMLCard):
                 </div>
             </div>
         </div>
-        '''
+        """
         return jinja2.Template(data)
 
     def generate_js(self) -> jinja2.Template:
-        data = f'''
+        data = f"""
         function update_{self.name}_card(data) {{
             {self.name}_on_card = document.getElementById("{self.name}_on_card");
             {self.name}_off_card = document.getElementById("{self.name}_off_card");
@@ -368,16 +369,14 @@ class LightsCard(HTMLCard):
                 }}
             }}
         }}
-        '''
+        """
         return jinja2.Template(data)
 
 
-
 class AvailableCards:
-    def __init__(self, cards: List[HTMLCard], modifiers: List[CardModifier]):
+    def __init__(self, modifiers: List[CardModifier], cards: List[HTMLCard]) -> object:
         self.cards = cards
         self.modifiers = modifiers
-
 
     def get_modifier(self, modifier_name: str):
         for instance in self.modifiers:

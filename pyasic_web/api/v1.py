@@ -25,7 +25,6 @@ from .responses import *
 router = APIRouter(prefix="/v1", tags=["v1"])
 
 
-
 @router.post("/miners/")
 @router.get("/miners/")
 async def miners(
@@ -105,18 +104,18 @@ async def hostname(
     return await data.hostname(selector, current_user)
 
 
-@router.post("/ideal_chips/")
-async def ideal_chips(
+@router.post("/expected_chips/")
+async def expected_chips(
     selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
 ) -> MinerGroupResponse:
-    return await data.ideal_chips(selector, current_user)
+    return await data.expected_chips(selector, current_user)
 
 
-@router.post("/ideal_hashrate/")
-async def ideal_hashrate(
+@router.post("/expected_hashrate/")
+async def expected_hashrate(
     selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
 ) -> MinerGroupResponse:
-    return await data.ideal_hashrate(selector, current_user)
+    return await data.expected_hashrate(selector, current_user)
 
 
 @router.post("/lights/")
@@ -147,25 +146,25 @@ async def model(
     return await data.model(selector, current_user)
 
 
-@router.post("/pct_ideal_chips/")
-async def pct_ideal_chips(
+@router.post("/pct_expected_chips/")
+async def pct_expected_chips(
     selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
 ) -> MinerGroupResponse:
-    return await data.pct_ideal_chips(selector, current_user)
+    return await data.pct_expected_chips(selector, current_user)
 
 
-@router.post("/pct_ideal_hashrate/")
-async def pct_ideal_hashrate(
+@router.post("/pct_expected_hashrate/")
+async def pct_expected_hashrate(
     selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
 ) -> MinerGroupResponse:
-    return await data.pct_ideal_hashrate(selector, current_user)
+    return await data.pct_expected_hashrate(selector, current_user)
 
 
-@router.post("/pct_ideal_wattage/")
-async def pct_ideal_wattage(
+@router.post("/pct_expected_wattage/")
+async def pct_expected_wattage(
     selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
 ) -> MinerGroupResponse:
-    return await data.pct_ideal_wattage(selector, current_user)
+    return await data.pct_expected_wattage(selector, current_user)
 
 
 @router.post("/pools/")
@@ -194,6 +193,7 @@ async def total_wattage(
     selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
 ) -> MinerGroupResponse:
     return await data.total_wattage(selector, current_user)
+
 
 @router.post("/nominal/")
 async def nominal(

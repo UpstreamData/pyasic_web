@@ -33,8 +33,17 @@ from pyasic_web.func.web_settings import (
     get_current_settings,
 )
 from pyasic_web.templates import card_exists, templates
-from pyasic_web.templates.cards import BasicCard, CountCard, GraphCard, PoolsCard, ErrorsCard, \
-    LightsCard, GRAPH_MODIFIER, AvailableCards, BooleanCard
+from pyasic_web.templates.cards import (
+    BasicCard,
+    CountCard,
+    GraphCard,
+    PoolsCard,
+    ErrorsCard,
+    LightsCard,
+    GRAPH_MODIFIER,
+    AvailableCards,
+    BooleanCard,
+)
 
 router = APIRouter()
 
@@ -92,23 +101,23 @@ CARDS = AvailableCards(
         ),
         BasicCard(
             title="Ideal Chips",
-            name="ideal_chips",
-            data_endpoint=v1.ideal_chips.__name__,
+            name="expected_chips",
+            data_endpoint=v1.expected_chips.__name__,
         ),
         GraphCard(
             title="Ideal Chips",
-            name="ideal_chips",
-            data_endpoint=v1.ideal_chips.__name__,
+            name="expected_chips",
+            data_endpoint=v1.expected_chips.__name__,
         ),
         BasicCard(
             title="Ideal Hashrate",
-            name="ideal_hashrate",
-            data_endpoint=v1.ideal_hashrate.__name__,
+            name="expected_hashrate",
+            data_endpoint=v1.expected_hashrate.__name__,
         ),
         GraphCard(
             title="Ideal Hashrate",
-            name="ideal_hashrate",
-            data_endpoint=v1.ideal_hashrate.__name__,
+            name="expected_hashrate",
+            data_endpoint=v1.expected_hashrate.__name__,
         ),
         BasicCard(
             title="Make",
@@ -132,33 +141,33 @@ CARDS = AvailableCards(
         ),
         BasicCard(
             title="% Ideal Chips",
-            name="pct_ideal_chips",
-            data_endpoint=v1.pct_ideal_chips.__name__,
+            name="pct_expected_chips",
+            data_endpoint=v1.pct_expected_chips.__name__,
         ),
         GraphCard(
             title="% Ideal Chips",
-            name="pct_ideal_chips",
-            data_endpoint=v1.pct_ideal_chips.__name__,
+            name="pct_expected_chips",
+            data_endpoint=v1.pct_expected_chips.__name__,
         ),
         BasicCard(
             title="% Ideal Hashrate",
-            name="pct_ideal_hashrate",
-            data_endpoint=v1.pct_ideal_hashrate.__name__,
+            name="pct_expected_hashrate",
+            data_endpoint=v1.pct_expected_hashrate.__name__,
         ),
         GraphCard(
             title="% Ideal Hashrate",
-            name="pct_ideal_hashrate",
-            data_endpoint=v1.pct_ideal_hashrate.__name__,
+            name="pct_expected_hashrate",
+            data_endpoint=v1.pct_expected_hashrate.__name__,
         ),
         BasicCard(
             title="% Ideal Wattage",
-            name="pct_ideal_wattage",
-            data_endpoint=v1.pct_ideal_wattage.__name__,
+            name="pct_expected_wattage",
+            data_endpoint=v1.pct_expected_wattage.__name__,
         ),
         GraphCard(
             title="% Ideal Wattage",
-            name="pct_ideal_wattage",
-            data_endpoint=v1.pct_ideal_wattage.__name__,
+            name="pct_expected_wattage",
+            data_endpoint=v1.pct_expected_wattage.__name__,
         ),
         BasicCard(
             title="Pools",
@@ -195,11 +204,7 @@ CARDS = AvailableCards(
             name="wattage",
             data_endpoint=v1.total_wattage.__name__,
         ),
-        BooleanCard(
-            title="Nominal",
-            name="nominal",
-            data_endpoint=v1.nominal.__name__
-        )
+        BooleanCard(title="Nominal", name="nominal", data_endpoint=v1.nominal.__name__),
     ],
     modifiers=[GRAPH_MODIFIER],
 )
@@ -222,7 +227,10 @@ async def miner_page(
             "miner": miner_ip,
             "user": current_user,
             "cards": CARDS,
-            "data_endpoints": set(request.url_for(CARDS.get_card(c).data_endpoint).path for c in current_user.miner_cards)
+            "data_endpoints": set(
+                request.url_for(CARDS.get_card(c).data_endpoint).path
+                for c in current_user.miner_cards
+            ),
         },
     )
 

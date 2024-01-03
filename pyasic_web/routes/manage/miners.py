@@ -68,8 +68,8 @@ async def manage_miners_ws(
                             "ip": miner,
                             "model": data[miner].get("model", "Unknown"),
                             "hashrate": data[miner].get("hashrate", 0),
-                            "percent_ideal_chips": data[miner].get(
-                                "percent_ideal_chips", 0
+                            "percent_expected_chips": data[miner].get(
+                                "percent_expected_chips", 0
                             ),
                             "errors": data[miner].get("errors", []),
                             "fault_light": data[miner].get("fault_light", False),

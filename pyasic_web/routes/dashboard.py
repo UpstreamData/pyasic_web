@@ -22,7 +22,16 @@ from pyasic_web.auth.users import get_current_user, User
 from pyasic_web.func.users import get_user_ip_range
 from pyasic_web.func.miners import get_current_miner_list
 from pyasic_web.templates import card_exists, templates
-from pyasic_web.templates.cards import BasicCard, CountCard, GraphCard, PoolsCard, ErrorsCard, LightsCard, GRAPH_MODIFIER, AvailableCards
+from pyasic_web.templates.cards import (
+    BasicCard,
+    CountCard,
+    GraphCard,
+    PoolsCard,
+    ErrorsCard,
+    LightsCard,
+    GRAPH_MODIFIER,
+    AvailableCards,
+)
 from pyasic_web.api import v1
 
 router = APIRouter()
@@ -72,23 +81,23 @@ CARDS = AvailableCards(
         ),
         BasicCard(
             title="Ideal Chips",
-            name="ideal_chips",
-            data_endpoint=v1.ideal_chips.__name__,
+            name="expected_chips",
+            data_endpoint=v1.expected_chips.__name__,
         ),
         GraphCard(
             title="Ideal Chips",
-            name="ideal_chips",
-            data_endpoint=v1.ideal_chips.__name__,
+            name="expected_chips",
+            data_endpoint=v1.expected_chips.__name__,
         ),
         BasicCard(
             title="Ideal Hashrate",
-            name="ideal_hashrate",
-            data_endpoint=v1.ideal_hashrate.__name__,
+            name="expected_hashrate",
+            data_endpoint=v1.expected_hashrate.__name__,
         ),
         GraphCard(
             title="Ideal Hashrate",
-            name="ideal_hashrate",
-            data_endpoint=v1.ideal_hashrate.__name__,
+            name="expected_hashrate",
+            data_endpoint=v1.expected_hashrate.__name__,
         ),
         LightsCard(
             title="Lights",
@@ -107,33 +116,33 @@ CARDS = AvailableCards(
         ),
         BasicCard(
             title="% Ideal Chips",
-            name="pct_ideal_chips",
-            data_endpoint=v1.pct_ideal_chips.__name__,
+            name="pct_expected_chips",
+            data_endpoint=v1.pct_expected_chips.__name__,
         ),
         GraphCard(
             title="% Ideal Chips",
-            name="pct_ideal_chips",
-            data_endpoint=v1.pct_ideal_chips.__name__,
+            name="pct_expected_chips",
+            data_endpoint=v1.pct_expected_chips.__name__,
         ),
         BasicCard(
             title="% Ideal Hashrate",
-            name="pct_ideal_hashrate",
-            data_endpoint=v1.pct_ideal_hashrate.__name__,
+            name="pct_expected_hashrate",
+            data_endpoint=v1.pct_expected_hashrate.__name__,
         ),
         GraphCard(
             title="% Ideal Hashrate",
-            name="pct_ideal_hashrate",
-            data_endpoint=v1.pct_ideal_hashrate.__name__,
+            name="pct_expected_hashrate",
+            data_endpoint=v1.pct_expected_hashrate.__name__,
         ),
         BasicCard(
             title="% Ideal Wattage",
-            name="pct_ideal_wattage",
-            data_endpoint=v1.pct_ideal_wattage.__name__,
+            name="pct_expected_wattage",
+            data_endpoint=v1.pct_expected_wattage.__name__,
         ),
         GraphCard(
             title="% Ideal Wattage",
-            name="pct_ideal_wattage",
-            data_endpoint=v1.pct_ideal_wattage.__name__,
+            name="pct_expected_wattage",
+            data_endpoint=v1.pct_expected_wattage.__name__,
         ),
         PoolsCard(
             title="Pools",
@@ -188,6 +197,9 @@ async def dashboard_page(
             ),
             "user": current_user,
             "cards": CARDS,
-            "data_endpoints": set(request.url_for(CARDS.get_card(c).data_endpoint).path for c in current_user.dashboard_cards)
+            "data_endpoints": set(
+                request.url_for(CARDS.get_card(c).data_endpoint).path
+                for c in current_user.dashboard_cards
+            ),
         },
     )
