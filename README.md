@@ -2,7 +2,10 @@
 
 pyasic_web is a web server for controlling miners and viewing miner data via pyasic, and is fully customizable.
 
-By default, pyasic_web runs on port 8080, and is accessible from external devices.  The default login for the administrative user is `admin/pass`.
+## Running
+- Install requirements (ideally in a virtual environment) with `pip install -r requirements.txt`
+- Run with `python main.py` from this directory.
+- You should now have access on port 8080, login with username `admin` and password `pass`.
 
 ## Login
 ![Login_Page](https://github.com/UpstreamData/pyasic_web/assets/75442874/a9d27160-2447-4556-89f6-39fa78ca5bd1)

@@ -18,10 +18,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from fastapi.requests import Request
 
+from pyasic_web.api import v1
 from pyasic_web.auth.users import get_current_user, User
-from pyasic_web.func.users import get_user_ip_range
 from pyasic_web.func.miners import get_current_miner_list
-from pyasic_web.templates import card_exists, templates
+from pyasic_web.func.users import get_user_ip_range
+from pyasic_web.templates import templates
 from pyasic_web.templates.cards import (
     BasicCard,
     CountCard,
@@ -32,7 +33,6 @@ from pyasic_web.templates.cards import (
     GRAPH_MODIFIER,
     AvailableCards,
 )
-from pyasic_web.api import v1
 
 router = APIRouter()
 
@@ -80,22 +80,22 @@ CARDS = AvailableCards(
             data_endpoint=v1.hashrate.__name__,
         ),
         BasicCard(
-            title="Ideal Chips",
+            title="Expected Chips",
             name="expected_chips",
             data_endpoint=v1.expected_chips.__name__,
         ),
         GraphCard(
-            title="Ideal Chips",
+            title="Expected Chips",
             name="expected_chips",
             data_endpoint=v1.expected_chips.__name__,
         ),
         BasicCard(
-            title="Ideal Hashrate",
+            title="Expected Hashrate",
             name="expected_hashrate",
             data_endpoint=v1.expected_hashrate.__name__,
         ),
         GraphCard(
-            title="Ideal Hashrate",
+            title="Expected Hashrate",
             name="expected_hashrate",
             data_endpoint=v1.expected_hashrate.__name__,
         ),
