@@ -38,6 +38,28 @@
                     <ul class="dropdown-menu">
                         <li>
                             <hr class="dropdown-divider">
+                            <button onclick="updateWattage()"
+                                id="update_wattage"
+                                class="dropdown-item"
+                                role="button"
+                                value="Load Balance">
+                            <svg width="20"
+                                 height="22"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 stroke-linecap="round"
+                                 stroke-linejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                <polyline points="17 6 23 6 23 12"></polyline>
+                            </svg>
+                            Load Balance
+                        </button>
+                        <input type="number"
+                               class="form-control border p-1 my-2 w-75 rounded ms-4 me-0"
+                               id="load_balance_wattage">
+
                         </li>
                     </ul>
                 </div>
@@ -115,6 +137,12 @@
     window.onload = (event) => {
         update_data();
     }
+    function updateWattage(event) {
+        var wattage_input = document.getElementById("load_balance_wattage");
+        set_wattage = wattage_input.value
+        post("{{ url_for('dashboard_wattage_page') }}", {wattage: set_wattage})
+    };
+
 
         </script>
     </div>

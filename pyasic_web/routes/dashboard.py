@@ -15,12 +15,14 @@
 # ------------------------------------------------------------------------------
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+import pyasic
+from fastapi import APIRouter, Depends, Security
 from fastapi.requests import Request
 
+from pyasic_web import AUTH_SCHEME
 from pyasic_web.api import v1
 from pyasic_web.auth.users import get_current_user, User
-from pyasic_web.func.miners import get_current_miner_list
+from pyasic_web.func.miners import get_current_miner_list, load_balance
 from pyasic_web.func.users import get_user_ip_range
 from pyasic_web.templates import templates
 from pyasic_web.templates.cards import (
@@ -203,3 +205,10 @@ async def dashboard_page(
             ),
         },
     )
+
+@router.post("/wattage", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
+async def miner_wattage_page(request: Request):
+    d = await request.json()
+    wattage = d["wattage"]
+    if wattage:
+        await load_balance(wattage)

@@ -20,7 +20,9 @@ from fastapi import APIRouter, Security
 
 from pyasic_web.auth.users import User, get_current_user
 from . import data
+from .func import get_allowed_miners
 from .responses import *
+from ..func.miners import load_balance
 
 router = APIRouter(prefix="/v1", tags=["v1"])
 
@@ -200,3 +202,9 @@ async def nominal(
     selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)]
 ) -> MinerGroupResponse:
     return await data.nominal(selector, current_user)
+
+@router.post("/set_wattage/")
+async def nominal(
+    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)], wattage: int
+) -> bool:
+    return await load_balance(wattage)
