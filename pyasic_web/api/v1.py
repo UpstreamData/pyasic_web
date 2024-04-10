@@ -203,8 +203,11 @@ async def nominal(
 ) -> MinerGroupResponse:
     return await data.nominal(selector, current_user)
 
+
 @router.post("/set_wattage/")
 async def nominal(
-    selector: MinerSelector, current_user: Annotated[User, Security(get_current_user)], wattage: int
+    selector: MinerSelector,
+    current_user: Annotated[User, Security(get_current_user)],
+    wattage: int,
 ) -> bool:
     return await load_balance(wattage)

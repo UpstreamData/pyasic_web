@@ -30,7 +30,12 @@ from pyasic_web import settings
 from pyasic_web.api.data import data_manager
 from pyasic_web.auth import AUTH_SCHEME
 from pyasic_web.auth.users import User, get_current_user
-from pyasic_web.func.miners import get_current_miner_list, update_miner_list, get_miner_phases, update_miner_phases
+from pyasic_web.func.miners import (
+    get_current_miner_list,
+    update_miner_list,
+    get_miner_phases,
+    update_miner_phases,
+)
 from pyasic_web.func.users import get_user_ip_range
 
 from pyasic_web.templates import templates
@@ -76,7 +81,7 @@ async def manage_miners_ws(
                             ),
                             "errors": data[miner].get("errors", []),
                             "fault_light": data[miner].get("fault_light", False),
-                            "phase": miner_phases[miner]
+                            "phase": miner_phases[miner],
                         }
                     )
     except WebSocketDisconnect:

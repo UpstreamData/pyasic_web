@@ -206,6 +206,7 @@ async def dashboard_page(
         },
     )
 
+
 @router.post("/wattage", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def miner_wattage_page(request: Request):
     d = await request.json()
