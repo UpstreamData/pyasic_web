@@ -17,7 +17,7 @@
 import asyncio
 import json
 
-from pyasic.miners.miner_factory import miner_factory
+from pyasic import miner_factory
 from pyasic_web.errors.miner import MinerDataError
 from pyasic_web.func.web_settings import (
     get_current_settings,
