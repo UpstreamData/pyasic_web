@@ -30,7 +30,7 @@ from pyasic_web import settings
 from pyasic_web.api.data import data_manager
 from pyasic_web.auth import AUTH_SCHEME
 from pyasic_web.auth.users import User, get_current_user
-from pyasic_web.func.miners import get_current_miner_list
+from pyasic_web.func.miners import get_current_miner_list, update_miner_list
 from pyasic_web.func.users import get_user_ip_range
 
 from pyasic_web.templates import templates
@@ -127,13 +127,11 @@ async def manage_miners_remove_page(request: Request):
     miners = await get_current_miner_list("*")
     for miner_ip in miners_remove:
         miners.remove(miner_ip)
-    async with aiofiles.open(settings.MINER_LIST, "w") as file:
-        await file.write(json.dumps(miners))
+    await update_miner_list(miners)
     return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
 
 
 @router.post("/remove_all", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def manage_miners_remove_all_page(request: Request):
-    async with aiofiles.open(settings.MINER_LIST, "w") as file:
-        await file.write(json.dumps([]))
+    await update_miner_list([])
     return RedirectResponse(request.url_for("dashboard_page"), status_code=303)

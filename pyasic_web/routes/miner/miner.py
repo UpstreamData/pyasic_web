@@ -19,29 +19,23 @@ import json
 from typing import Annotated
 
 import aiofiles
+import pyasic
 from fastapi import APIRouter, Security
 from fastapi.exceptions import HTTPException
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 
-import pyasic
 from pyasic_web import settings
 from pyasic_web.api import v1
 from pyasic_web.auth import AUTH_SCHEME
 from pyasic_web.auth.users import get_current_user, User
-from pyasic_web.func.miners import get_current_miner_list
+from pyasic_web.func.miners import get_current_miner_list, update_miner_list
 from pyasic_web.func.users import get_user_ip_range
-from pyasic_web.func.web_settings import (
-    get_current_settings,
-)
-from pyasic_web.templates import card_exists, templates
+from pyasic_web.templates import templates
 from pyasic_web.templates.cards import (
     BasicCard,
-    CountCard,
     GraphCard,
-    PoolsCard,
     ErrorsCard,
-    LightsCard,
     GRAPH_MODIFIER,
     AvailableCards,
     BooleanCard,
@@ -237,18 +231,16 @@ async def miner_page(
     )
 
 
-@router.post("/remove", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
+@router.get("/remove", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def miner_remove_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miners = await get_current_miner_list("*")
     miners.remove(miner_ip)
-    async with aiofiles.open(settings.MINER_LIST, "w") as file:
-        await file.write(json.dumps(miners))
-
+    await update_miner_list(miners)
     return RedirectResponse(request.url_for("dashboard_page"), status_code=303)
 
 
-@router.post("/light", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
+@router.get("/light", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def miner_light_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miner = await pyasic.get_miner(miner_ip)

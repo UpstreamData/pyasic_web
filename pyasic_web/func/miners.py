@@ -13,7 +13,7 @@
 #  See the License for the specific language governing permissions and         -
 #  limitations under the License.                                              -
 # ------------------------------------------------------------------------------
-
+from __future__ import annotations
 import ipaddress
 import json
 import os
@@ -30,7 +30,7 @@ async def get_current_miner_list(allowed_ips: str = "*"):
     cur_miners = []
     if os.path.exists(settings.MINER_LIST):
         async with aiofiles.open(settings.MINER_LIST) as file:
-            cur_miners = [*cur_miners, *json.loads(await file.read())]
+            cur_miners = json.loads(await file.read())
     if not allowed_ips == "*":
         if isinstance(allowed_ips, str):
             allowed_ips = allowed_ips.replace(" ", "").split(",")
@@ -39,4 +39,25 @@ async def get_current_miner_list(allowed_ips: str = "*"):
             ip for ip in cur_miners if ipaddress.ip_address(ip) in network.hosts
         ]
     cur_miners = sorted(cur_miners, key=lambda x: ipaddress.ip_address(x))
+    return cur_miners
+
+
+async def update_miner_list(miners: list[str]):
+    async with aiofiles.open(settings.MINER_LIST, "w") as file:
+        await file.write(json.dumps(miners))
+
+    miner_phases = await get_miner_phases()
+    new_miner_phases = {}
+    for miner in miners:
+        new_miner_phases[miner] = miner_phases.get(miner)
+
+    async with aiofiles.open(settings.MINER_PHASE_LIST, "w") as file:
+        await file.write(json.dumps(new_miner_phases))
+
+
+async def get_miner_phases() -> dict:
+    cur_miners = {}
+    if os.path.exists(settings.MINER_PHASE_LIST):
+        async with aiofiles.open(settings.MINER_PHASE_LIST) as file:
+            cur_miners = json.loads(await file.read())
     return cur_miners

@@ -61,7 +61,7 @@
                     </li>
                     <li>
                         <a class="dropdown-item"
-                           href="http://{{ request.url.hostname }}:{% if request.url.port %}{{ request.url.port }}{% else %}80{% endif %}/miner/{{ miner }}/light"
+                           href="{{ url_for('miner_light_page', miner_ip=miner) }}"
                            role="button">
                             <svg class="m-0 p-0"
                                  style="fill: currentColor;
