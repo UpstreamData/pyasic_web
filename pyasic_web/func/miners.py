@@ -61,3 +61,14 @@ async def get_miner_phases() -> dict:
         async with aiofiles.open(settings.MINER_PHASE_LIST) as file:
             cur_miners = json.loads(await file.read())
     return cur_miners
+
+
+async def update_miner_phases(miners: list[str], phase: int):
+    current_phases = await get_miner_phases()
+    for miner in miners:
+        try:
+            current_phases[miner] = phase
+        except KeyError:
+            pass
+    async with aiofiles.open(settings.MINER_PHASE_LIST, "w") as file:
+        await file.write(json.dumps(current_phases))

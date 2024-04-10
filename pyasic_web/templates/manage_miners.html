@@ -32,6 +32,15 @@
                 <button class="btn btn-outline-warning"
                         onclick="restartBackendMiners()"
                         type="button">Restart Backend Miners</button>
+                <div class="input-group">
+                    <button class="btn col-9 btn-outline-info rounded-0" onclick="updatePhaseMiners()" type="button">Update Phase</button>
+                    <select class="form-select col-3 rounded-0 border-info" id="minerPhaseNumber">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+
+                </div>
                 <input type="checkbox"
                        class="btn-check select-all checkbox"
                        id="selectAllCheckbox"
@@ -83,6 +92,12 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td>Phase</td>
+                                        <td id="{{ miner }}_phase">
+                                            <div class="spinner-grow spinner-grow-sm" role="status"></div>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>Light</td>
                                         <td id="{{ miner }}_light">
                                             <div class="spinner-grow spinner-grow-sm" role="status"></div>
@@ -123,8 +138,9 @@
             var data = JSON.parse(event.data)
             document.getElementById(data["ip"] + "_model").innerHTML = data["model"]
             document.getElementById(data["ip"] + "_hashrate").innerHTML = data["hashrate"] + " TH/s"
-            document.getElementById(data["ip"] + "_chip_pct").innerHTML = data["percent_expected_chips"] + " %"
+            document.getElementById(data["ip"] + "_chip_pct").innerHTML = (data["percent_expected_chips"] || "???") + " %"
             document.getElementById(data["ip"] + "_errors").innerHTML = data["errors"].length
+            document.getElementById(data["ip"] + "_phase").innerHTML = data["phase"] || "???";
             if (data["fault_light"]) {
                 var fault_light_ico = 'On <svg class="ms-2 m-0 p-0" style="fill: currentColor; vertical-align: -.25em;" width="20" height="22" id="svg_fault_light"><use xlink:href="#light-on"></use></svg>'
             } else {
@@ -163,6 +179,18 @@
                     minerList.push(checkedBoxes[i].defaultValue);
                 }
                 post("{{ url_for('manage_miners_light_page') }}", {miners: minerList})
+            };
+        };
+
+        function updatePhaseMiners(event) {
+            var checkedBoxes = document.querySelectorAll('input[name=minerCheckboxes]:checked');
+            var phaseNum = document.getElementById("minerPhaseNumber").value;
+            if (checkedBoxes.length != 0) {
+                var minerList = [];
+                for (i = 0; i< checkedBoxes.length; i++) {
+                    minerList.push(checkedBoxes[i].defaultValue);
+                }
+                post("{{ url_for('manage_miners_phase_page') }}", {miners: minerList, phase: phaseNum})
             };
         };
 

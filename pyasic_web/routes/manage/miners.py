@@ -30,7 +30,7 @@ from pyasic_web import settings
 from pyasic_web.api.data import data_manager
 from pyasic_web.auth import AUTH_SCHEME
 from pyasic_web.auth.users import User, get_current_user
-from pyasic_web.func.miners import get_current_miner_list, update_miner_list
+from pyasic_web.func.miners import get_current_miner_list, update_miner_list, get_miner_phases, update_miner_phases
 from pyasic_web.func.users import get_user_ip_range
 
 from pyasic_web.templates import templates
@@ -60,6 +60,8 @@ async def manage_miners_ws(
 ):
     await websocket.accept()
     miners = await get_current_miner_list(await get_user_ip_range(current_user))
+    miner_phases = await get_miner_phases()
+    miner_phases = {k: v for k, v in miner_phases.items() if k in miners}
     try:
         async for data in data_manager.subscribe():
             for miner in miners:
@@ -74,6 +76,7 @@ async def manage_miners_ws(
                             ),
                             "errors": data[miner].get("errors", []),
                             "fault_light": data[miner].get("fault_light", False),
+                            "phase": miner_phases[miner]
                         }
                     )
     except WebSocketDisconnect:
@@ -106,6 +109,16 @@ async def manage_miners_reboot_page(request: Request):
         return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
     miners = await asyncio.gather(*[get_miner(miner) for miner in miners_light])
     await asyncio.gather(*[miner.reboot() for miner in miners])
+    return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
+
+
+@router.post("/phase")
+async def manage_miners_phase_page(request: Request):
+    miners_phase = (await request.json())["miners"]
+    phase_set = int((await request.json())["phase"])
+    if not miners_phase:
+        return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
+    await update_miner_phases(miners_phase, phase_set)
     return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
 
 
