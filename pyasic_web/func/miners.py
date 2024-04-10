@@ -15,6 +15,7 @@
 # ------------------------------------------------------------------------------
 
 import ipaddress
+import json
 import os
 
 import aiofiles
@@ -29,11 +30,11 @@ async def get_current_miner_list(allowed_ips: str = "*"):
     cur_miners = []
     if os.path.exists(settings.MINER_LIST):
         async with aiofiles.open(settings.MINER_LIST) as file:
-            async for line in file:
-                # noinspection PyUnresolvedReferences - type hinted as coroutine
-                cur_miners.append(line.strip())
+            cur_miners = [*cur_miners, *json.loads(await file.read())]
     if not allowed_ips == "*":
-        network = MinerNetwork.from_list(allowed_ips.replace(" ", "").split(","))
+        if isinstance(allowed_ips, str):
+            allowed_ips = allowed_ips.replace(" ", "").split(",")
+        network = MinerNetwork.from_list(allowed_ips)
         cur_miners = [
             ip for ip in cur_miners if ipaddress.ip_address(ip) in network.hosts
         ]

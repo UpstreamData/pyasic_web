@@ -15,8 +15,10 @@
 # ------------------------------------------------------------------------------
 
 import asyncio
+import json
 from typing import Annotated
 
+import aiofiles
 import websockets.exceptions
 from fastapi import APIRouter, Security
 from fastapi.requests import Request
@@ -54,9 +56,8 @@ async def miner_scan_page(
 @router.post("/add")
 async def miner_scan_add_page(request: Request):
     miners = await request.json()
-    with open(settings.MINER_LIST, "a+") as file:
-        for miner_ip in miners["miners"]:
-            file.write(miner_ip + "\n")
+    async with aiofiles.open(settings.MINER_LIST, "w") as file:
+        await file.write(json.dumps(miners["miners"]))
     return RedirectResponse(request.url_for("dashboard_page"), status_code=303)
 
 

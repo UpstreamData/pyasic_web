@@ -15,8 +15,10 @@
 # ------------------------------------------------------------------------------
 
 import asyncio
+import json
 from typing import Annotated
 
+import aiofiles
 from fastapi import APIRouter, Security
 from fastapi.exceptions import HTTPException
 from fastapi.requests import Request
@@ -240,9 +242,8 @@ async def miner_remove_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miners = await get_current_miner_list("*")
     miners.remove(miner_ip)
-    with open(settings.MINER_LIST, "w") as file:
-        for miner_ip in miners:
-            file.write(miner_ip + "\n")
+    async with aiofiles.open(settings.MINER_LIST, "w") as file:
+        await file.write(json.dumps(miners))
 
     return RedirectResponse(request.url_for("dashboard_page"), status_code=303)
 

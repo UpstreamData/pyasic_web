@@ -18,6 +18,7 @@ import asyncio
 import json
 from typing import Annotated
 
+import aiofiles
 import websockets.exceptions
 from fastapi import APIRouter, Security
 from fastapi.requests import Request
@@ -126,14 +127,13 @@ async def manage_miners_remove_page(request: Request):
     miners = await get_current_miner_list("*")
     for miner_ip in miners_remove:
         miners.remove(miner_ip)
-    with open(settings.MINER_LIST, "w") as file:
-        for miner_ip in miners:
-            file.write(miner_ip + "\n")
+    async with aiofiles.open(settings.MINER_LIST, "w") as file:
+        await file.write(json.dumps(miners))
     return RedirectResponse(request.url_for("manage_miners_page"), status_code=303)
 
 
 @router.post("/remove_all", dependencies=[Security(AUTH_SCHEME, scopes=["admin"])])
 async def manage_miners_remove_all_page(request: Request):
-    file = open(settings.MINER_LIST, "w")
-    file.close()
+    async with aiofiles.open(settings.MINER_LIST, "w") as file:
+        await file.write(json.dumps([]))
     return RedirectResponse(request.url_for("dashboard_page"), status_code=303)
