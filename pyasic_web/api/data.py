@@ -18,7 +18,6 @@ import json
 from typing import List, Literal, Union, Dict
 
 import pyasic
-from pyasic.misc import Singleton
 from pyasic_web.api.func import get_allowed_miners
 from pyasic_web.api.responses import (
     MinerSelector,
@@ -42,7 +41,7 @@ from pyasic_web.func.miners import get_current_miner_list
 from pyasic_web.func.web_settings import get_current_settings
 
 
-class MinerDataManager(metaclass=Singleton):
+class MinerDataManager:
     def __init__(self):
         self.data = {}
         self.miners = []
