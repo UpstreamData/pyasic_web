@@ -245,9 +245,9 @@ async def miner_light_page(request: Request):
     miner_ip = request.path_params["miner_ip"]
     miner = await pyasic.get_miner(miner_ip)
     if miner.light:
-        asyncio.create_task(miner.fault_light_off())
+        await miner.fault_light_off()
     else:
-        asyncio.create_task(miner.fault_light_on())
+        await miner.fault_light_on()
 
     return RedirectResponse(
         request.url_for("miner_page", miner_ip=miner_ip), status_code=303

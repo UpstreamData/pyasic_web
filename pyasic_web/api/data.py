@@ -110,6 +110,9 @@ async def get_miner_data(miner_ip: str):
             pyasic.get_miner(miner_ip), miner_identify_timeout
         )
 
+        if miner is None:
+            return {"ip": miner_ip, "py_error": MinerDataError.NO_RESPONSE.value}
+
         data = await asyncio.wait_for(miner.get_data(), miner_data_timeout)
 
         # return {"ip": str(miner_ip.ip), "hashrate": data.hashrate}
